@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "phase": "PHASE 2 - STRUCTURED INGESTION",
+  "samples": [
+    {
+      "id": "sample-post-order-001",
+      "description": "Site-specific post order update for visitor ID handling.",
+      "payload": {
+        "input_text": "For Sierra Ridge, overnight guards must verify a physical photo ID for all after-hours visitors before granting access. If the visitor only has a photo of an ID, call the resident before entry and note the exception in the log.",
+        "source": "manual_entry",
+        "community": "Sierra Ridge",
+        "received_at": "2026-05-14T13:30:00-04:00",
+        "classification": "",
+        "priority": "",
+        "target_folder": "",
+        "suggested_filename": "",
+        "normalized_markdown": ""
+      }
+    },
+    {
+      "id": "sample-incident-001",
+      "description": "Incident note requiring follow-up and QA review.",
+      "payload": {
+        "input_text": "At Harbor Point on 2026-05-14 around 07:45, the east gate arm stayed open after a vendor truck exited. Patrol secured the gate manually and notified maintenance. Need follow-up to confirm the gate controller is repaired.",
+        "source": "shift_note",
+        "community": "Harbor Point",
+        "received_at": "2026-05-14T08:05:00-04:00",
+        "classification": "",
+        "priority": "",
+        "target_folder": "",
+        "suggested_filename": "",
+        "normalized_markdown": ""
+      }
+    },
+    {
+      "id": "sample-automation-001",
+      "description": "n8n-ready automation idea without implementation.",
+      "payload": {
+        "input_text": "Create an n8n workflow later that accepts a webhook from the operations form, classifies the note, writes a Markdown file to the vault, and commits it to GitHub.",
+        "source": "planning_note",
+        "community": "global",
+        "received_at": "2026-05-14T14:00:00-04:00",
+        "classification": "",
+        "priority": "",
+        "target_folder": "",
+        "suggested_filename": "",
+        "normalized_markdown": ""
+      }
+    }
+  ]
+}
