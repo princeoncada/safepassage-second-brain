@@ -1,0 +1,66 @@
+{
+  "version": "1.0",
+  "phase": "PHASE 2 - STRUCTURED INGESTION",
+  "samples": [
+    {
+      "input_id": "sample-post-order-001",
+      "expected": {
+        "classification": "post_order",
+        "priority": "high",
+        "community": "Sierra Ridge",
+        "target_folder": "vault/03_Post_Orders",
+        "template_path": "templates/post_order_template.md",
+        "suggested_filename": "2026-05-14-sierra-ridge-after-hours-visitor-id-post-order.md",
+        "qa_risk": {
+          "severity": "high",
+          "requires_human_review": true,
+          "risk_categories": [
+            "access-control",
+            "security"
+          ]
+        },
+        "normalized_markdown": "---\ntitle: After-Hours Visitor ID Verification\ntype: post_order\ncommunity: Sierra Ridge\npriority: high\neffective_date: 2026-05-14\nsource: manual_entry\nstatus: draft\ntags:\n  - visitor-access\n  - id-verification\n  - after-hours\nlast_updated: 2026-05-14\nversion: 1.0\n---\n\n## Summary\n\nOvernight guards at Sierra Ridge must verify a physical photo ID for all after-hours visitors before granting access.\n\n## Details\n\nIf a visitor only presents a photo of an ID, the guard must call the resident before allowing entry and document the exception in the visitor log.\n\n## Required Actions\n\n- Verify physical photo ID for all after-hours visitors.\n- Call the resident before entry when only a photo of an ID is available.\n- Record any exception in the visitor log.\n\n## QA and Risk Notes\n\nThis post order affects access control and should be reviewed before activation.\n\n## Open Questions\n\n- Confirm the exact after-hours time window for Sierra Ridge.\n\n## Change History\n\n- 1.0 initial draft from manual entry on 2026-05-14.\n"
+      }
+    },
+    {
+      "input_id": "sample-incident-001",
+      "expected": {
+        "classification": "incident",
+        "priority": "high",
+        "community": "Harbor Point",
+        "target_folder": "vault/06_Incidents",
+        "template_path": "templates/incident_template.md",
+        "suggested_filename": "2026-05-14-harbor-point-east-gate-arm-incident.md",
+        "qa_risk": {
+          "severity": "high",
+          "requires_human_review": true,
+          "risk_categories": [
+            "access-control",
+            "incident-follow-up",
+            "security"
+          ]
+        },
+        "normalized_markdown": "---\ntitle: East Gate Arm Stayed Open\ntype: incident\ncommunity: Harbor Point\npriority: high\neffective_date: 2026-05-14\nsource: shift_note\nstatus: draft\ntags:\n  - gate-access\n  - maintenance\n  - incident-follow-up\nlast_updated: 2026-05-14\nversion: 1.0\n---\n\n## Summary\n\nThe Harbor Point east gate arm stayed open after a vendor truck exited on 2026-05-14 around 07:45.\n\n## Incident Details\n\nPatrol secured the gate manually and notified maintenance.\n\n## Follow-Up Required\n\n- Confirm the gate controller has been repaired.\n- Update this incident after maintenance confirms resolution.\n\n## QA and Risk Notes\n\nThis incident affects access control and requires follow-up verification.\n\n## Open Questions\n\n- Who from maintenance received the notification?\n- What time was the gate controller repaired?\n\n## Change History\n\n- 1.0 initial draft from shift note on 2026-05-14.\n"
+      }
+    },
+    {
+      "input_id": "sample-automation-001",
+      "expected": {
+        "classification": "automation",
+        "priority": "medium",
+        "community": "global",
+        "target_folder": "vault/10_Automations",
+        "template_path": "templates/workflow_template.md",
+        "suggested_filename": "2026-05-14-global-operations-form-ingestion-automation.md",
+        "qa_risk": {
+          "severity": "low",
+          "requires_human_review": false,
+          "risk_categories": [
+            "data-quality"
+          ]
+        },
+        "normalized_markdown": "---\ntitle: Operations Form Ingestion Automation\ntype: automation\ncommunity: global\npriority: medium\neffective_date: 2026-05-14\nsource: planning_note\nstatus: draft\ntags:\n  - n8n\n  - ingestion\n  - github\nlast_updated: 2026-05-14\nversion: 1.0\n---\n\n## Summary\n\nA future n8n workflow should accept operations form webhook submissions, classify each note, write a Markdown file to the vault, and commit the change to GitHub.\n\n## Details\n\nThis is a Phase 2 workflow design note only. It does not implement ChromaDB, RAG, Open WebUI, or advanced automations.\n\n## Required Actions\n\n- Define the webhook payload.\n- Connect the prompt chain for classification, routing, normalization, and QA risk checking.\n- Write the final Markdown to the routed vault folder.\n- Commit the resulting file to GitHub on master.\n\n## QA and Risk Notes\n\nValidate filenames, required metadata, and folder routing before enabling unattended writes.\n\n## Open Questions\n\n- Confirm which operations form will send the webhook.\n\n## Change History\n\n- 1.0 initial draft from planning note on 2026-05-14.\n"
+      }
+    }
+  ]
+}
