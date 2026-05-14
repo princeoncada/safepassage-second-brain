@@ -19,11 +19,17 @@ version: 1.0
 
 ## Applies To
 
+## Required Verification
+
 ## Agent Action
 
 ## Deny / Approve Logic
 
 ## Required Script
+
+## Escalation Rules
+
+## Exceptions
 
 ## QA Risk
 
