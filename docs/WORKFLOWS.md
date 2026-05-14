@@ -28,6 +28,10 @@ User raw input
 | Normalizer prompt | `prompts/summarization/normalizer.md` |
 | QA risk prompt | `prompts/compliance/qa_risk_checker.md` |
 | n8n workflow documentation | `workflows/n8n/PHASE_2_INGESTION_WORKFLOW.md` |
+| Importable n8n workflow | `workflows/n8n/phase_2_ingestion_workflow.json` |
+| Local n8n setup guide | `docs/N8N_SETUP.md` |
+| Local testing guide | `docs/LOCAL_TESTING.md` |
+| Webhook test payloads | `automation/ingestion/test_webhook_payload.json` |
 
 ## Routing Summary
 
@@ -56,6 +60,28 @@ Human review is required when:
 - QA risk severity is `high` or `critical`.
 - The item contains access control, life safety, legal, security, privacy, or credential risk.
 - Required metadata is missing and the item could affect operations.
+
+When human review is required, the Phase 2 workflow routes the generated Markdown to `vault/00_Inbox`. It does not treat the item as approved operational truth.
+
+## Helper Scripts
+
+| Script | Purpose |
+|---|---|
+| `automation/scripts/sanitize_filename.js` | Converts proposed filenames into safe lowercase kebab-case `.md` filenames. |
+| `automation/scripts/validate_metadata.js` | Checks normalized Markdown for required YAML frontmatter fields. |
+| `automation/scripts/validate_payload.js` | Validates canonical ingestion payload shape. |
+| `automation/scripts/write_markdown.js` | Safely writes Markdown under the configured vault path without overwriting by default. |
+| `automation/scripts/git_commit_push.js` | Runs Git add, commit, and push to `origin master`. |
+
+## Operational Workflow Export
+
+The importable n8n workflow is:
+
+```text
+workflows/n8n/phase_2_ingestion_workflow.json
+```
+
+It is intentionally inactive on import. Review environment variables, volume access, Git credentials, and webhook behavior before activating it.
 
 ## Phase Boundary
 
