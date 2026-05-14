@@ -42,7 +42,7 @@ version:
 
 ## QA Risk Checker Blocks A Write
 
-This is expected for high-risk content. Review the item manually when risk categories include:
+In the Phase 2 workflow, high-risk content should be routed to `vault/00_Inbox` for review. Review the item manually when risk categories include:
 
 - `access-control`
 - `life-safety`
@@ -51,15 +51,56 @@ This is expected for high-risk content. Review the item manually when risk categ
 - `security`
 - `credential-risk`
 
+## n8n Should Not Write Outside Inbox
+
+For review-required items, confirm the workflow writes to:
+
+```text
+vault/00_Inbox
+```
+
+Do not write directly to operational folders when:
+
+- `requires_human_review` is `true`
+- classification is `unknown`
+- QA risk severity is `high` or `critical`
+
 ## n8n Should Not Commit A File
 
 Do not commit when:
 
-- `requires_human_review` is `true`
 - `normalized_markdown` is empty
 - the target folder is outside `vault/`
 - the filename does not end in `.md`
 - the payload contains a real secret or credential
+
+## Workflow Import Fails
+
+Check:
+
+- `workflows/n8n/phase_2_ingestion_workflow.json` is valid JSON.
+- Your n8n version supports Webhook, Set, HTTP Request, Code, IF, Execute Command, and Respond to Webhook nodes.
+- The workflow remains inactive until reviewed.
+
+## Execute Command Cannot Find Helper Scripts
+
+The n8n runtime must be able to access:
+
+```text
+automation/scripts/git_commit_push.js
+```
+
+Run n8n from the repository root or mount the repository into the container so relative paths resolve correctly.
+
+## Git Push Fails
+
+Check:
+
+- n8n has Git installed.
+- `origin` points to the expected GitHub repository.
+- the checked out branch is `master`.
+- Git user name and email are configured.
+- GitHub credentials are available to the n8n runtime without committing secrets.
 
 ## Secret Appears In Input
 
@@ -73,4 +114,4 @@ Then flag the item with `credential-risk`.
 
 ## Phase Boundary Confusion
 
-Phase 2 only covers structured ingestion. Do not add ChromaDB, RAG, Open WebUI, or advanced automation implementation until a later phase explicitly starts.
+Phase 2 only covers structured ingestion. Do not add ChromaDB, RAG, Open WebUI, autonomous agents, vector databases, memory systems, semantic search, or advanced automation implementation until a later phase explicitly starts.
