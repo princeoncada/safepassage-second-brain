@@ -1,0 +1,24 @@
+# Environment
+.env
+
+# n8n local data
+.n8n/
+n8n_data/
+
+# ChromaDB future local data
+chroma_data/
+
+# Exports
+exports/docx/*.docx
+exports/pdf/*.pdf
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
