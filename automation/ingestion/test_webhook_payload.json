@@ -1,0 +1,76 @@
+{
+  "version": "1.0",
+  "phase": "PHASE 2 - STRUCTURED INGESTION",
+  "endpoint": "POST /webhook/phase-2-ingestion",
+  "description": "Realistic webhook payloads for local n8n testing. These examples contain no secrets.",
+  "examples": [
+    {
+      "id": "webhook-post-order-001",
+      "name": "Post order update",
+      "body": {
+        "input_text": "For Sierra Ridge, overnight guards must verify a physical photo ID for all after-hours visitors before granting access. If the visitor only has a photo of an ID, call the resident before entry and note the exception in the visitor log.",
+        "source": "manual_webhook_test",
+        "community": "Sierra Ridge",
+        "received_at": "2026-05-14T13:30:00-04:00"
+      },
+      "expected": {
+        "classification": "post_order",
+        "priority": "high",
+        "target_folder": "vault/00_Inbox",
+        "requires_human_review": true,
+        "reason": "Access-control content should be review-routed to the inbox."
+      }
+    },
+    {
+      "id": "webhook-incident-001",
+      "name": "Incident report",
+      "body": {
+        "input_text": "At Harbor Point on 2026-05-14 around 07:45, the east gate arm stayed open after a vendor truck exited. Patrol secured the gate manually and notified maintenance. Need follow-up to confirm the gate controller is repaired.",
+        "source": "manual_webhook_test",
+        "community": "Harbor Point",
+        "received_at": "2026-05-14T08:05:00-04:00"
+      },
+      "expected": {
+        "classification": "incident",
+        "priority": "high",
+        "target_folder": "vault/00_Inbox",
+        "requires_human_review": true,
+        "reason": "Gate access incident should be review-routed to the inbox."
+      }
+    },
+    {
+      "id": "webhook-automation-001",
+      "name": "Automation planning note",
+      "body": {
+        "input_text": "Create an n8n workflow later that accepts a webhook from the operations form, classifies the note, writes a Markdown file to the vault, and commits it to GitHub.",
+        "source": "manual_webhook_test",
+        "community": "global",
+        "received_at": "2026-05-14T14:00:00-04:00"
+      },
+      "expected": {
+        "classification": "automation",
+        "priority": "medium",
+        "target_folder": "vault/10_Automations",
+        "requires_human_review": false,
+        "reason": "Planning note can route to automations unless QA checker flags missing context."
+      }
+    },
+    {
+      "id": "webhook-unknown-001",
+      "name": "Unknown input",
+      "body": {
+        "input_text": "Need to remember the thing from yesterday before the next shift.",
+        "source": "manual_webhook_test",
+        "community": "",
+        "received_at": "2026-05-14T15:00:00-04:00"
+      },
+      "expected": {
+        "classification": "unknown",
+        "priority": "medium",
+        "target_folder": "vault/00_Inbox",
+        "requires_human_review": true,
+        "reason": "Input lacks enough operational context."
+      }
+    }
+  ]
+}
