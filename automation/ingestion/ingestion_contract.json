@@ -1,0 +1,143 @@
+{
+  "contract_name": "safepassage_phase_2_structured_ingestion",
+  "version": "1.0",
+  "phase": "PHASE 2 - STRUCTURED INGESTION",
+  "status": "in_progress",
+  "source_of_truth": "Markdown files in vault/",
+  "description": "Reusable contract for n8n and AI-assisted structured ingestion into the SafePassage Obsidian vault.",
+  "canonical_payload": {
+    "input_text": {
+      "type": "string",
+      "required": true,
+      "description": "Raw user-provided operational input."
+    },
+    "source": {
+      "type": "string",
+      "required": true,
+      "description": "Where the input came from, such as manual_entry, email, chat, call_note, or webhook."
+    },
+    "community": {
+      "type": "string",
+      "required": false,
+      "description": "Community name, global, or unknown."
+    },
+    "received_at": {
+      "type": "string",
+      "required": true,
+      "format": "ISO-8601 datetime",
+      "description": "Timestamp when n8n received the input."
+    },
+    "classification": {
+      "type": "string",
+      "required": false,
+      "allowed_values": [
+        "post_order",
+        "sop",
+        "incident",
+        "qa_rule",
+        "script",
+        "workflow",
+        "briefing",
+        "visitor_log",
+        "code_snippet",
+        "automation",
+        "training",
+        "community_profile",
+        "unknown"
+      ],
+      "description": "Document type selected by the intent classifier."
+    },
+    "priority": {
+      "type": "string",
+      "required": false,
+      "allowed_values": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "description": "Operational priority selected by the classifier or human reviewer."
+    },
+    "target_folder": {
+      "type": "string",
+      "required": false,
+      "description": "Vault folder selected by the document router."
+    },
+    "suggested_filename": {
+      "type": "string",
+      "required": false,
+      "description": "Lowercase kebab-case Markdown filename."
+    },
+    "normalized_markdown": {
+      "type": "string",
+      "required": false,
+      "description": "Metadata-complete Markdown content ready to write into the vault."
+    }
+  },
+  "processing_stages": [
+    {
+      "stage": 1,
+      "name": "webhook_receive",
+      "owner": "n8n",
+      "input": "raw request body",
+      "output": "canonical payload with input_text, source, community, and received_at"
+    },
+    {
+      "stage": 2,
+      "name": "intent_classification",
+      "owner": "AI prompt",
+      "prompt": "prompts/classification/intent_classifier.md",
+      "output": "classification, priority, confidence, short_summary, missing_fields, risk_signals"
+    },
+    {
+      "stage": 3,
+      "name": "document_routing",
+      "owner": "AI prompt plus routing_rules.json",
+      "prompt": "prompts/classification/document_router.md",
+      "output": "target_folder, template_path, suggested_filename, write_path"
+    },
+    {
+      "stage": 4,
+      "name": "normalization",
+      "owner": "AI prompt",
+      "prompt": "prompts/summarization/normalizer.md",
+      "output": "normalized_markdown and open_questions"
+    },
+    {
+      "stage": 5,
+      "name": "qa_risk_check",
+      "owner": "AI prompt",
+      "prompt": "prompts/compliance/qa_risk_checker.md",
+      "output": "severity, requires_human_review, risk_categories, recommended_action"
+    },
+    {
+      "stage": 6,
+      "name": "vault_write",
+      "owner": "n8n",
+      "output": "Markdown file written to target folder unless blocked for human review"
+    },
+    {
+      "stage": 7,
+      "name": "git_commit",
+      "owner": "n8n",
+      "output": "Committed Markdown change on master"
+    }
+  ],
+  "validation_rules": [
+    "input_text must not be empty",
+    "received_at must be present before classification",
+    "classification must be one supported document type or unknown",
+    "unknown classifications must route to vault/00_Inbox",
+    "normalized_markdown must include required YAML frontmatter before vault write",
+    "suggested_filename must end with .md",
+    "target_folder must match routing_rules.json",
+    "high or critical QA risk must require human review",
+    "secrets must not be written to vault files"
+  ],
+  "phase_boundaries": [
+    "No ChromaDB implementation",
+    "No RAG implementation",
+    "No Open WebUI implementation",
+    "No advanced automations beyond documented n8n-ready ingestion flow"
+  ]
+}
