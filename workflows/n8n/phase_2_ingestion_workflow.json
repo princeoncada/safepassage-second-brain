@@ -1,0 +1,578 @@
+{
+  "name": "Phase 2 - Structured Ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PHASE 2 ONLY\n\nThis workflow classifies, routes, normalizes, QA-checks, writes Markdown to the vault, and commits to master.\n\nRequired env vars:\n- DEEPSEEK_API_KEY\n- VAULT_PATH\n- GITHUB_REPO_URL\n\nDo not add ChromaDB, RAG, Open WebUI, autonomous agents, vector databases, memory systems, or semantic search to this workflow.",
+        "height": 320,
+        "width": 420
+      },
+      "id": "1dbe13fb-99f1-4f11-9618-f2ac6fb3c000",
+      "name": "Workflow Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -820,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "phase-2-ingestion",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b27a8f2e-dc1f-43a8-9103-6ea34743c001",
+      "name": "Webhook - Receive Raw Operational Text",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        160
+      ],
+      "webhookId": "phase-2-ingestion"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "payload-input-text",
+              "name": "input_text",
+              "type": "string",
+              "value": "={{ $json.body?.input_text || $json.body?.text || $json.input_text || $json.text || '' }}"
+            },
+            {
+              "id": "payload-source",
+              "name": "source",
+              "type": "string",
+              "value": "={{ $json.body?.source || $json.source || 'webhook' }}"
+            },
+            {
+              "id": "payload-community",
+              "name": "community",
+              "type": "string",
+              "value": "={{ $json.body?.community || $json.community || '' }}"
+            },
+            {
+              "id": "payload-received-at",
+              "name": "received_at",
+              "type": "string",
+              "value": "={{ $json.body?.received_at || $json.received_at || $now.toISO() }}"
+            },
+            {
+              "id": "payload-classification",
+              "name": "classification",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "id": "payload-priority",
+              "name": "priority",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "id": "payload-target-folder",
+              "name": "target_folder",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "id": "payload-suggested-filename",
+              "name": "suggested_filename",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "id": "payload-normalized-markdown",
+              "name": "normalized_markdown",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e1057097-2ef7-44da-84cb-bf520683c002",
+      "name": "Set - Build Canonical Ingestion Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -280,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.DEEPSEEK_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek-chat\",\n  \"temperature\": 0.1,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are the SafePassage structured ingestion intent classifier. Return only valid JSON. Classify the input as one of: post_order, sop, incident, qa_rule, script, workflow, briefing, visitor_log, code_snippet, automation, training, community_profile, unknown. Include classification, priority, community, confidence, short_summary, needs_human_review, missing_fields, and risk_signals. Do not invent facts. Do not include secrets.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Classify this raw input using the Phase 2 intent classifier rules from prompts/classification/intent_classifier.md:\\n\\n\" + JSON.stringify($json)\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "bb7589aa-ef8b-4cb0-8ee8-a5b648f1c003",
+      "name": "HTTP - DeepSeek Intent Classifier",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        20,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function parseJsonContent(content) {\n  if (typeof content !== 'string') return {};\n  const trimmed = content.trim().replace(/^```json\\s*/i, '').replace(/```$/i, '').trim();\n  return JSON.parse(trimmed);\n}\n\nconst payload = $('Set - Build Canonical Ingestion Payload').first().json;\nconst content = $json.choices?.[0]?.message?.content || '';\nconst classified = parseJsonContent(content);\n\nreturn [{\n  json: {\n    ...payload,\n    classification: classified.classification || 'unknown',\n    priority: classified.priority || 'medium',\n    community: classified.community || payload.community || '',\n    classifier: classified,\n    needs_human_review: classified.needs_human_review === true,\n    short_summary: classified.short_summary || ''\n  }\n}];"
+      },
+      "id": "5ee41410-42e1-4827-bf50-00b9c3e9c004",
+      "name": "Code - Parse Classification Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.DEEPSEEK_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek-chat\",\n  \"temperature\": 0.1,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are the SafePassage document router. Return only valid JSON with classification, target_folder, template_path, suggested_filename, write_path, needs_human_review, and routing_reason. Use the Phase 2 routing rules. Unknown input routes to vault/00_Inbox.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Route this classified payload using prompts/classification/document_router.md and automation/ingestion/routing_rules.json:\\n\\n\" + JSON.stringify($json)\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "d7400120-3807-43d1-ab2c-393759ebc005",
+      "name": "HTTP - DeepSeek Document Router",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        620,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function parseJsonContent(content) {\n  if (typeof content !== 'string') return {};\n  const trimmed = content.trim().replace(/^```json\\s*/i, '').replace(/```$/i, '').trim();\n  return JSON.parse(trimmed);\n}\n\nconst payload = $('Code - Parse Classification Response').first().json;\nconst content = $json.choices?.[0]?.message?.content || '';\nconst routed = parseJsonContent(content);\n\nreturn [{\n  json: {\n    ...payload,\n    target_folder: routed.target_folder || 'vault/00_Inbox',\n    template_path: routed.template_path || 'templates/workflow_template.md',\n    suggested_filename: routed.suggested_filename || 'unclassified-ingestion.md',\n    write_path: routed.write_path || '',\n    router: routed,\n    needs_human_review: payload.needs_human_review === true || routed.needs_human_review === true\n  }\n}];"
+      },
+      "id": "340d81f6-0816-4b2f-8e4c-d4530461c006",
+      "name": "Code - Parse Routing Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.DEEPSEEK_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek-chat\",\n  \"temperature\": 0.1,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are the SafePassage Markdown normalizer. Return only valid JSON with suggested_filename, normalized_markdown, metadata_complete, open_questions, and normalization_notes. The Markdown must include required YAML frontmatter. Do not invent facts. Do not include secrets.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Normalize this canonical ingestion payload using prompts/summarization/normalizer.md:\\n\\n\" + JSON.stringify($json)\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "fae9e897-f21e-4e07-99e8-0da06506c007",
+      "name": "HTTP - DeepSeek Normalizer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function parseJsonContent(content) {\n  if (typeof content !== 'string') return {};\n  const trimmed = content.trim().replace(/^```json\\s*/i, '').replace(/```$/i, '').trim();\n  return JSON.parse(trimmed);\n}\n\nconst payload = $('Code - Parse Routing Response').first().json;\nconst content = $json.choices?.[0]?.message?.content || '';\nconst normalized = parseJsonContent(content);\n\nreturn [{\n  json: {\n    ...payload,\n    suggested_filename: normalized.suggested_filename || payload.suggested_filename,\n    normalized_markdown: normalized.normalized_markdown || '',\n    metadata_complete: normalized.metadata_complete === true,\n    open_questions: normalized.open_questions || [],\n    normalizer: normalized\n  }\n}];"
+      },
+      "id": "99fc93ff-f406-4956-8bc9-ecf4d4ddb008",
+      "name": "Code - Parse Normalization Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.DEEPSEEK_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek-chat\",\n  \"temperature\": 0.1,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are the SafePassage QA risk checker. Return only valid JSON with severity, requires_human_review, risk_categories, risk_summary, recommended_action, metadata_warnings, and content_warnings. Do not repeat secrets.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Review this normalized payload using prompts/compliance/qa_risk_checker.md:\\n\\n\" + JSON.stringify($json)\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "94531d6c-16dc-4ea0-81b5-036ddc0ad009",
+      "name": "HTTP - DeepSeek QA Risk Checker",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1820,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function parseJsonContent(content) {\n  if (typeof content !== 'string') return {};\n  const trimmed = content.trim().replace(/^```json\\s*/i, '').replace(/```$/i, '').trim();\n  return JSON.parse(trimmed);\n}\n\nconst payload = $('Code - Parse Normalization Response').first().json;\nconst content = $json.choices?.[0]?.message?.content || '';\nconst qa = parseJsonContent(content);\n\nreturn [{\n  json: {\n    ...payload,\n    qa_risk: qa,\n    requires_human_review: payload.needs_human_review === true || qa.requires_human_review === true,\n    qa_severity: qa.severity || 'none'\n  }\n}];"
+      },
+      "id": "3004cc48-3ea1-4bc6-9b04-431e7d27c010",
+      "name": "Code - Parse QA Risk Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2120,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "human-review-condition",
+              "leftValue": "={{ $json.requires_human_review }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c38d163c-3a94-4d7e-a21b-e3b720067011",
+      "name": "IF - Requires Human Review",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2420,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  item.json.target_folder = 'vault/00_Inbox';\n  item.json.review_routing_reason = 'QA risk checker or classifier required human review.';\n  return item;\n});"
+      },
+      "id": "b512dbbd-379a-4e5d-b4d5-596ee2e4f012",
+      "name": "Code - Route Human Review To Inbox",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst path = require('path');\n\nconst requiredFields = ['title', 'type', 'community', 'priority', 'effective_date', 'source', 'status', 'tags', 'last_updated', 'version'];\n\nfunction sanitizeFilename(input) {\n  const raw = String(input || 'unclassified-ingestion.md').replace(/\\.md$/i, '');\n  const cleaned = raw.toLowerCase()\n    .replace(/[\\\\/:*?\"<>|]/g, ' ')\n    .replace(/[^a-z0-9\\s._-]/g, ' ')\n    .replace(/[\\s._-]+/g, '-')\n    .replace(/^-+|-+$/g, '');\n  return `${cleaned || 'unclassified-ingestion'}.md`;\n}\n\nfunction validateFrontmatter(markdown) {\n  const match = String(markdown || '').match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---\\r?\\n?/);\n  if (!match) throw new Error('normalized_markdown is missing YAML frontmatter.');\n  for (const field of requiredFields) {\n    const pattern = new RegExp(`^${field}:`, 'm');\n    if (!pattern.test(match[1])) throw new Error(`normalized_markdown is missing frontmatter field: ${field}`);\n  }\n}\n\nreturn items.map((item) => {\n  const payload = item.json;\n  const markdown = String(payload.normalized_markdown || '');\n  validateFrontmatter(markdown);\n\n  const vaultRoot = path.resolve(process.env.VAULT_PATH || 'vault');\n  const targetFolder = String(payload.target_folder || 'vault/00_Inbox').replace(/\\\\/g, '/');\n  const relativeFolder = targetFolder.replace(/^\\.?\\/*vault\\/*/, '') || '00_Inbox';\n  const filename = sanitizeFilename(payload.suggested_filename);\n  const destination = path.resolve(vaultRoot, relativeFolder, filename);\n\n  if (destination !== vaultRoot && !destination.startsWith(`${vaultRoot}${path.sep}`)) {\n    throw new Error('Refusing to write outside VAULT_PATH.');\n  }\n\n  if (fs.existsSync(destination)) {\n    throw new Error(`Refusing to overwrite existing file: ${destination}`);\n  }\n\n  fs.mkdirSync(path.dirname(destination), { recursive: true });\n  fs.writeFileSync(destination, markdown, 'utf8');\n\n  payload.written_file = destination;\n  payload.written_filename = filename;\n  payload.write_status = 'written';\n  return item;\n});"
+      },
+      "id": "a50f5eaf-f66c-4aaf-89b7-154d6dd0c013",
+      "name": "Code - Write Markdown File Locally",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3020,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node automation/scripts/git_commit_push.js \"chore: ingest structured knowledge\""
+      },
+      "id": "f5e7f66e-e13d-4557-8595-65bfe041f014",
+      "name": "Execute Command - Git Add Commit Push Master",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        3320,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $('Code - Write Markdown File Locally').first().json;\nlet gitResult = {};\ntry {\n  gitResult = JSON.parse($json.stdout || '{}');\n} catch {\n  gitResult = { raw_stdout: $json.stdout || '', raw_stderr: $json.stderr || '' };\n}\n\nreturn [{\n  json: {\n    status: 'accepted',\n    classification: payload.classification,\n    priority: payload.priority,\n    target_folder: payload.target_folder,\n    suggested_filename: payload.written_filename || payload.suggested_filename,\n    requires_human_review: payload.requires_human_review === true,\n    qa_severity: payload.qa_severity,\n    written_file: payload.written_file,\n    git: gitResult\n  }\n}];"
+      },
+      "id": "4465e0fc-d74b-4da3-802d-c6d9ecda3015",
+      "name": "Code - Build Webhook Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3620,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "51c2d6b9-08fc-40cc-87b1-18607f4f7016",
+      "name": "Respond to Webhook - Ingestion Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        3920,
+        160
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - Receive Raw Operational Text": {
+      "main": [
+        [
+          {
+            "node": "Set - Build Canonical Ingestion Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Build Canonical Ingestion Payload": {
+      "main": [
+        [
+          {
+            "node": "HTTP - DeepSeek Intent Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - DeepSeek Intent Classifier": {
+      "main": [
+        [
+          {
+            "node": "Code - Parse Classification Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Parse Classification Response": {
+      "main": [
+        [
+          {
+            "node": "HTTP - DeepSeek Document Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - DeepSeek Document Router": {
+      "main": [
+        [
+          {
+            "node": "Code - Parse Routing Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Parse Routing Response": {
+      "main": [
+        [
+          {
+            "node": "HTTP - DeepSeek Normalizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - DeepSeek Normalizer": {
+      "main": [
+        [
+          {
+            "node": "Code - Parse Normalization Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Parse Normalization Response": {
+      "main": [
+        [
+          {
+            "node": "HTTP - DeepSeek QA Risk Checker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - DeepSeek QA Risk Checker": {
+      "main": [
+        [
+          {
+            "node": "Code - Parse QA Risk Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Parse QA Risk Response": {
+      "main": [
+        [
+          {
+            "node": "IF - Requires Human Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Requires Human Review": {
+      "main": [
+        [
+          {
+            "node": "Code - Route Human Review To Inbox",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code - Write Markdown File Locally",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Route Human Review To Inbox": {
+      "main": [
+        [
+          {
+            "node": "Code - Write Markdown File Locally",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Write Markdown File Locally": {
+      "main": [
+        [
+          {
+            "node": "Execute Command - Git Add Commit Push Master",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command - Git Add Commit Push Master": {
+      "main": [
+        [
+          {
+            "node": "Code - Build Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Build Webhook Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook - Ingestion Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "phase-2-structured-ingestion-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "Importable Phase 2 structured ingestion workflow. Uses DeepSeek through OpenAI-compatible HTTP requests and writes Markdown to the local vault."
+  },
+  "tags": [
+    {
+      "name": "phase-2"
+    },
+    {
+      "name": "structured-ingestion"
+    }
+  ]
+}
