@@ -1,0 +1,99 @@
+{
+  "version": "1.0",
+  "phase": "PHASE 2 - STRUCTURED INGESTION",
+  "default_route": {
+    "classification": "unknown",
+    "target_folder": "vault/00_Inbox",
+    "template_path": "templates/workflow_template.md",
+    "requires_human_review": true
+  },
+  "archive_route": {
+    "classification": "archived",
+    "target_folder": "vault/99_Archive",
+    "template_path": "templates/workflow_template.md",
+    "requires_human_review": false
+  },
+  "routes": [
+    {
+      "classification": "briefing",
+      "target_folder": "vault/01_Daily_Briefings",
+      "template_path": "templates/briefing_template.md"
+    },
+    {
+      "classification": "community_profile",
+      "target_folder": "vault/02_Communities",
+      "template_path": "templates/workflow_template.md"
+    },
+    {
+      "classification": "post_order",
+      "target_folder": "vault/03_Post_Orders",
+      "template_path": "templates/post_order_template.md"
+    },
+    {
+      "classification": "qa_rule",
+      "target_folder": "vault/04_QA_Rules",
+      "template_path": "templates/qa_template.md"
+    },
+    {
+      "classification": "script",
+      "target_folder": "vault/05_Scripts",
+      "template_path": "templates/workflow_template.md"
+    },
+    {
+      "classification": "incident",
+      "target_folder": "vault/06_Incidents",
+      "template_path": "templates/incident_template.md"
+    },
+    {
+      "classification": "visitor_log",
+      "target_folder": "vault/07_Visitor_Logs",
+      "template_path": "templates/visitor_log_template.md"
+    },
+    {
+      "classification": "training",
+      "target_folder": "vault/08_Training",
+      "template_path": "templates/workflow_template.md"
+    },
+    {
+      "classification": "sop",
+      "target_folder": "vault/09_SOPs",
+      "template_path": "templates/sop_template.md"
+    },
+    {
+      "classification": "automation",
+      "target_folder": "vault/10_Automations",
+      "template_path": "templates/workflow_template.md"
+    },
+    {
+      "classification": "workflow",
+      "target_folder": "vault/10_Automations",
+      "template_path": "templates/workflow_template.md"
+    },
+    {
+      "classification": "code_snippet",
+      "target_folder": "vault/11_Code_Snippets",
+      "template_path": "templates/code_snippet_template.md"
+    },
+    {
+      "classification": "unknown",
+      "target_folder": "vault/00_Inbox",
+      "template_path": "templates/workflow_template.md",
+      "requires_human_review": true
+    }
+  ],
+  "filename_convention": {
+    "format": "yyyy-mm-dd-community-topic-type.md",
+    "case": "lowercase kebab-case",
+    "unsafe_characters": [
+      "\\",
+      "/",
+      ":",
+      "*",
+      "?",
+      "\"",
+      "<",
+      ">",
+      "|"
+    ]
+  }
+}
