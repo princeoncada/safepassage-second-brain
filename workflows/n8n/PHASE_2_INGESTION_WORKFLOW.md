@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 2 workflow documentation is ready for n8n buildout. This file describes the intended workflow but does not include an exported n8n workflow yet.
+Phase 2 workflow documentation is ready for local n8n validation. The importable workflow export is `workflows/n8n/phase_2_ingestion_workflow.json`.
 
 ## Goal
 
@@ -51,8 +51,8 @@ The webhook must produce the canonical payload defined in `automation/ingestion/
 | 5 | AI Request or Lookup | Run `prompts/classification/document_router.md` and validate against `automation/ingestion/routing_rules.json`. |
 | 6 | AI Request | Run `prompts/summarization/normalizer.md`. |
 | 7 | AI Request | Run `prompts/compliance/qa_risk_checker.md`. |
-| 8 | IF | If human review is required, route to `vault/00_Inbox` or stop for review. |
-| 9 | Write Binary File or Execute Command | Write Markdown to the selected `vault/` folder. |
+| 8 | IF | If human review is required, route the Markdown to `vault/00_Inbox`. |
+| 9 | Code | Write Markdown to the selected `vault/` folder. |
 | 10 | Execute Command | Run Git add and commit on `master`. |
 | 11 | Respond to Webhook | Return classification, filename, target folder, and review status. |
 
@@ -61,7 +61,7 @@ The webhook must produce the canonical payload defined in `automation/ingestion/
 - Do not write files outside `vault/`.
 - Do not write secrets into Markdown.
 - Do not call ChromaDB, RAG, or Open WebUI in Phase 2.
-- Do not make unattended writes when `qa_risk_checker` returns `requires_human_review: true`.
+- When `qa_risk_checker` returns `requires_human_review: true`, write only to `vault/00_Inbox`.
 - Do not commit generated n8n credentials, `.env`, or `n8n_data`.
 - Keep workflow exports in `workflows/n8n/` once the workflow is built.
 
@@ -78,6 +78,12 @@ The webhook must produce the canonical payload defined in `automation/ingestion/
 }
 ```
 
-## Manual Build Notes
+## Importable Workflow
 
-The current repository contains the contract, prompts, routing rules, and sample fixtures needed to build this workflow in n8n. The actual n8n export should be added later after manual credential setup and test execution.
+Import this file into n8n:
+
+```text
+workflows/n8n/phase_2_ingestion_workflow.json
+```
+
+Use `docs/N8N_SETUP.md` and `docs/LOCAL_TESTING.md` for setup and validation. Phase 2 is not complete until local import, API calls, vault writes, and Git push behavior are verified.
