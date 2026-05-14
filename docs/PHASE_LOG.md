@@ -36,19 +36,22 @@ IN PROGRESS
 - [x] Expected sample outputs created
 - [x] n8n ingestion workflow documentation created
 - [x] Phase 2 validation checklist created
+- [x] Importable n8n workflow JSON created
+- [x] Helper scripts created
+- [x] Webhook test payloads created
+- [x] Local setup and testing docs created
 
 ## Phase 2 Remaining Work
 
-- [ ] Build the actual n8n workflow from `workflows/n8n/PHASE_2_INGESTION_WORKFLOW.md`
-- [ ] Export the tested n8n workflow into `workflows/n8n/`
+- [ ] Import `workflows/n8n/phase_2_ingestion_workflow.json` into local n8n
 - [ ] Run real prompt-chain tests against sample inputs
 - [ ] Confirm generated Markdown writes correctly into `vault/`
 - [ ] Confirm n8n can commit generated files to GitHub on `master`
 
 ## Known Issues
 
-- The actual n8n workflow export is not added yet.
-- Human review handling is documented but not implemented in n8n yet.
+- The n8n workflow export exists but has not been locally imported or executed yet.
+- Human review routing is included in the workflow design but has not been locally validated yet.
 
 ## Validation Status
 
