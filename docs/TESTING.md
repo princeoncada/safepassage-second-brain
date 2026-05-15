@@ -102,7 +102,7 @@ The secret scan should return no real secrets. Placeholder values in `.env.examp
 
 ## Current Checkpoint Status
 
-Phase 2 Minimal POW, Phase 3A Retrieval POW, and Phase 3B Grounded Answering POW passed on 2026-05-15. The system is a working proof of work, not a finished final product.
+Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, and Phase 3D Local API Wrapper passed on 2026-05-15. Phase 3E Open WebUI integration is documentation and local UI configuration over the existing FastAPI backend. The system is a working proof of work, not a finished final product.
 
 ## Phase 2 Minimal POW Validated Tests
 
@@ -317,4 +317,42 @@ Expected:
 - `no_ai=true` returns retrieved sources without DeepSeek.
 - Atlantis Bay refuses safely.
 - existing CLI scripts still work.
-- no Open WebUI integration exists yet.
+- Open WebUI remains presentation-only and does not bypass FastAPI.
+
+## Phase 3E Open WebUI Validation
+
+First validate FastAPI directly:
+
+```powershell
+python -m uvicorn api.main:app --reload --port 8000
+```
+
+Then configure Open WebUI to call:
+
+```text
+POST http://localhost:8000/ask
+```
+
+If Open WebUI runs in Docker and FastAPI runs on the host:
+
+```text
+POST http://host.docker.internal:8000/ask
+```
+
+Validate these prompts in Open WebUI:
+
+```text
+What are Sierra Ridge overnight visitor ID rules?
+What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?
+What happened with tailgating at Monterey?
+What is the vehicle policy for Atlantis Bay?
+```
+
+Expected:
+
+- grounded answers appear in the UI;
+- citations appear;
+- retrieval confidence appears;
+- Atlantis Bay refuses safely;
+- no hallucinated policy appears;
+- existing CLI scripts and FastAPI `/ask` still work.
