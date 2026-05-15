@@ -107,3 +107,24 @@ These are not blockers.
 8. Git auto-commit remains deferred.
 
 Recommended next phase: PHASE 3C - RAG QUALITY HARDENING. After Phase 3C, consider Open WebUI integration.
+
+## Phase 3C Hardening
+
+Phase 3C hardens quality without adding major features:
+
+- near-duplicate chunk reduction;
+- community/type query hints;
+- section reranking;
+- stronger insufficient-context refusal;
+- cleaner answer citation output.
+
+Validation:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+python rag/scripts/query_vault.py "overnight visitors must present physical ID before access" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+```
+
+Details: `rag/docs/PHASE_3C_RAG_QUALITY_HARDENING.md`.
