@@ -83,6 +83,17 @@ question
 
 Phase 3C adds heuristic quality hardening only: dedupe, reranking, citation cleanup, and conservative insufficient-context detection. It does not add new databases or UI layers.
 
+### Local API
+
+```text
+HTTP request
+-> FastAPI /ask endpoint
+-> existing RAG retrieval/answer logic
+-> JSON response with answer, citations, confidence, and retrieved sources
+```
+
+Phase 3D exposes local HTTP access only. FastAPI does not store memory, edit the vault, or replace the Markdown source of truth.
+
 ## Phase 3A Retrieval Flow
 
 Markdown files in `vault/`
