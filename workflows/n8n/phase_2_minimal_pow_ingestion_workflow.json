@@ -1,1 +1,25 @@
-PLACEHOLDER
+{
+  "name": "Phase 2 Minimal POW Ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "phase-2-minimal-pow-ingest",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "860d03b6-e8fe-421a-af6c-741db290e2c2",
+      "name": "Webhook - Minimal POW Ingest",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        0
+      ]
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
