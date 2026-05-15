@@ -213,3 +213,45 @@ These are not blockers.
 6. Incident documents need richer structured fields. Future fix: add time, lane, vehicle details, action taken, escalation, and camera reference.
 7. Open Questions may contain generic AI filler. Future fix: include them only when confidence is low or required fields are missing.
 8. Git auto-commit remains deferred. Future fix: add controlled sync later.
+
+## Phase 3C RAG Quality Hardening Validation
+
+Rebuild:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Retrieval:
+
+```powershell
+python rag/scripts/query_vault.py "overnight visitors must present physical ID before access" --top-k 5
+python rag/scripts/query_vault.py "What happened with tailgating at Monterey?" --top-k 5
+python rag/scripts/query_vault.py "What should the agent do if digital ID is presented instead of physical ID?" --top-k 5
+```
+
+Expected:
+
+- Sierra Ridge `post_order` appears top 3 for physical ID.
+- Monterey `incident` appears top 3 for tailgating.
+- Sierra Ridge `qa_rule` appears top 3 for digital ID.
+- low-value sections do not dominate.
+- duplicate near-identical chunks are reduced.
+
+Answering:
+
+```powershell
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What happened with tailgating at Monterey?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+python rag/scripts/answer_vault.py "What are Sierra Ridge overnight visitor ID rules?" --no-ai --show-context --top-k 5
+```
+
+Expected:
+
+- answer citations are limited to sources actually cited by the generated answer;
+- Atlantis Bay refuses before inventing a policy;
+- output shows retrieval confidence and refusal reason when context is weak.
+
+The user will manually review and commit Phase 3C changes.
