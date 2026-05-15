@@ -4,6 +4,7 @@ Current status: WORKING PROOF OF WORK
 
 - Phase 3A retrieval works.
 - Phase 3B grounded answering works.
+- Phase 3D local API wrapper is available for HTTP access.
 - Open WebUI is not implemented yet.
 
 Phase 3A tests whether local semantic search can retrieve the right Markdown chunks from `vault/`.
@@ -128,3 +129,41 @@ python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?
 ```
 
 Details: `rag/docs/PHASE_3C_RAG_QUALITY_HARDENING.md`.
+
+## Phase 3D Local API
+
+Start the local FastAPI wrapper:
+
+```powershell
+python -m uvicorn api.main:app --reload --port 8000
+```
+
+Ask through HTTP:
+
+```powershell
+Invoke-RestMethod `
+  -Method POST `
+  -Uri "http://localhost:8000/ask" `
+  -ContentType "application/json" `
+  -Body '{
+    "question":"What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?",
+    "top_k":5
+  }'
+```
+
+Retrieval-only:
+
+```powershell
+Invoke-RestMethod `
+  -Method POST `
+  -Uri "http://localhost:8000/ask" `
+  -ContentType "application/json" `
+  -Body '{
+    "question":"What are Sierra Ridge overnight visitor ID rules?",
+    "top_k":5,
+    "no_ai":true,
+    "show_context":true
+  }'
+```
+
+The API is only a local interface wrapper. Markdown remains the source of truth and ChromaDB remains rebuildable derived data.
