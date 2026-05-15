@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-CHECKPOINT LOCKED AFTER PHASE 3B POW. Phase 2 Minimal POW, Phase 3A Retrieval POW, and Phase 3B Grounded Answering POW are validated and passed.
+PHASE 3E OPEN WEBUI INTEGRATION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, and Phase 3D Local API Wrapper are validated and passed.
 
 ## What Exists
 
@@ -16,6 +16,8 @@ CHECKPOINT LOCKED AFTER PHASE 3B POW. Phase 2 Minimal POW, Phase 3A Retrieval PO
 - Phase 3A local RAG scripts under `rag/` for disposable ChromaDB indexing and retrieval-only querying.
 - Phase 3A retrieval quality refinement filters low-value sections by default and prioritizes useful evidence sections.
 - Phase 3B CLI answer generation in `rag/scripts/answer_vault.py`, grounded only in retrieved ChromaDB chunks.
+- Phase 3D FastAPI wrapper under `api/` for local HTTP access.
+- Phase 3E Open WebUI documentation under `openwebui/` for presentation-only UI integration.
 
 ## Current Stable Components
 
@@ -23,6 +25,9 @@ CHECKPOINT LOCKED AFTER PHASE 3B POW. Phase 2 Minimal POW, Phase 3A Retrieval PO
 - `rag/scripts/index_vault.py`
 - `rag/scripts/query_vault.py`
 - `rag/scripts/answer_vault.py`
+- `api/main.py`
+- `api/service.py`
+- `api/schemas.py`
 
 Do not revive the old complex Phase 2 workflow unless specifically requested. The minimal POW workflow is the current stable ingestion base.
 
@@ -50,7 +55,7 @@ Future AI work should:
 
 ## Do Not Do Yet
 
-- Do not implement Open WebUI.
+- Do not move retrieval, embeddings, ChromaDB, memory, ingestion, or business logic into Open WebUI.
 - Do not add advanced automations beyond the documented Phase 2 ingestion workflow.
 - Do not add autonomous agents, advanced memory systems, automatic memory editing, or dashboards.
 - Do not use cloud embeddings.
@@ -63,7 +68,7 @@ PHASE 3C - RAG QUALITY HARDENING
 
 Focus on dedupe improvement, citation cleanup, section reranking, title/filename compression, answer citation alignment, and stronger insufficient-context filtering.
 
-After Phase 3C, consider Open WebUI integration.
+After Phase 3C, Phase 3D added FastAPI access and Phase 3E documents Open WebUI as a presentation-only client.
 
 ## Phase 3C In Progress
 
@@ -90,6 +95,25 @@ The `/ask` endpoint wraps the existing `rag/scripts/answer_vault.py` logic. It d
 
 The user will manually review and commit. Do not run `git commit` or `git push`.
 
+## Phase 3E In Progress
+
+Phase 3E documents Open WebUI as a presentation layer that calls the local FastAPI backend.
+
+Created docs:
+
+- `openwebui/README.md`
+- `openwebui/examples/openwebui_connection_example.md`
+
+Architecture boundary:
+
+```text
+Open WebUI -> FastAPI -> retrieval -> grounded answering -> citations/refusal
+```
+
+Do not move retrieval, embeddings, ChromaDB, memory, ingestion, or business logic into Open WebUI. Do not add agents, tool calling, automatic vault editing, workflow automation, or Git auto-commit.
+
+The user will manually review and commit. Do not run `git commit` or `git push`.
+
 ## Phase 3A Exit Criteria
 
 Phase 3A should only be marked validated after:
@@ -109,7 +133,7 @@ Phase 3B should only be marked validated after:
 - `answer_vault.py --no-ai --show-context` works without an API key;
 - generated answers cite source file and section;
 - insufficient context produces a safe refusal;
-- no Open WebUI, n8n changes, agents, or automation are added.
+- no Open WebUI-hosted retrieval, n8n changes, agents, or automation are added.
 
 ## Phase 2 Exit Criteria
 
