@@ -13,6 +13,13 @@ services:
       - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
       - GENERIC_TIMEZONE=Asia/Manila
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - VAULT_PATH=${VAULT_PATH}
+      - N8N_ENABLE_EXECUTIONS_PROCESS=main
+      - NODE_FUNCTION_ALLOW_EXTERNAL=*
+      - NODE_FUNCTION_ALLOW_BUILTIN=*
+      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
+      - N8N_RUNNERS_ENABLED=true
     volumes:
       - ./n8n_data:/home/node/.n8n
       - ./vault:/data/vault
