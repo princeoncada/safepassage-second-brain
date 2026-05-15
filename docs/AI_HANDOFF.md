@@ -77,6 +77,19 @@ Current Phase 3C changes are intentionally narrow:
 
 The user will manually review and commit. Do not run `git commit` or `git push`.
 
+## Phase 3D In Progress
+
+Phase 3D adds a local FastAPI wrapper only:
+
+- `api/main.py`
+- `api/schemas.py`
+- `api/service.py`
+- `api/README.md`
+
+The `/ask` endpoint wraps the existing `rag/scripts/answer_vault.py` logic. It does not add Open WebUI, n8n changes, agents, memory editing, or Git automation.
+
+The user will manually review and commit. Do not run `git commit` or `git push`.
+
 ## Phase 3A Exit Criteria
 
 Phase 3A should only be marked validated after:
