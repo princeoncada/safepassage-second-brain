@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 3B - ANSWER GENERATION FROM RETRIEVED VAULT CONTEXT is in progress. Phase 2 Minimal POW ingestion and Phase 3A retrieval are working locally and must not be rewritten.
+CHECKPOINT LOCKED AFTER PHASE 3B POW. Phase 2 Minimal POW, Phase 3A Retrieval POW, and Phase 3B Grounded Answering POW are validated and passed.
 
 ## What Exists
 
@@ -17,6 +17,15 @@ PHASE 3B - ANSWER GENERATION FROM RETRIEVED VAULT CONTEXT is in progress. Phase 
 - Phase 3A retrieval quality refinement filters low-value sections by default and prioritizes useful evidence sections.
 - Phase 3B CLI answer generation in `rag/scripts/answer_vault.py`, grounded only in retrieved ChromaDB chunks.
 
+## Current Stable Components
+
+- `workflows/n8n/phase_2_minimal_pow_ingestion_workflow.json`
+- `rag/scripts/index_vault.py`
+- `rag/scripts/query_vault.py`
+- `rag/scripts/answer_vault.py`
+
+Do not revive the old complex Phase 2 workflow unless specifically requested. The minimal POW workflow is the current stable ingestion base.
+
 ## Continue From Here
 
 Future AI work should:
@@ -28,9 +37,16 @@ Future AI work should:
 5. Keep prompts modular.
 6. Add or refine samples when document type behavior changes.
 7. Keep `docs/PHASE_LOG.md` accurate.
-8. Keep `workflows/n8n/phase_2_ingestion_workflow.json` inactive by default until local validation is complete.
+8. Keep `workflows/n8n/phase_2_minimal_pow_ingestion_workflow.json` as the stable ingestion base.
 9. Treat `vault/` Markdown as the source of truth.
 10. Treat `rag/chroma/` as disposable derived data.
+
+## Do Not Touch Without Explicit Request
+
+- Do not rewrite the working Phase 2 Minimal POW workflow.
+- Do not rewrite Phase 3A retrieval scripts from scratch.
+- Do not rewrite Phase 3B answering from scratch.
+- Do not revive the old complex Phase 2 workflow.
 
 ## Do Not Do Yet
 
@@ -40,6 +56,14 @@ Future AI work should:
 - Do not use cloud embeddings.
 - Do not expand Phase 3B beyond retrieved-context answer generation.
 - Do not commit secrets, real API keys, `.env`, `n8n_data`, or generated credential files.
+
+## Recommended Next Phase
+
+PHASE 3C - RAG QUALITY HARDENING
+
+Focus on dedupe improvement, citation cleanup, section reranking, title/filename compression, answer citation alignment, and stronger insufficient-context filtering.
+
+After Phase 3C, consider Open WebUI integration.
 
 ## Phase 3A Exit Criteria
 

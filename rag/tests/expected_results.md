@@ -2,6 +2,16 @@
 
 Phase 3A passes when semantic retrieval returns the right source chunks from `vault/`. It does not need to generate answers.
 
+Validated status: PASSED
+
+Validated index output:
+
+```text
+Indexed 26 chunks from 7 files after filtering
+Skipped low-value sections: 21
+Skipped duplicate chunks: 2
+```
+
 By default, the index excludes low-value sections:
 
 - `Change History`
@@ -71,3 +81,11 @@ To inspect low-value sections for debugging, rebuild and query with:
 python rag/scripts/index_vault.py --include-low-value-sections
 python rag/scripts/query_vault.py "What are Sierra Ridge physical ID rules?" --include-low-value-sections
 ```
+
+## Known Issues
+
+These are not blockers:
+
+- duplicate source files still appear in retrieval results when generated test files contain nearly identical Sierra Ridge post orders;
+- retrieval ranking can place QA Notes above Summary or Details;
+- titles and filenames are too verbose.

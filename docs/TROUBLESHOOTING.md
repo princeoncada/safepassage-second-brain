@@ -114,7 +114,7 @@ Then flag the item with `credential-risk`.
 
 ## Phase Boundary Confusion
 
-Phase 2 only covers structured ingestion. Do not add ChromaDB, RAG, Open WebUI, autonomous agents, vector databases, memory systems, semantic search, or advanced automation implementation until a later phase explicitly starts.
+Phase 2 only covers structured ingestion. Phase 3A retrieval and Phase 3B grounded answering are now validated proof-of-work layers. Do not add Open WebUI, autonomous agents, advanced memory systems, or automation implementation until a later phase explicitly starts.
 
 ## Phase 3A Index Has No Results
 
@@ -176,6 +176,34 @@ pip install -r rag/requirements.txt
 ```
 
 Phase 3A uses local `sentence-transformers` embeddings and does not require API keys.
+
+## Hugging Face Token Warning
+
+An `HF_TOKEN` warning from `sentence-transformers` or Hugging Face is non-blocking for the local model used in this proof of work. Indexing and querying can still pass without `HF_TOKEN`.
+
+## ChromaDB Reset Is Safe
+
+ChromaDB is disposable derived data. Reset it safely with:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+```
+
+Then rebuild:
+
+```powershell
+python rag/scripts/index_vault.py
+```
+
+The Markdown vault remains the source of truth.
+
+## Duplicate Retrieval Results
+
+Duplicates can happen if generated test files are not cleaned. This is a known non-blocking refinement item. Future work should add stronger dedupe by normalized title + section + community, or clean duplicate generated test files.
+
+## Weak Context Refusal
+
+The weak context threshold may trigger refusal correctly. If the retrieved chunks do not directly answer the question, Phase 3B should say the vault does not contain enough information to answer safely.
 
 ## Phase 3B Missing DeepSeek Key
 

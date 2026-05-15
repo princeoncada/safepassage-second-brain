@@ -1,5 +1,11 @@
 # Phase 3 Local RAG Proof of Work
 
+Current status: WORKING PROOF OF WORK
+
+- Phase 3A retrieval works.
+- Phase 3B grounded answering works.
+- Open WebUI is not implemented yet.
+
 Phase 3A tests whether local semantic search can retrieve the right Markdown chunks from `vault/`.
 
 Phase 3B adds minimal grounded answer generation using only retrieved vault chunks.
@@ -57,3 +63,47 @@ python rag/scripts/reset_chroma.py --yes
 ```
 
 The ChromaDB index is disposable. Rebuild it any time from the Markdown vault.
+
+## Validated Results
+
+Indexing:
+
+```text
+Indexed 26 chunks from 7 files after filtering
+Skipped low-value sections: 21
+Skipped duplicate chunks: 2
+```
+
+Retrieval passed for:
+
+```text
+overnight visitors must present physical ID before access
+What happened with tailgating at Monterey?
+What should the agent do if digital ID is presented instead of physical ID?
+```
+
+Answering passed for:
+
+```text
+What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?
+What happened with tailgating at Monterey?
+What are Sierra Ridge overnight visitor ID rules?
+What is the vehicle policy for Atlantis Bay?
+```
+
+The first three answer from retrieved context. Atlantis Bay refuses with insufficient context.
+
+## Known Issues / Next Refinements
+
+These are not blockers.
+
+1. Duplicate source files still appear in retrieval results.
+2. Citations currently list all retrieved chunks, including weak or less relevant chunks.
+3. Retrieval ranking can place QA Notes above Summary or Details.
+4. Source numbering between generated answer and printed citation list can be confusing.
+5. Titles and filenames are too verbose.
+6. Incident documents need richer structured fields.
+7. Open Questions may contain generic AI filler.
+8. Git auto-commit remains deferred.
+
+Recommended next phase: PHASE 3C - RAG QUALITY HARDENING. After Phase 3C, consider Open WebUI integration.

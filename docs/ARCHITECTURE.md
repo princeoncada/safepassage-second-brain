@@ -18,22 +18,66 @@ Stores human-readable Markdown documents.
 Provides version history, rollback, audit trail, and collaboration safety.
 
 ### n8n
-Handles ingestion, formatting, routing, exports, GitHub commits, and future ChromaDB indexing.
+Handles the current stable Phase 2 Minimal POW ingestion webhook.
+
+Current working ingestion flow:
+
+```text
+n8n webhook
+-> deterministic classification/routing
+-> optional DeepSeek Markdown cleanup
+-> deterministic YAML/frontmatter creation
+-> safe local vault write
+```
+
+The stable ingestion workflow is `workflows/n8n/phase_2_minimal_pow_ingestion_workflow.json`.
 
 ### DeepSeek API
-Used initially for classification, summarization, formatting, and structured ingestion.
+Used optionally in Phase 2 Minimal POW to clean Markdown sections, with deterministic fallback when unavailable.
 
 For Phase 3B, DeepSeek is used only for final answer generation from retrieved vault context. It must not retrieve, edit memory, or invent unsupported policy.
 
 ### ChromaDB
-Planned for Phase 3. Used for semantic retrieval and metadata-aware search.
+Used for local semantic retrieval and metadata-aware search.
 
-For Phase 3A, ChromaDB is a local disposable index under `rag/chroma/`. It is rebuilt from Markdown in `vault/` and is not a source of truth.
+ChromaDB is a local disposable index under `rag/chroma/`. It is rebuilt from Markdown in `vault/` and is not a source of truth.
 
 ### Open WebUI
 Planned later as the chat interface only. It is not the storage layer.
 
-Open WebUI is not part of Phase 3A or Phase 3B.
+Open WebUI is not implemented yet. Consider it only after Phase 3C RAG Quality Hardening.
+
+## Current Working Flow
+
+### Ingestion
+
+```text
+n8n webhook
+-> deterministic classification/routing
+-> optional DeepSeek Markdown cleanup
+-> deterministic YAML/frontmatter creation
+-> safe local vault write
+```
+
+### Retrieval
+
+```text
+vault Markdown
+-> section-based chunking
+-> local embeddings
+-> ChromaDB
+-> query_vault.py retrieval
+```
+
+### Answering
+
+```text
+question
+-> retrieve top chunks
+-> DeepSeek answer generation
+-> cite source file + section
+-> refuse when context is insufficient
+```
 
 ## Phase 3A Retrieval Flow
 
@@ -43,7 +87,7 @@ Markdown files in `vault/`
 -> local ChromaDB collection `safepassage_vault_chunks`
 -> retrieval-only CLI query results
 
-Phase 3A does not generate answers. It validates retrieval quality before adding answer generation.
+Phase 3A did not generate answers. It validated retrieval quality before Phase 3B added grounded answer generation.
 
 ## Phase 3B Answer Flow
 

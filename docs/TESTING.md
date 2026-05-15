@@ -17,8 +17,8 @@
 - [ ] `docs/N8N_SETUP.md` explains local n8n import and configuration.
 - [ ] `docs/LOCAL_TESTING.md` explains local validation.
 - [ ] `docs/AI_HANDOFF.md` explains how future AI should continue.
-- [ ] `docs/PHASE_LOG.md` shows Phase 2 as in progress, not complete.
-- [ ] No Phase 3 implementation files are added.
+- [ ] `docs/PHASE_LOG.md` reflects the current checkpoint status.
+- [ ] No unplanned features are added beyond the current checkpoint scope.
 - [ ] No secrets are committed.
 
 ## Practical Test Cases
@@ -100,9 +100,27 @@ rg -n "DEEPSEEK_API_KEY=sk-|api[_-]?key\\s*[:=]\\s*['\\\"][A-Za-z0-9]" .
 
 The secret scan should return no real secrets. Placeholder values in `.env.example` are acceptable.
 
-## Local Execution Status
+## Current Checkpoint Status
 
-Do not mark Phase 2 complete until a human validates the workflow in local n8n. Repository-level JSON and script checks are not the same as confirming DeepSeek API calls, vault writes, or Git pushes.
+Phase 2 Minimal POW, Phase 3A Retrieval POW, and Phase 3B Grounded Answering POW passed on 2026-05-15. The system is a working proof of work, not a finished final product.
+
+## Phase 2 Minimal POW Validated Tests
+
+Validated outcomes:
+
+- `/help` returned usage and wrote no file.
+- `/qa` routed to `vault/04_QA_Rules`.
+- `/incident` routed to `vault/06_Incidents`.
+- `/log` routed to `vault/07_Visitor_Logs`.
+- unknown input routed to `vault/00_Inbox`.
+- `/post` routed to `vault/03_Post_Orders`.
+- invalid DeepSeek key still produced fallback Markdown and wrote a file.
+
+Stable workflow:
+
+```text
+workflows/n8n/phase_2_minimal_pow_ingestion_workflow.json
+```
 
 ## Phase 3A RAG Validation
 
@@ -115,7 +133,16 @@ pip install -r rag/requirements.txt
 Build the local disposable ChromaDB index:
 
 ```powershell
+python rag/scripts/reset_chroma.py --yes
 python rag/scripts/index_vault.py
+```
+
+Validated index result:
+
+```text
+Indexed 26 chunks from 7 files after filtering
+Skipped low-value sections: 21
+Skipped duplicate chunks: 2
 ```
 
 The index excludes `Change History`, `Open Questions`, and `Source Input` by default because those sections are boilerplate-heavy and polluted top results during retrieval testing. Preferred sections are `Summary`, `Details`, `Agent Action`, and `QA Notes`.
@@ -124,11 +151,11 @@ Run retrieval-only test queries:
 
 ```powershell
 python rag/scripts/query_vault.py "overnight visitors must present physical ID before access" --top-k 5
-python rag/scripts/query_vault.py "What happened with tailgating at Monterey?"
-python rag/scripts/query_vault.py "What should the agent do if digital ID is presented instead of physical ID?"
+python rag/scripts/query_vault.py "What happened with tailgating at Monterey?" --top-k 5
+python rag/scripts/query_vault.py "What should the agent do if digital ID is presented instead of physical ID?" --top-k 5
 ```
 
-Expected results are documented in `rag/tests/expected_results.md`. Phase 3A passes only when relevant chunks are retrieved and duplicate-looking results are reduced; it does not generate AI answers.
+Expected results are documented in `rag/tests/expected_results.md`. Phase 3A passed: relevant chunks were retrieved, low-value sections were filtered, and duplicate-looking results were reduced. Phase 3A does not generate AI answers.
 
 Reset the index when needed:
 
@@ -163,7 +190,7 @@ Run grounded answer tests:
 python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
 python rag/scripts/answer_vault.py "What happened with tailgating at Monterey?" --top-k 5
 python rag/scripts/answer_vault.py "What are Sierra Ridge overnight visitor ID rules?" --top-k 5
-python rag/scripts/answer_vault.py "What is the rule for a community that is not in the vault?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
 ```
 
 Retrieval-only validation:
@@ -172,4 +199,17 @@ Retrieval-only validation:
 python rag/scripts/answer_vault.py "What are Sierra Ridge overnight visitor ID rules?" --no-ai --show-context
 ```
 
-Expected results are documented in `rag/tests/answer_expected_results.md`. Phase 3B passes only when answers use retrieved context, cite source file and section, and refuse safely when context is insufficient.
+Expected results are documented in `rag/tests/answer_expected_results.md`. Phase 3B passed: the first three questions answered from retrieved context, citations were included, and Atlantis Bay refused with insufficient context.
+
+## Known Issues / Next Refinements
+
+These are not blockers.
+
+1. Duplicate source files still appear in retrieval results. Future fix: stronger dedupe by normalized title + section + community, or clean duplicate test files.
+2. Citations currently list all retrieved chunks, including weak or less relevant chunks. Future fix: cite only chunks actually used.
+3. Retrieval ranking can place QA Notes above Summary or Details. Future fix: section weighting or reranking.
+4. Source numbering between generated answer and printed citation list can be confusing. Future fix: align citation numbering.
+5. Titles and filenames are too verbose. Future fix: deterministic title and filename compression.
+6. Incident documents need richer structured fields. Future fix: add time, lane, vehicle details, action taken, escalation, and camera reference.
+7. Open Questions may contain generic AI filler. Future fix: include them only when confidence is low or required fields are missing.
+8. Git auto-commit remains deferred. Future fix: add controlled sync later.

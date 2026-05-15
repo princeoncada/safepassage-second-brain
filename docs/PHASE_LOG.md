@@ -2,117 +2,152 @@
 
 ## Current Phase
 
-PHASE 3B - ANSWER GENERATION FROM RETRIEVED VAULT CONTEXT
+CHECKPOINT LOCKED AFTER PHASE 3B POW
 
-## Goal
+## Overall System Status
 
-Classify, route, normalize, and QA-check operational knowledge before writing metadata-complete Markdown into the Obsidian vault.
+WORKING PROOF OF WORK
 
-## Status
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, and grounded answering.
 
-IN PROGRESS
+## Phase 2 Minimal POW
 
-## Phase 1 Foundation Validation
+PASSED
 
-- [x] Git repository initialized
-- [x] Folder structure created
-- [x] Metadata standard created
-- [x] Templates created
-- [x] Docker Compose added
-- [x] n8n setup present
-- [x] DeepSeek API variable placeholder prepared
-- [x] Initial ingestion payload example created
-- [x] Phase 1 validated
+Validated:
 
-## Phase 2 Completed So Far
+- [x] `/help` returned usage and wrote no file
+- [x] `/post` routed to `vault/03_Post_Orders`
+- [x] `/qa` routed to `vault/04_QA_Rules`
+- [x] `/incident` routed to `vault/06_Incidents`
+- [x] `/log` routed to `vault/07_Visitor_Logs`
+- [x] unknown fallback routed to `vault/00_Inbox`
+- [x] invalid DeepSeek key still produced fallback Markdown and wrote a file
+- [x] deterministic classification works
+- [x] deterministic routing works
+- [x] local vault writing works
 
-- [x] Existing repo structure reviewed
-- [x] Phase 1 files validated
-- [x] Structured ingestion prompts created or updated
-- [x] Folder routing documentation created
-- [x] Reusable ingestion contract created
-- [x] Routing rules JSON created
-- [x] Sample ingestion inputs created
-- [x] Expected sample outputs created
-- [x] n8n ingestion workflow documentation created
-- [x] Phase 2 validation checklist created
-- [x] Importable n8n workflow JSON created
-- [x] Helper scripts created
-- [x] Webhook test payloads created
-- [x] Local setup and testing docs created
+Stable workflow:
 
-## Phase 2 Remaining Work
+```text
+workflows/n8n/phase_2_minimal_pow_ingestion_workflow.json
+```
 
-- [ ] Import `workflows/n8n/phase_2_ingestion_workflow.json` into local n8n
-- [ ] Run real prompt-chain tests against sample inputs
-- [ ] Confirm generated Markdown writes correctly into `vault/`
-- [ ] Confirm n8n can commit generated files to GitHub on `master`
+Do not revive or rewrite the older complex Phase 2 workflow unless specifically requested.
 
-## Phase 2 Minimal Proof of Work
+## Phase 3A Minimal RAG Retrieval POW
 
-- [ ] Import workflow into n8n
-- [ ] Replace DeepSeek placeholder key
-- [ ] Run /help test
-- [ ] Run /post test
-- [ ] Run /qa test
-- [ ] Run /incident test
-- [ ] Run /log test
-- [ ] Run unknown fallback test
-- [ ] Confirm files written to correct vault folders
-- [ ] Confirm DeepSeek failure still writes fallback Markdown
+PASSED
 
-## Phase 3A Minimal RAG Proof of Work
+Validated:
 
-- [x] Add local RAG script folder
-- [x] Add ChromaDB requirements
-- [x] Add deterministic vault indexing script
-- [x] Add retrieval-only query script
-- [x] Add safe ChromaDB reset script
-- [x] Add Phase 3A test query definitions
-- [x] Add Phase 3A documentation
-- [x] Install RAG dependencies locally
-- [x] Run vault indexing locally
-- [x] Run Sierra Ridge physical ID query
-- [x] Run Monterey tailgating query
-- [x] Run digital ID QA query
-- [x] Confirm relevant chunks are retrieved
-- [x] Confirm no answer generation was implemented in Phase 3A
+- [x] ChromaDB local index works
+- [x] `sentence-transformers` embeddings work
+- [x] vault Markdown chunking works
+- [x] low-value section filtering works
+- [x] duplicate chunks reduced
+- [x] retrieval returns correct community/type/sections
+- [x] no AI answer generation in Phase 3A
 
-## Phase 3A Retrieval Quality Refinement
+Validated index run:
 
-- [x] Confirm Phase 3A indexing works locally
-- [x] Confirm ChromaDB retrieval works locally
-- [x] Exclude low-value sections from default indexing
-- [x] Prefer Summary, Details, Agent Action, and QA Notes
-- [x] Reduce duplicate-looking retrieval results
-- [x] Rebuild local ChromaDB index after refinement
-- [x] Validate physical ID retrieval ranking
-- [x] Validate Monterey tailgating retrieval ranking
-- [x] Validate digital ID QA retrieval ranking
+```text
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+Indexed 26 chunks from 7 files after filtering
+Skipped low-value sections: 21
+Skipped duplicate chunks: 2
+```
 
-## Phase 3B Grounded Answer Generation
+Successful retrieval queries:
 
-- [x] Start Phase 3B answer generation layer
-- [x] Add strict answer-from-context prompt
-- [x] Add CLI answer script using retrieved ChromaDB chunks
-- [x] Add retrieval-only `--no-ai` mode
-- [x] Add missing API key handling for `DEEPSEEK_API_KEY`
-- [x] Add answer test queries and expected result criteria
-- [x] Add Phase 3B documentation
-- [ ] Validate DeepSeek grounded answers locally
-- [ ] Confirm citations include source file and section
-- [ ] Confirm insufficient context response is safe
-- [ ] Confirm no Open WebUI, n8n, agents, or automation were added
+```text
+overnight visitors must present physical ID before access
+What happened with tailgating at Monterey?
+What should the agent do if digital ID is presented instead of physical ID?
+```
 
-## Known Issues
+## Phase 3B Grounded Answering POW
 
-- The n8n workflow export exists but has not been locally imported or executed yet.
-- Human review routing is included in the workflow design but has not been locally validated yet.
+PASSED
 
-## Validation Status
+Validated:
 
-PHASE 3A RETRIEVAL POW PASSED; PHASE 3B ANSWERING STARTED AND IN PROGRESS; PHASE 3 COMPLETE NOT MARKED
+- [x] retrieval-only `--no-ai` works
+- [x] DeepSeek answer generation works
+- [x] answers use retrieved context
+- [x] source citations are included
+- [x] insufficient context question correctly refuses unsafe answer
+- [x] operational answers are concise and grounded
 
-## Ready for Next Phase
+Validated answer commands:
+
+```text
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What happened with tailgating at Monterey?" --top-k 5
+python rag/scripts/answer_vault.py "What are Sierra Ridge overnight visitor ID rules?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+```
+
+Expected results:
+
+- first three questions answer correctly from retrieved context
+- Atlantis Bay refuses with insufficient context
+
+## Known Issues / Next Refinements
+
+These are not blockers.
+
+1. Duplicate source files still appear in retrieval results.
+   Cause: multiple generated test files contain nearly identical Sierra Ridge post orders.
+   Future fix: add stronger dedupe by normalized title + section + community, or clean duplicate test files.
+
+2. Citations currently list all retrieved chunks, including weak or less relevant chunks.
+   Future fix: only cite chunks actually used in the generated answer.
+
+3. Retrieval ranking can place QA Notes above Summary or Details.
+   Future fix: add section weighting or reranking so Summary, Details, and Agent Action are preferred for factual answers.
+
+4. Source numbering between generated answer and printed citation list can be confusing.
+   Future fix: standardize final answer citation numbering to match retrieved source IDs exactly.
+
+5. Titles and filenames are too verbose.
+   Future fix: add deterministic title compression and filename compression.
+
+6. Incident documents need richer structured fields.
+   Future fix: expand incident ingestion format with time, lane, vehicle details, action taken, escalation, and camera reference.
+
+7. Open Questions may contain generic AI filler.
+   Future fix: only include open questions when confidence is low or required operational fields are missing.
+
+8. Git auto-commit remains deferred.
+   Future fix: add manual or controlled sync later only after retrieval and answering remain stable.
+
+## Next Recommended Phase
+
+PHASE 3C - RAG QUALITY HARDENING
+
+Scope:
+
+- dedupe improvement
+- citation cleanup
+- section reranking
+- title/filename compression
+- answer citation alignment
+- stronger insufficient-context filtering
+
+After Phase 3C, consider Open WebUI integration.
+
+## Deferred
+
+- Open WebUI
+- n8n RAG integration
+- autonomous agents
+- Git auto-commit
+- dashboards
+- voice/UI
+- Phase 4 automations
+
+## Ready For Final Project Completion
 
 NO

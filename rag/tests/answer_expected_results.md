@@ -63,7 +63,7 @@ Fail signs:
 Query:
 
 ```powershell
-python rag/scripts/answer_vault.py "What is the rule for a community that is not in the vault?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
 ```
 
 Pass criteria:
@@ -75,6 +75,16 @@ Fail signs:
 
 - Answer generalizes Sierra Ridge or Monterey rules to an unknown community.
 - Answer invents a policy.
+
+Validated result: Atlantis Bay refused with insufficient context.
+
+## Known Issues
+
+These are not blockers:
+
+- citations currently list all retrieved chunks, including weak or less relevant chunks;
+- source numbering between generated answer and printed citation list can be confusing;
+- duplicate source files can still appear when generated test files contain nearly identical content.
 
 ## Retrieval-Only Mode
 
