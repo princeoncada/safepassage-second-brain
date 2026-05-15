@@ -230,6 +230,44 @@ This is expected. `answer_vault.py` separates retrieved sources from answer cita
 
 This can happen when duplicate files have meaningfully different content. The dedupe is lightweight and heuristic. Future hardening can add stronger title/section/community dedupe or clean generated test files from the vault.
 
+## Phase 3D API Server Does Not Start
+
+Install dependencies:
+
+```powershell
+pip install -r rag/requirements.txt
+```
+
+Then start:
+
+```powershell
+python -m uvicorn api.main:app --reload --port 8000
+```
+
+If port `8000` is already in use, choose another local port.
+
+## Phase 3D Missing DeepSeek Key
+
+If `/ask` returns `status: "error"` because `DEEPSEEK_API_KEY` is missing, set it:
+
+```powershell
+$env:DEEPSEEK_API_KEY="your_key_here"
+```
+
+Or send:
+
+```json
+{
+  "no_ai": true
+}
+```
+
+to validate retrieval only.
+
+## Phase 3D API Refuses A Question
+
+This can be correct. The API reuses the conservative insufficient-context checks from `answer_vault.py`. Inspect `retrieval_confidence`, `confidence_reason`, `sources`, and `warnings` in the JSON response.
+
 ## Phase 3B Missing DeepSeek Key
 
 If `answer_vault.py` says `DEEPSEEK_API_KEY` is not set, set it in PowerShell:
