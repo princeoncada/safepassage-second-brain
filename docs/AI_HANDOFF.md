@@ -14,6 +14,7 @@ PHASE 3A - MINIMAL RAG PROOF OF WORK is in progress. Phase 2 Minimal POW ingesti
 - Helper scripts for filename sanitization, payload validation, metadata validation, Markdown writing, and Git commit/push.
 - n8n setup and local testing documentation.
 - Phase 3A local RAG scripts under `rag/` for disposable ChromaDB indexing and retrieval-only querying.
+- Phase 3A retrieval quality refinement filters low-value sections by default and prioritizes useful evidence sections.
 
 ## Continue From Here
 
@@ -36,6 +37,7 @@ Future AI work should:
 - Do not add advanced automations beyond the documented Phase 2 ingestion workflow.
 - Do not add autonomous agents, advanced memory systems, or answer generation.
 - Do not use cloud embeddings or API keys for Phase 3A.
+- Do not start Phase 3B until Phase 3A retrieval ranking is validated.
 - Do not commit secrets, real API keys, `.env`, `n8n_data`, or generated credential files.
 
 ## Phase 3A Exit Criteria
@@ -46,6 +48,7 @@ Phase 3A should only be marked validated after:
 - `python rag/scripts/index_vault.py` creates a local ChromaDB index;
 - `query_vault.py` retrieves Sierra Ridge `post_order` or `qa_rule` chunks for physical ID questions;
 - `query_vault.py` retrieves a Monterey `incident` chunk for tailgating questions;
+- low-value sections such as `Change History`, `Open Questions`, and `Source Input` do not pollute default top results;
 - retrieval quality is inspected before any answer generation is added.
 
 ## Phase 2 Exit Criteria

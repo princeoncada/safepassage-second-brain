@@ -145,6 +145,28 @@ python rag/scripts/reset_chroma.py --yes
 python rag/scripts/index_vault.py
 ```
 
+By default, Phase 3A excludes low-value sections from indexing:
+
+- `Change History`
+- `Open Questions`
+- `Source Input`
+
+If those sections are appearing in results, rebuild the index without the debug flag:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+If duplicate-looking results appear, confirm the index was rebuilt after the dedupe refinement. The indexer skips effectively identical chunks, and the query script dedupes repeated source/title/section and content fingerprints.
+
+To inspect excluded low-value sections for debugging only:
+
+```powershell
+python rag/scripts/index_vault.py --include-low-value-sections
+python rag/scripts/query_vault.py "What are Sierra Ridge physical ID rules?" --include-low-value-sections --top-k 5
+```
+
 ## Phase 3A Dependency Install Fails
 
 Confirm Python and pip are available, then run:

@@ -78,6 +78,19 @@ IN PROGRESS
 - [ ] Confirm relevant chunks are retrieved
 - [ ] Confirm no answer generation is implemented
 
+## Phase 3A Retrieval Quality Refinement
+
+- [x] Confirm Phase 3A indexing works locally
+- [x] Confirm ChromaDB retrieval works locally
+- [x] Exclude low-value sections from default indexing
+- [x] Prefer Summary, Details, Agent Action, and QA Notes
+- [x] Reduce duplicate-looking retrieval results
+- [ ] Rebuild local ChromaDB index after refinement
+- [ ] Validate physical ID retrieval ranking
+- [ ] Validate Monterey tailgating retrieval ranking
+- [ ] Validate digital ID QA retrieval ranking
+- [ ] Keep Phase 3B answer generation unstarted
+
 ## Known Issues
 
 - The n8n workflow export exists but has not been locally imported or executed yet.
@@ -85,7 +98,7 @@ IN PROGRESS
 
 ## Validation Status
 
-PHASE 3A IMPLEMENTATION PRESENT; LOCAL RAG VALIDATION PENDING
+PHASE 3A RETRIEVAL WORKS; RANKING REFINEMENT IN PROGRESS; PHASE 3B ANSWER GENERATION NOT STARTED
 
 ## Ready for Next Phase
 

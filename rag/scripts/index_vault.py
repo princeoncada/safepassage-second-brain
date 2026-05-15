@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import re
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,25 @@ MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 VAULT_DIR = REPO_ROOT / "vault"
 CHROMA_DIR = REPO_ROOT / "rag" / "chroma"
+CONFIG_PATH = REPO_ROOT / "rag" / "config" / "retrieval_config.json"
+
+
+DEFAULT_LOW_VALUE_SECTIONS = {"change history", "open questions", "source input"}
+DEFAULT_PREFERRED_SECTIONS = {"summary", "details", "agent action", "qa notes"}
+
+
+def load_retrieval_config() -> dict[str, Any]:
+    if not CONFIG_PATH.exists():
+        return {
+            "low_value_sections": sorted(DEFAULT_LOW_VALUE_SECTIONS),
+            "preferred_sections": sorted(DEFAULT_PREFERRED_SECTIONS),
+        }
+    with CONFIG_PATH.open("r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def normalize_section_name(section: str) -> str:
+    return re.sub(r"\s+", " ", section.strip()).lower()
 
 
 def parse_frontmatter(markdown: str) -> tuple[dict[str, Any], str]:
@@ -68,6 +88,12 @@ def stable_chunk_id(relative_path: str, section: str) -> str:
     return digest[:32]
 
 
+def content_fingerprint(doc_type: str, community: str, section: str, content: str) -> str:
+    normalized = " ".join(content.lower().split())
+    basis = f"{doc_type.lower()}::{community.lower()}::{section.lower()}::{normalized}"
+    return hashlib.sha256(basis.encode("utf-8")).hexdigest()
+
+
 def iter_markdown_files(include_archive: bool) -> list[Path]:
     files = sorted(VAULT_DIR.rglob("*.md"))
     if include_archive:
@@ -75,10 +101,16 @@ def iter_markdown_files(include_archive: bool) -> list[Path]:
     return [path for path in files if "99_Archive" not in path.relative_to(VAULT_DIR).parts]
 
 
-def build_chunks(include_archive: bool) -> tuple[list[str], list[str], list[dict[str, str]]]:
+def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tuple[list[str], list[str], list[dict[str, str]]]:
+    config = load_retrieval_config()
+    low_value_sections = {normalize_section_name(section) for section in config.get("low_value_sections", [])}
+    preferred_sections = {normalize_section_name(section) for section in config.get("preferred_sections", [])}
     ids: list[str] = []
     documents: list[str] = []
     metadatas: list[dict[str, str]] = []
+    seen_fingerprints: set[str] = set()
+    skipped_low_value = 0
+    skipped_duplicates = 0
 
     for markdown_path in iter_markdown_files(include_archive):
         raw = markdown_path.read_text(encoding="utf-8")
@@ -92,6 +124,18 @@ def build_chunks(include_archive: bool) -> tuple[list[str], list[str], list[dict
         status = normalize_metadata_value(frontmatter.get("status"))
 
         for section, content in split_sections(body):
+            normalized_section = normalize_section_name(section)
+            is_low_value = normalized_section in low_value_sections
+            if is_low_value and not include_low_value_sections:
+                skipped_low_value += 1
+                continue
+
+            fingerprint = content_fingerprint(doc_type, community, section, content)
+            if fingerprint in seen_fingerprints:
+                skipped_duplicates += 1
+                continue
+            seen_fingerprints.add(fingerprint)
+
             chunk_text = "\n".join(
                 [
                     f"Title: {title}",
@@ -115,21 +159,34 @@ def build_chunks(include_archive: bool) -> tuple[list[str], list[str], list[dict
                     "priority": priority,
                     "tags": tags,
                     "status": status,
+                    "is_low_value_section": str(is_low_value).lower(),
+                    "is_preferred_section": str(normalized_section in preferred_sections).lower(),
+                    "content_fingerprint": fingerprint,
                 }
             )
 
+    print(f"Skipped low-value sections: {skipped_low_value}")
+    print(f"Skipped duplicate chunks: {skipped_duplicates}")
     return ids, documents, metadatas
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Index SafePassage Markdown vault chunks into local ChromaDB.")
     parser.add_argument("--include-archive", action="store_true", help="Include vault/99_Archive markdown files.")
+    parser.add_argument(
+        "--include-low-value-sections",
+        action="store_true",
+        help="Index low-value sections such as Change History, Open Questions, and Source Input.",
+    )
     args = parser.parse_args()
 
     if not VAULT_DIR.exists():
         raise SystemExit(f"Vault directory not found: {VAULT_DIR}")
 
-    ids, documents, metadatas = build_chunks(include_archive=args.include_archive)
+    ids, documents, metadatas = build_chunks(
+        include_archive=args.include_archive,
+        include_low_value_sections=args.include_low_value_sections,
+    )
     if not documents:
         raise SystemExit("No Markdown chunks found to index.")
 

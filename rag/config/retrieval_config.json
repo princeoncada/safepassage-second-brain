@@ -1,0 +1,19 @@
+{
+  "low_value_sections": [
+    "Change History",
+    "Open Questions",
+    "Source Input"
+  ],
+  "preferred_sections": [
+    "Summary",
+    "Details",
+    "Agent Action",
+    "QA Notes"
+  ],
+  "section_boosts": {
+    "Summary": 0.08,
+    "Details": 0.06,
+    "Agent Action": 0.05,
+    "QA Notes": 0.04
+  }
+}

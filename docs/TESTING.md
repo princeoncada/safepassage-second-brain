@@ -118,18 +118,33 @@ Build the local disposable ChromaDB index:
 python rag/scripts/index_vault.py
 ```
 
+The index excludes `Change History`, `Open Questions`, and `Source Input` by default because those sections are boilerplate-heavy and polluted top results during retrieval testing. Preferred sections are `Summary`, `Details`, `Agent Action`, and `QA Notes`.
+
 Run retrieval-only test queries:
 
 ```powershell
-python rag/scripts/query_vault.py "What are Sierra Ridge physical ID rules?"
+python rag/scripts/query_vault.py "overnight visitors must present physical ID before access" --top-k 5
 python rag/scripts/query_vault.py "What happened with tailgating at Monterey?"
-python rag/scripts/query_vault.py "What should I do if a digital ID is accepted when physical ID is required?"
+python rag/scripts/query_vault.py "What should the agent do if digital ID is presented instead of physical ID?"
 ```
 
-Expected results are documented in `rag/tests/expected_results.md`. Phase 3A passes only when relevant chunks are retrieved; it does not generate AI answers.
+Expected results are documented in `rag/tests/expected_results.md`. Phase 3A passes only when relevant chunks are retrieved and duplicate-looking results are reduced; it does not generate AI answers.
 
 Reset the index when needed:
 
 ```powershell
 python rag/scripts/reset_chroma.py --yes
+```
+
+Then rebuild:
+
+```powershell
+python rag/scripts/index_vault.py
+```
+
+To debug excluded sections:
+
+```powershell
+python rag/scripts/index_vault.py --include-low-value-sections
+python rag/scripts/query_vault.py "What are Sierra Ridge physical ID rules?" --include-low-value-sections --top-k 5
 ```
