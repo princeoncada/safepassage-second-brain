@@ -22,6 +22,7 @@ CONFIG_PATH = REPO_ROOT / "rag" / "config" / "retrieval_config.json"
 
 DEFAULT_LOW_VALUE_SECTIONS = {"change history", "open questions", "source input"}
 DEFAULT_PREFERRED_SECTIONS = {"summary", "details", "agent action", "qa notes"}
+DEFAULT_NEAR_DUPLICATE_SIMILARITY_THRESHOLD = 0.9
 
 
 def load_retrieval_config() -> dict[str, Any]:
@@ -36,6 +37,22 @@ def load_retrieval_config() -> dict[str, Any]:
 
 def normalize_section_name(section: str) -> str:
     return re.sub(r"\s+", " ", section.strip()).lower()
+
+
+def normalize_key(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+
+
+def token_set(value: str) -> set[str]:
+    return {token for token in normalize_key(value).split() if len(token) > 2}
+
+
+def jaccard_similarity(left: str, right: str) -> float:
+    left_tokens = token_set(left)
+    right_tokens = token_set(right)
+    if not left_tokens or not right_tokens:
+        return 0.0
+    return len(left_tokens & right_tokens) / len(left_tokens | right_tokens)
 
 
 def parse_frontmatter(markdown: str) -> tuple[dict[str, Any], str]:
@@ -94,6 +111,29 @@ def content_fingerprint(doc_type: str, community: str, section: str, content: st
     return hashlib.sha256(basis.encode("utf-8")).hexdigest()
 
 
+def is_near_duplicate(
+    existing_chunks: list[dict[str, str]],
+    doc_type: str,
+    community: str,
+    section: str,
+    content: str,
+    threshold: float,
+) -> bool:
+    normalized_type = normalize_key(doc_type)
+    normalized_community = normalize_key(community)
+    normalized_section = normalize_key(section)
+    for existing in existing_chunks:
+        if existing["normalized_type"] != normalized_type:
+            continue
+        if existing["normalized_community"] != normalized_community:
+            continue
+        if existing["normalized_section"] != normalized_section:
+            continue
+        if jaccard_similarity(existing["content"], content) >= threshold:
+            return True
+    return False
+
+
 def iter_markdown_files(include_archive: bool) -> list[Path]:
     files = sorted(VAULT_DIR.rglob("*.md"))
     if include_archive:
@@ -105,10 +145,14 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
     config = load_retrieval_config()
     low_value_sections = {normalize_section_name(section) for section in config.get("low_value_sections", [])}
     preferred_sections = {normalize_section_name(section) for section in config.get("preferred_sections", [])}
+    near_duplicate_threshold = float(
+        config.get("near_duplicate_similarity_threshold", DEFAULT_NEAR_DUPLICATE_SIMILARITY_THRESHOLD)
+    )
     ids: list[str] = []
     documents: list[str] = []
     metadatas: list[dict[str, str]] = []
     seen_fingerprints: set[str] = set()
+    seen_semantic_chunks: list[dict[str, str]] = []
     skipped_low_value = 0
     skipped_duplicates = 0
 
@@ -134,7 +178,18 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
             if fingerprint in seen_fingerprints:
                 skipped_duplicates += 1
                 continue
+            if is_near_duplicate(seen_semantic_chunks, doc_type, community, section, content, near_duplicate_threshold):
+                skipped_duplicates += 1
+                continue
             seen_fingerprints.add(fingerprint)
+            seen_semantic_chunks.append(
+                {
+                    "normalized_type": normalize_key(doc_type),
+                    "normalized_community": normalize_key(community),
+                    "normalized_section": normalize_key(section),
+                    "content": content,
+                }
+            )
 
             chunk_text = "\n".join(
                 [
@@ -162,6 +217,9 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
                     "is_low_value_section": str(is_low_value).lower(),
                     "is_preferred_section": str(normalized_section in preferred_sections).lower(),
                     "content_fingerprint": fingerprint,
+                    "normalized_title": normalize_key(title),
+                    "normalized_community": normalize_key(community),
+                    "normalized_section": normalize_key(section),
                 }
             )
 
