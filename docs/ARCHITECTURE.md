@@ -43,9 +43,7 @@ Used for local semantic retrieval and metadata-aware search.
 ChromaDB is a local disposable index under `rag/chroma/`. It is rebuilt from Markdown in `vault/` and is not a source of truth.
 
 ### Open WebUI
-Planned later as the chat interface only. It is not the storage layer.
-
-Open WebUI is not implemented yet. Consider it only after Phase 3C RAG Quality Hardening.
+Open WebUI is the Phase 3E conversational presentation layer only. It calls the local FastAPI `/ask` endpoint and is not the storage layer, retrieval layer, embedding layer, memory layer, or business-logic layer.
 
 ## Current Working Flow
 
@@ -94,6 +92,18 @@ HTTP request
 
 Phase 3D exposes local HTTP access only. FastAPI does not store memory, edit the vault, or replace the Markdown source of truth.
 
+### Open WebUI
+
+```text
+Open WebUI
+-> FastAPI /ask endpoint
+-> retrieval
+-> grounded answering
+-> citations/refusal/confidence
+```
+
+Phase 3E uses Open WebUI only as the conversational presentation layer. Open WebUI must not own retrieval, embeddings, ChromaDB, ingestion, memory, or operational business logic.
+
 ## Phase 3A Retrieval Flow
 
 Markdown files in `vault/`
@@ -115,11 +125,13 @@ User question
 
 If retrieved context is insufficient, the answer must say the vault does not contain enough information to answer safely.
 
-## Phase 1 Data Flow
+## Historical Phase 1 Data Flow
 
+```text
 User input
-→ n8n webhook
-→ DeepSeek classification/normalization
-→ Markdown file created in vault
-→ Git commit
-→ Optional DOCX export later
+-> n8n webhook
+-> DeepSeek classification/normalization
+-> Markdown file created in vault
+-> Git commit
+-> Optional DOCX export later
+```
