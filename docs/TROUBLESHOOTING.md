@@ -205,6 +205,31 @@ Duplicates can happen if generated test files are not cleaned. This is a known n
 
 The weak context threshold may trigger refusal correctly. If the retrieved chunks do not directly answer the question, Phase 3B should say the vault does not contain enough information to answer safely.
 
+## Phase 3C Query Refuses Unexpectedly
+
+Phase 3C uses conservative checks:
+
+- retrieval distance threshold;
+- community hint mismatch;
+- expected document type mismatch.
+
+If a refusal seems too strict, inspect retrieval only:
+
+```powershell
+python rag/scripts/answer_vault.py "your question" --no-ai --show-context --top-k 5
+python rag/scripts/query_vault.py "your question" --top-k 5
+```
+
+Then improve vault Markdown quality or adjust `rag/config/retrieval_config.json`.
+
+## Phase 3C Citation Output Looks Shorter
+
+This is expected. `answer_vault.py` separates retrieved sources from answer citations and only prints citations that the generated answer explicitly used. If the model omits source IDs, the script prints retrieved sources for review.
+
+## Phase 3C Duplicate Results Still Appear
+
+This can happen when duplicate files have meaningfully different content. The dedupe is lightweight and heuristic. Future hardening can add stronger title/section/community dedupe or clean generated test files from the vault.
+
 ## Phase 3B Missing DeepSeek Key
 
 If `answer_vault.py` says `DEEPSEEK_API_KEY` is not set, set it in PowerShell:
