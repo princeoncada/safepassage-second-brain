@@ -67,6 +67,7 @@ vault Markdown
 -> local embeddings
 -> ChromaDB
 -> query_vault.py retrieval
+-> heuristic dedupe/reranking
 ```
 
 ### Answering
@@ -74,10 +75,13 @@ vault Markdown
 ```text
 question
 -> retrieve top chunks
+-> deterministic confidence/refusal checks
 -> DeepSeek answer generation
--> cite source file + section
+-> cite actually used source file + section
 -> refuse when context is insufficient
 ```
+
+Phase 3C adds heuristic quality hardening only: dedupe, reranking, citation cleanup, and conservative insufficient-context detection. It does not add new databases or UI layers.
 
 ## Phase 3A Retrieval Flow
 
