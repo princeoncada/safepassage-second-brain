@@ -255,3 +255,66 @@ Expected:
 - output shows retrieval confidence and refusal reason when context is weak.
 
 The user will manually review and commit Phase 3C changes.
+
+## Phase 3D Local API Validation
+
+Install dependencies:
+
+```powershell
+pip install -r rag/requirements.txt
+```
+
+Start the server:
+
+```powershell
+python -m uvicorn api.main:app --reload --port 8000
+```
+
+AI mode:
+
+```powershell
+Invoke-RestMethod `
+  -Method POST `
+  -Uri "http://localhost:8000/ask" `
+  -ContentType "application/json" `
+  -Body '{
+    "question":"What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?",
+    "top_k":5
+  }'
+```
+
+No-AI mode:
+
+```powershell
+Invoke-RestMethod `
+  -Method POST `
+  -Uri "http://localhost:8000/ask" `
+  -ContentType "application/json" `
+  -Body '{
+    "question":"What are Sierra Ridge overnight visitor ID rules?",
+    "top_k":5,
+    "no_ai":true,
+    "show_context":true
+  }'
+```
+
+Insufficient context:
+
+```powershell
+Invoke-RestMethod `
+  -Method POST `
+  -Uri "http://localhost:8000/ask" `
+  -ContentType "application/json" `
+  -Body '{
+    "question":"What is the vehicle policy for Atlantis Bay?",
+    "top_k":5
+  }'
+```
+
+Expected:
+
+- `/ask` returns grounded answer with citations in AI mode.
+- `no_ai=true` returns retrieved sources without DeepSeek.
+- Atlantis Bay refuses safely.
+- existing CLI scripts still work.
+- no Open WebUI integration exists yet.
