@@ -154,6 +154,25 @@ IN PROGRESS
 
 No Open WebUI, n8n changes, agents, Git auto-commit, dashboards, voice, or Phase 4 automations were added.
 
+## Phase 3D Local API Interface Wrapper
+
+IN PROGRESS
+
+- [x] Add FastAPI app under `api/`
+- [x] Add `/ask` endpoint
+- [x] Reuse existing RAG answer pipeline
+- [x] Return JSON answer, citations, confidence, and retrieved sources
+- [x] Support `no_ai=true`
+- [x] Handle missing `DEEPSEEK_API_KEY` cleanly
+- [ ] User starts local API server
+- [ ] User validates `/ask` AI mode
+- [ ] User validates `/ask` no-AI mode
+- [ ] User validates Atlantis Bay insufficient-context refusal
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+No Open WebUI, n8n changes, agents, autonomous memory editing, Git auto-commit, dashboards, voice, or Phase 4 automations were added.
+
 ## Deferred
 
 - Open WebUI
