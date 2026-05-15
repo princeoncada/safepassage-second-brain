@@ -114,7 +114,7 @@ Then flag the item with `credential-risk`.
 
 ## Phase Boundary Confusion
 
-Phase 2 only covers structured ingestion. Phase 3A retrieval and Phase 3B grounded answering are now validated proof-of-work layers. Do not add Open WebUI, autonomous agents, advanced memory systems, or automation implementation until a later phase explicitly starts.
+Phase 2 only covers structured ingestion. Phase 3A retrieval, Phase 3B grounded answering, Phase 3C quality hardening, Phase 3D local API access, and Phase 3E Open WebUI presentation docs are proof-of-work layers. Do not move retrieval, memory, vault writes, agents, or automation implementation into Open WebUI.
 
 ## Phase 3A Index Has No Results
 
@@ -267,6 +267,56 @@ to validate retrieval only.
 ## Phase 3D API Refuses A Question
 
 This can be correct. The API reuses the conservative insufficient-context checks from `answer_vault.py`. Inspect `retrieval_confidence`, `confidence_reason`, `sources`, and `warnings` in the JSON response.
+
+## Phase 3E Open WebUI Cannot Reach API
+
+Confirm FastAPI is running:
+
+```powershell
+python -m uvicorn api.main:app --reload --port 8000
+```
+
+Test directly:
+
+```powershell
+Invoke-RestMethod `
+  -Method POST `
+  -Uri "http://localhost:8000/ask" `
+  -ContentType "application/json" `
+  -Body '{
+    "question":"What are Sierra Ridge overnight visitor ID rules?",
+    "top_k":5,
+    "no_ai":true
+  }'
+```
+
+If Open WebUI is running in Docker, use `http://host.docker.internal:8000/ask` instead of `http://localhost:8000/ask`.
+
+## Phase 3E CORS Issues
+
+The FastAPI app allows localhost origins. If Open WebUI uses another origin, add that local origin to `api/main.py` only after confirming it is still local-first.
+
+## Phase 3E Missing DeepSeek Key
+
+If Open WebUI receives a `DEEPSEEK_API_KEY` error, set the key in the shell running FastAPI:
+
+```powershell
+$env:DEEPSEEK_API_KEY="your_key_here"
+python -m uvicorn api.main:app --reload --port 8000
+```
+
+Use `no_ai=true` to validate retrieval without DeepSeek.
+
+## Phase 3E Stale Chroma Index
+
+If Open WebUI answers look stale or missing, rebuild the local index:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Open WebUI should never bypass FastAPI or call ChromaDB directly.
 
 ## Phase 3B Missing DeepSeek Key
 
