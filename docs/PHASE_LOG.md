@@ -138,6 +138,22 @@ Scope:
 
 After Phase 3C, consider Open WebUI integration.
 
+## Phase 3C RAG Quality Hardening
+
+IN PROGRESS
+
+- [x] Add stronger near-duplicate suppression
+- [x] Add section reranking refinements
+- [x] Add deterministic community/type query hints
+- [x] Add stronger insufficient-context checks
+- [x] Separate retrieved sources from answer citations
+- [x] Add retrieval confidence output
+- [ ] User runs validation commands locally
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+No Open WebUI, n8n changes, agents, Git auto-commit, dashboards, voice, or Phase 4 automations were added.
+
 ## Deferred
 
 - Open WebUI
