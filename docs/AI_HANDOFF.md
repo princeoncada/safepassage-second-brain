@@ -65,6 +65,18 @@ Focus on dedupe improvement, citation cleanup, section reranking, title/filename
 
 After Phase 3C, consider Open WebUI integration.
 
+## Phase 3C In Progress
+
+Current Phase 3C changes are intentionally narrow:
+
+- stronger near-duplicate suppression;
+- section and metadata reranking;
+- deterministic community/type hints;
+- conservative insufficient-context refusal;
+- cleaner answer citation reporting.
+
+The user will manually review and commit. Do not run `git commit` or `git push`.
+
 ## Phase 3A Exit Criteria
 
 Phase 3A should only be marked validated after:
