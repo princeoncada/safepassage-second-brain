@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-CHECKPOINT LOCKED AFTER PHASE 3B POW
+PHASE 3E OPEN WEBUI INTEGRATION
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, and grounded answering.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, and local API access. Phase 3E documents Open WebUI as the presentation-only interface.
 
 ## Phase 2 Minimal POW
 
@@ -123,24 +123,22 @@ These are not blockers.
 8. Git auto-commit remains deferred.
    Future fix: add manual or controlled sync later only after retrieval and answering remain stable.
 
-## Next Recommended Phase
+## Next Recommended Step
 
-PHASE 3C - RAG QUALITY HARDENING
+Finish Phase 3E validation in Open WebUI.
 
 Scope:
 
-- dedupe improvement
-- citation cleanup
-- section reranking
-- title/filename compression
-- answer citation alignment
-- stronger insufficient-context filtering
+- configure Open WebUI to call the local FastAPI `/ask` endpoint;
+- validate grounded answers and citations in the UI;
+- validate Atlantis Bay insufficient-context refusal;
+- keep Open WebUI presentation-only.
 
-After Phase 3C, consider Open WebUI integration.
+After Phase 3E validation, consider the next hardening or integration phase. Do not jump to agents, direct vault editing, or Phase 4 automations without an explicit phase request.
 
 ## Phase 3C RAG Quality Hardening
 
-IN PROGRESS
+PASSED
 
 - [x] Add stronger near-duplicate suppression
 - [x] Add section reranking refinements
@@ -148,15 +146,15 @@ IN PROGRESS
 - [x] Add stronger insufficient-context checks
 - [x] Separate retrieved sources from answer citations
 - [x] Add retrieval confidence output
-- [ ] User runs validation commands locally
-- [ ] User reviews changes manually
+- [x] User runs validation commands locally
+- [x] User reviews changes manually
 - [ ] User commits changes manually
 
 No Open WebUI, n8n changes, agents, Git auto-commit, dashboards, voice, or Phase 4 automations were added.
 
 ## Phase 3D Local API Interface Wrapper
 
-IN PROGRESS
+PASSED
 
 - [x] Add FastAPI app under `api/`
 - [x] Add `/ask` endpoint
@@ -164,18 +162,37 @@ IN PROGRESS
 - [x] Return JSON answer, citations, confidence, and retrieved sources
 - [x] Support `no_ai=true`
 - [x] Handle missing `DEEPSEEK_API_KEY` cleanly
-- [ ] User starts local API server
-- [ ] User validates `/ask` AI mode
-- [ ] User validates `/ask` no-AI mode
-- [ ] User validates Atlantis Bay insufficient-context refusal
-- [ ] User reviews changes manually
+- [x] User starts local API server
+- [x] User validates `/ask` AI mode
+- [x] User validates `/ask` no-AI mode
+- [x] User validates Atlantis Bay insufficient-context refusal
+- [x] User reviews changes manually
 - [ ] User commits changes manually
 
 No Open WebUI, n8n changes, agents, autonomous memory editing, Git auto-commit, dashboards, voice, or Phase 4 automations were added.
 
+## Phase 3E Open WebUI Integration
+
+IN PROGRESS
+
+- [x] Add Open WebUI setup documentation
+- [x] Add Open WebUI connection example
+- [x] Document FastAPI as the operational backend
+- [x] Document UI formatting for answers, citations, confidence, and warnings
+- [x] Document Open WebUI operational boundaries
+- [ ] User configures Open WebUI to call local FastAPI
+- [ ] User validates Sierra Ridge ID rules prompt
+- [ ] User validates Sierra Ridge digital ID prompt
+- [ ] User validates Monterey tailgating prompt
+- [ ] User validates Atlantis Bay refusal prompt
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+Open WebUI is presentation-only. No agents, automatic vault editing, memory rewriting, tool calling, workflow automation, Git auto-commit, dashboards, or Phase 4 automations were added.
+
 ## Deferred
 
-- Open WebUI
+- Open WebUI-hosted retrieval, memory, agents, or direct vault access
 - n8n RAG integration
 - autonomous agents
 - Git auto-commit
