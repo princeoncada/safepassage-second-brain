@@ -29,11 +29,12 @@ def load_retrieval_config() -> dict[str, Any]:
         return {
             "low_value_sections": ["Change History", "Open Questions", "Source Input"],
             "section_boosts": {
-                "Summary": 0.08,
-                "Details": 0.06,
-                "Agent Action": 0.05,
-                "QA Notes": 0.04,
+                "Summary": 0.14,
+                "Details": 0.12,
+                "Agent Action": 0.1,
+                "QA Notes": 0.06,
             },
+            "weak_context_distance_threshold": 0.95,
         }
     with CONFIG_PATH.open("r", encoding="utf-8") as file:
         return json.load(file)
@@ -41,6 +42,10 @@ def load_retrieval_config() -> dict[str, Any]:
 
 def normalize_section_name(section: str) -> str:
     return re.sub(r"\s+", " ", str(section or "").strip()).lower()
+
+
+def normalize_key(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
 
 
 def normalize_text(text: str) -> str:
@@ -51,7 +56,87 @@ def truthy(value: Any) -> bool:
     return str(value).lower() == "true"
 
 
-def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) -> list[dict[str, Any]]:
+def token_set(value: str) -> set[str]:
+    return {token for token in normalize_key(value).split() if len(token) > 2}
+
+
+def jaccard_similarity(left: str, right: str) -> float:
+    left_tokens = token_set(left)
+    right_tokens = token_set(right)
+    if not left_tokens or not right_tokens:
+        return 0.0
+    return len(left_tokens & right_tokens) / len(left_tokens | right_tokens)
+
+
+def extract_query_hints(query: str, config: dict[str, Any], candidate_communities: set[str]) -> dict[str, Any]:
+    normalized_query = normalize_key(query)
+    communities = {normalize_key(community): community for community in config.get("known_communities", [])}
+    communities.update({normalize_key(community): community for community in candidate_communities if community})
+    community_hint = ""
+    missing_community_hint = ""
+    for normalized_community, original in communities.items():
+        if normalized_community and normalized_community in normalized_query:
+            community_hint = original
+            break
+    if not community_hint:
+        proper_phrases = re.findall(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b", query)
+        ignored = {"What", "Source Input", "Open Questions", "Change History", "Agent Action"}
+        for phrase in proper_phrases:
+            if phrase not in ignored:
+                missing_community_hint = phrase
+                break
+
+    expected_types: set[str] = set()
+    if any(term in normalized_query for term in ["post order", "rule", "policy"]):
+        expected_types.update({"post_order", "qa_rule"})
+    if any(term in normalized_query for term in ["incident", "happened", "tailgating", "tailgate"]):
+        expected_types.add("incident")
+    if any(term in normalized_query for term in ["visitor log", "tag", "vendor"]):
+        expected_types.add("visitor_log")
+
+    return {
+        "community": community_hint,
+        "missing_community": missing_community_hint,
+        "expected_types": expected_types,
+    }
+
+
+def retrieval_assessment(chunks: list[dict[str, Any]], hints: dict[str, Any], threshold: float) -> dict[str, Any]:
+    if not chunks:
+        return {"confidence": "none", "refuse": True, "reason": "no chunks returned"}
+    best_distance = min(float(chunk["distance"]) for chunk in chunks)
+    if hints["missing_community"]:
+        return {
+            "confidence": "weak",
+            "refuse": True,
+            "reason": f"no indexed source matched community hint '{hints['missing_community']}'",
+        }
+    if hints["community"] and all(normalize_key(chunk["community"]) != normalize_key(hints["community"]) for chunk in chunks):
+        return {
+            "confidence": "weak",
+            "refuse": True,
+            "reason": f"no retrieved source matched community hint '{hints['community']}'",
+        }
+    if best_distance > threshold:
+        return {
+            "confidence": "weak",
+            "refuse": True,
+            "reason": f"best distance {best_distance:.4f} is above threshold {threshold}",
+        }
+    if hints["expected_types"] and not any(chunk["type"] in hints["expected_types"] for chunk in chunks):
+        return {
+            "confidence": "weak",
+            "refuse": True,
+            "reason": f"no retrieved source matched expected types {', '.join(sorted(hints['expected_types']))}",
+        }
+    return {
+        "confidence": "strong",
+        "refuse": False,
+        "reason": f"best distance {best_distance:.4f} is within threshold {threshold}",
+    }
+
+
+def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
     if not CHROMA_DIR.exists():
         raise SystemExit("Chroma index does not exist. Run: python rag/scripts/index_vault.py")
 
@@ -81,15 +166,27 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         for section, boost in config.get("section_boosts", {}).items()
     }
     low_value_sections = {normalize_section_name(section) for section in config.get("low_value_sections", [])}
+    low_value_penalty = float(config.get("low_value_section_penalty", 0.35))
+    community_match_boost = float(config.get("community_match_boost", 0.18))
+    community_mismatch_penalty = float(config.get("community_mismatch_penalty", 0.45))
+    type_match_boost = float(config.get("type_match_boost", 0.1))
+    type_mismatch_penalty = float(config.get("type_mismatch_penalty", 0.18))
+    weak_threshold = float(config.get("weak_context_distance_threshold", 0.95))
+    near_duplicate_threshold = float(config.get("near_duplicate_similarity_threshold", 0.9))
+    candidate_communities = {str(metadata.get("community", "")) for metadata in metadatas if metadata}
+    hints = extract_query_hints(query, config, candidate_communities)
 
     candidates: list[tuple[float, float, str, dict[str, Any]]] = []
     seen_keys: set[tuple[str, str, str]] = set()
     seen_content: set[str] = set()
+    seen_near_duplicates: list[dict[str, str]] = []
 
     for index, document in enumerate(documents):
         metadata = metadatas[index] or {}
         section = str(metadata.get("section", ""))
         normalized_section = normalize_section_name(section)
+        normalized_community = normalize_key(str(metadata.get("community", "")))
+        normalized_type = normalize_key(str(metadata.get("type", "")))
         if not include_low_value_sections and (
             truthy(metadata.get("is_low_value_section")) or normalized_section in low_value_sections
         ):
@@ -97,17 +194,50 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
 
         dedupe_key = (
             str(metadata.get("source_file", "")),
-            str(metadata.get("title", "")).lower(),
+            str(metadata.get("normalized_title") or normalize_key(str(metadata.get("title", "")))),
             normalized_section,
         )
         content_key = str(metadata.get("content_fingerprint") or normalize_text(document))
         if dedupe_key in seen_keys or content_key in seen_content:
             continue
+        near_duplicate = False
+        for existing in seen_near_duplicates:
+            if existing["community"] != normalized_community:
+                continue
+            if existing["type"] != normalized_type:
+                continue
+            if existing["section"] != normalized_section:
+                continue
+            if jaccard_similarity(existing["document"], str(document)) >= near_duplicate_threshold:
+                near_duplicate = True
+                break
+        if near_duplicate:
+            continue
         seen_keys.add(dedupe_key)
         seen_content.add(content_key)
+        seen_near_duplicates.append(
+            {
+                "community": normalized_community,
+                "type": normalized_type,
+                "section": normalized_section,
+                "document": str(document),
+            }
+        )
 
         distance = float(distances[index]) if index < len(distances) else 999.0
         adjusted_distance = distance - section_boosts.get(normalized_section, 0.0)
+        if include_low_value_sections and normalized_section in low_value_sections:
+            adjusted_distance += low_value_penalty
+        if hints["community"]:
+            if normalized_community == normalize_key(hints["community"]):
+                adjusted_distance -= community_match_boost
+            else:
+                adjusted_distance += community_mismatch_penalty
+        if hints["expected_types"]:
+            if str(metadata.get("type", "")) in hints["expected_types"]:
+                adjusted_distance -= type_match_boost
+            else:
+                adjusted_distance += type_mismatch_penalty
         candidates.append((adjusted_distance, distance, str(document), metadata))
 
     candidates.sort(key=lambda candidate: (candidate[0], candidate[1]))
@@ -126,7 +256,8 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 "content": document,
             }
         )
-    return chunks
+    assessment = retrieval_assessment(chunks, hints, weak_threshold)
+    return chunks, hints, assessment
 
 
 def build_context_packet(chunks: list[dict[str, Any]]) -> str:
@@ -149,8 +280,8 @@ def build_context_packet(chunks: list[dict[str, Any]]) -> str:
     return "\n\n".join(blocks)
 
 
-def print_sources(chunks: list[dict[str, Any]]) -> None:
-    print("Retrieved Sources:")
+def print_sources(chunks: list[dict[str, Any]], title: str = "Retrieved Sources") -> None:
+    print(f"{title}:")
     if not chunks:
         print("- none")
         return
@@ -164,8 +295,8 @@ def print_sources(chunks: list[dict[str, Any]]) -> None:
         print(f"    {preview}")
 
 
-def print_citations(chunks: list[dict[str, Any]]) -> None:
-    print("Citations:")
+def print_citations(chunks: list[dict[str, Any]], title: str = "Citations") -> None:
+    print(f"{title}:")
     if not chunks:
         print("- none")
         return
@@ -173,13 +304,29 @@ def print_citations(chunks: list[dict[str, Any]]) -> None:
         print(f"[{chunk['source_id']}] {chunk['source_file']} — {chunk['section']}")
 
 
-def context_warning(chunks: list[dict[str, Any]]) -> str:
-    if not chunks:
-        return "Warning: no retrieved context was available."
-    best_distance = min(float(chunk["distance"]) for chunk in chunks)
-    if best_distance > 1.0:
-        return f"Warning: retrieved context may be weak. Best distance: {best_distance}"
-    return ""
+def cited_source_ids(answer: str, chunks: list[dict[str, Any]]) -> list[int]:
+    valid_ids = {int(chunk["source_id"]) for chunk in chunks}
+    found = []
+    for raw_id in re.findall(r"\[(\d+)\]", answer):
+        source_id = int(raw_id)
+        if source_id in valid_ids and source_id not in found:
+            found.append(source_id)
+    return found
+
+
+def chunks_by_ids(chunks: list[dict[str, Any]], source_ids: list[int]) -> list[dict[str, Any]]:
+    lookup = {int(chunk["source_id"]): chunk for chunk in chunks}
+    return [lookup[source_id] for source_id in source_ids if source_id in lookup]
+
+
+def insufficient_context_answer(reason: str) -> str:
+    return "\n".join(
+        [
+            "The vault does not contain enough information to answer this safely.",
+            "",
+            f"Reason: {reason}",
+        ]
+    )
 
 
 def call_deepseek(api_key: str, question: str, context_packet: str, prompt: str) -> str:
@@ -235,17 +382,25 @@ def main() -> int:
     parser.add_argument("--no-ai", action="store_true", help="Print retrieved context and skip DeepSeek.")
     args = parser.parse_args()
 
-    chunks = retrieve_chunks(args.question, args.top_k, args.include_low_value_sections)
+    chunks, hints, assessment = retrieve_chunks(args.question, args.top_k, args.include_low_value_sections)
     context_packet = build_context_packet(chunks)
 
     print(f"Question: {args.question}")
     print()
+    print(f"Retrieval Confidence: {assessment['confidence']}")
+    print(f"Confidence Reason: {assessment['reason']}")
+    if hints["community"]:
+        print(f"Community Hint: {hints['community']}")
+    if hints["missing_community"]:
+        print(f"Community Hint: {hints['missing_community']} (not found in indexed metadata)")
+    if hints["expected_types"]:
+        print(f"Expected Types: {', '.join(sorted(hints['expected_types']))}")
+    print()
     print_sources(chunks)
 
-    warning = context_warning(chunks)
-    if warning:
+    if assessment["confidence"] != "strong":
         print()
-        print(warning)
+        print("Warning: retrieved context is weak.")
 
     if args.show_context:
         print()
@@ -255,7 +410,15 @@ def main() -> int:
     if args.no_ai:
         print()
         print("AI skipped because --no-ai was used.")
-        print_citations(chunks)
+        print_citations(chunks, title="Retrieved Context Citations")
+        return 0
+
+    if assessment["refuse"]:
+        print()
+        print("Generated Answer:")
+        print(insufficient_context_answer(str(assessment["reason"])))
+        print()
+        print_sources(chunks, title="Closest Retrieved Sources")
         return 0
 
     api_key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
@@ -273,7 +436,15 @@ def main() -> int:
     print("Generated Answer:")
     print(answer)
     print()
-    print_citations(chunks)
+    source_ids = cited_source_ids(answer, chunks)
+    cited_chunks = chunks_by_ids(chunks, source_ids)
+    if cited_chunks:
+        print_citations(cited_chunks, title="Answer Citations")
+    else:
+        print("Answer Citations:")
+        print("- no explicit source IDs found in generated answer")
+        print()
+        print_sources(chunks, title="Retrieved Sources For Review")
     return 0
 
 
