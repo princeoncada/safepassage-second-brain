@@ -48,6 +48,19 @@ IN PROGRESS
 - [ ] Confirm generated Markdown writes correctly into `vault/`
 - [ ] Confirm n8n can commit generated files to GitHub on `master`
 
+## Phase 2 Minimal Proof of Work
+
+- [ ] Import workflow into n8n
+- [ ] Replace DeepSeek placeholder key
+- [ ] Run /help test
+- [ ] Run /post test
+- [ ] Run /qa test
+- [ ] Run /incident test
+- [ ] Run /log test
+- [ ] Run unknown fallback test
+- [ ] Confirm files written to correct vault folders
+- [ ] Confirm DeepSeek failure still writes fallback Markdown
+
 ## Known Issues
 
 - The n8n workflow export exists but has not been locally imported or executed yet.

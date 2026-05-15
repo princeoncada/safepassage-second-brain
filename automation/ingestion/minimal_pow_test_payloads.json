@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Prefix post order",
+    "payload": {
+      "input_text": "/post For Sierra Ridge, all overnight visitors must present physical ID before access is granted.",
+      "source": "manual_test",
+      "community": "Sierra Ridge"
+    },
+    "expected": {
+      "classification": "post_order",
+      "target_folder": "vault/03_Post_Orders"
+    }
+  },
+  {
+    "name": "Keyword post order",
+    "payload": {
+      "input_text": "POST ORDER: For Sierra Ridge, all overnight visitors must present physical ID before access is granted.",
+      "source": "manual_test",
+      "community": "Sierra Ridge"
+    },
+    "expected": {
+      "classification": "post_order",
+      "target_folder": "vault/03_Post_Orders"
+    }
+  },
+  {
+    "name": "Prefix QA",
+    "payload": {
+      "input_text": "/qa Always follow physical ID requirements. Digital ID should not be accepted when post order requires physical ID.",
+      "source": "manual_test",
+      "community": "global"
+    },
+    "expected": {
+      "classification": "qa_rule",
+      "target_folder": "vault/04_QA_Rules"
+    }
+  },
+  {
+    "name": "Incident",
+    "payload": {
+      "input_text": "/incident A vehicle tailgated through the resident lane at Monterey.",
+      "source": "manual_test",
+      "community": "Monterey"
+    },
+    "expected": {
+      "classification": "incident",
+      "target_folder": "vault/06_Incidents"
+    }
+  },
+  {
+    "name": "Visitor log",
+    "payload": {
+      "input_text": "/log tag: ABC123 resident: John Doe visitor: Uber Eats",
+      "source": "manual_test",
+      "community": "Sierra Ridge"
+    },
+    "expected": {
+      "classification": "visitor_log",
+      "target_folder": "vault/07_Visitor_Logs"
+    }
+  },
+  {
+    "name": "Unknown",
+    "payload": {
+      "input_text": "Need to remember this thing from yesterday.",
+      "source": "manual_test",
+      "community": "global"
+    },
+    "expected": {
+      "classification": "unknown",
+      "target_folder": "vault/00_Inbox"
+    }
+  },
+  {
+    "name": "Help",
+    "payload": {
+      "input_text": "/help",
+      "source": "manual_test",
+      "community": "global"
+    },
+    "expected": {
+      "write_file": false,
+      "response_includes": "command usage"
+    }
+  }
+]

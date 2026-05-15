@@ -13,13 +13,275 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -900,
+        -1200,
+        0
+      ],
+      "webhookId": "phase-2-minimal-pow-ingest"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || $json;\nconst inputText = String(body.input_text || body.text || '').trim();\nconst source = String(body.source || 'webhook').trim() || 'webhook';\nconst community = String(body.community || 'global').trim() || 'global';\nconst now = new Date();\nconst isoNow = now.toISOString();\n\nreturn [{\n  json: {\n    input_text: inputText,\n    original_input_text: inputText,\n    source,\n    community,\n    received_at: String(body.received_at || isoNow),\n    current_date: isoNow.slice(0, 10),\n    last_updated: isoNow,\n    version: '1.0',\n    vault_root: '/data/vault'\n  }\n}];"
+      },
+      "id": "f7fd9f73-41a4-44ce-8f09-d806450f4971",
+      "name": "Code - Build Canonical Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -920,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const prefixMap = {\n  '/post': { classification: 'post_order', target_folder: 'vault/03_Post_Orders' },\n  '/incident': { classification: 'incident', target_folder: 'vault/06_Incidents' },\n  '/qa': { classification: 'qa_rule', target_folder: 'vault/04_QA_Rules' },\n  '/log': { classification: 'visitor_log', target_folder: 'vault/07_Visitor_Logs' },\n  '/automation': { classification: 'automation', target_folder: 'vault/10_Automations' },\n  '/workflow': { classification: 'workflow', target_folder: 'vault/10_Automations' },\n  '/help': { classification: 'help_response', target_folder: '' }\n};\n\nconst keywordRules = [\n  { classification: 'post_order', target_folder: 'vault/03_Post_Orders', keywords: ['post order', 'must', 'required', 'before access', 'not allowed', 'physical id', 'visitor must'] },\n  { classification: 'incident', target_folder: 'vault/06_Incidents', keywords: ['incident', 'tailgate', 'tailgating', 'gate arm', 'happened', 'reported'] },\n  { classification: 'qa_rule', target_folder: 'vault/04_QA_Rules', keywords: ['qa', 'ding', 'audit', 'compliance'] },\n  { classification: 'visitor_log', target_folder: 'vault/07_Visitor_Logs', keywords: ['tag:', 'resident:', 'visitor:', 'vendor:'] },\n  { classification: 'automation', target_folder: 'vault/10_Automations', keywords: ['n8n', 'webhook', 'automation'] },\n  { classification: 'workflow', target_folder: 'vault/10_Automations', keywords: ['workflow', 'process', 'step by step'] }\n];\n\nfunction titleCase(input) {\n  return String(input || '')\n    .replace(/[-_]+/g, ' ')\n    .split(/\\s+/)\n    .filter(Boolean)\n    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())\n    .join(' ');\n}\n\nfunction slugify(input, maxLength = 72) {\n  const slug = String(input || '')\n    .toLowerCase()\n    .replace(/[\\\\/:*?\"<>|]/g, ' ')\n    .replace(/[^a-z0-9\\s-]/g, ' ')\n    .replace(/\\s+/g, '-')\n    .replace(/-+/g, '-')\n    .replace(/^-+|-+$/g, '');\n  return (slug || 'untitled').slice(0, maxLength).replace(/-+$/g, '') || 'untitled';\n}\n\nfunction firstSentence(input) {\n  const normalized = String(input || '').replace(/\\s+/g, ' ').trim();\n  const match = normalized.match(/^(.{1,140}?)([.!?]|$)/);\n  return (match ? match[1] : normalized.slice(0, 140)).trim();\n}\n\nfunction classifyByKeywords(text) {\n  const lower = text.toLowerCase();\n  for (const rule of keywordRules) {\n    if (rule.keywords.some((keyword) => lower.includes(keyword))) {\n      return { classification: rule.classification, target_folder: rule.target_folder, classification_source: 'keyword' };\n    }\n  }\n  return { classification: 'unknown', target_folder: 'vault/00_Inbox', classification_source: 'fallback' };\n}\n\nreturn items.map((item) => {\n  const payload = item.json;\n  const raw = String(payload.input_text || '').trim();\n  const lower = raw.toLowerCase();\n  const matchedPrefix = Object.keys(prefixMap).find((prefix) => lower === prefix || lower.startsWith(`${prefix} `));\n  const command = matchedPrefix || '';\n  const bodyText = matchedPrefix ? raw.slice(matchedPrefix.length).trim() : raw;\n  const routed = matchedPrefix ? { ...prefixMap[matchedPrefix], classification_source: 'prefix' } : classifyByKeywords(raw);\n  const highPriority = ['post_order', 'incident', 'qa_rule'];\n  const humanReview = ['post_order', 'incident', 'qa_rule', 'unknown'].includes(routed.classification);\n  const priority = highPriority.includes(routed.classification) ? 'high' : 'medium';\n  const communitySlug = slugify(payload.community || 'global', 32);\n  const topicSlug = slugify(firstSentence(bodyText || routed.classification), 64);\n  const classificationSlug = slugify(routed.classification, 32);\n  const filename = `${payload.current_date}-${communitySlug}-${topicSlug}-${classificationSlug}.md`;\n  const title = titleCase(firstSentence(bodyText || routed.classification));\n  const usage = [\n    'SafePassage Phase 2 Minimal POW ingestion commands:',\n    '/post <text> - route post orders to vault/03_Post_Orders',\n    '/incident <text> - route incidents to vault/06_Incidents',\n    '/qa <text> - route QA rules to vault/04_QA_Rules',\n    '/log <text> - route visitor logs to vault/07_Visitor_Logs',\n    '/automation <text> - route automations to vault/10_Automations',\n    '/workflow <text> - route workflows to vault/10_Automations',\n    '/help - return this usage response without writing a file'\n  ];\n\n  return {\n    json: {\n      ...payload,\n      command,\n      body_text: bodyText,\n      classification: routed.classification,\n      classification_source: routed.classification_source,\n      target_folder: routed.target_folder,\n      priority,\n      human_review_required: humanReview,\n      status: humanReview ? 'needs_review' : 'active',\n      title,\n      tags: [routed.classification, slugify(payload.community || 'global', 32), 'phase-2-minimal-pow'],\n      suggested_filename: filename,\n      is_help: routed.classification === 'help_response',\n      help_usage: usage,\n      deepseek_request_body: {\n        model: 'deepseek-chat',\n        temperature: 0.1,\n        messages: [\n          {\n            role: 'system',\n            content: 'Return JSON only with keys summary, details, agent_action, qa_notes, open_questions. Clean and improve Markdown body sections only. Do not generate YAML frontmatter. Do not classify, route, prioritize, name files, or invent facts.'\n          },\n          {\n            role: 'user',\n            content: JSON.stringify({\n              input_text: bodyText,\n              classification: routed.classification,\n              community: payload.community,\n              source: payload.source,\n              required_schema: {\n                summary: '',\n                details: '',\n                agent_action: '',\n                qa_notes: '',\n                open_questions: []\n              }\n            })\n          }\n        ]\n      }\n    }\n  };\n});"
+      },
+      "id": "bd0d3950-8e11-4e8a-9607-1e125efb9cf2",
+      "name": "Code - Deterministic Classification and Routing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer REPLACE_WITH_DEEPSEEK_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.deepseek_request_body) }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "8c70124d-bc10-4485-90eb-721709f95db7",
+      "name": "HTTP - Optional DeepSeek Markdown Cleanup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -360,
+        0
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $('Code - Deterministic Classification and Routing').first().json;\nconst http = $input.first().json || {};\n\nfunction fallbackSections(input) {\n  const text = String(input || '').trim();\n  return {\n    summary: text ? text.slice(0, 220) : 'No source input was provided.',\n    details: text || 'No details provided.',\n    agent_action: payload.human_review_required ? 'Review this item before operational use.' : 'No manual action required unless local procedure says otherwise.',\n    qa_notes: payload.human_review_required ? 'Human review is required by deterministic routing.' : 'No QA escalation required by deterministic routing.',\n    open_questions: []\n  };\n}\n\nfunction parseJsonText(value) {\n  if (typeof value !== 'string') return null;\n  const cleaned = value.trim().replace(/^```json\\s*/i, '').replace(/^```\\s*/i, '').replace(/```$/i, '').trim();\n  if (!cleaned) return null;\n  return JSON.parse(cleaned);\n}\n\nlet parsed = null;\nlet usedAi = false;\ntry {\n  if (http && http.choices && http.choices[0] && http.choices[0].message) {\n    parsed = parseJsonText(http.choices[0].message.content);\n  } else if (typeof http.body === 'string') {\n    const body = parseJsonText(http.body);\n    parsed = body && body.choices ? parseJsonText(body.choices[0]?.message?.content) : body;\n  } else if (http.body && typeof http.body === 'object') {\n    parsed = http.body.choices ? parseJsonText(http.body.choices[0]?.message?.content) : http.body;\n  }\n  usedAi = parsed && typeof parsed === 'object';\n} catch (error) {\n  parsed = null;\n}\n\nconst fallback = fallbackSections(payload.body_text);\nconst sections = {\n  summary: String(parsed?.summary || fallback.summary).trim(),\n  details: String(parsed?.details || fallback.details).trim(),\n  agent_action: String(parsed?.agent_action || fallback.agent_action).trim(),\n  qa_notes: String(parsed?.qa_notes || fallback.qa_notes).trim(),\n  open_questions: Array.isArray(parsed?.open_questions) ? parsed.open_questions.map((item) => String(item).trim()).filter(Boolean) : fallback.open_questions\n};\n\nreturn [{\n  json: {\n    ...payload,\n    ai_cleanup_used: usedAi,\n    ai_cleanup_failed: !usedAi,\n    markdown_sections: sections\n  }\n}];"
+      },
+      "id": "a03c384d-ea7f-47a8-895f-37b679d7c09b",
+      "name": "Code - Safe Parse AI Response With Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function yamlValue(value) {\n  const text = String(value ?? '').replace(/\\r?\\n/g, ' ').replace(/\"/g, '\\\\\"').trim();\n  return `\"${text}\"`;\n}\n\nfunction yamlArray(values) {\n  const list = Array.isArray(values) ? values : [];\n  return `[${list.map((value) => yamlValue(value)).join(', ')}]`;\n}\n\nfunction sectionList(values) {\n  if (!Array.isArray(values) || values.length === 0) return '- None recorded.';\n  return values.map((value) => `- ${String(value).trim()}`).join('\\n');\n}\n\nreturn items.map((item) => {\n  const payload = item.json;\n  if (payload.is_help) {\n    return {\n      json: {\n        ...payload,\n        should_write: false,\n        response_status: 'ok',\n        response_message: payload.help_usage.join('\\n')\n      }\n    };\n  }\n\n  const sections = payload.markdown_sections || {};\n  const markdown = [\n    '---',\n    `title: ${yamlValue(payload.title)}`,\n    `type: ${yamlValue(payload.classification)}`,\n    `community: ${yamlValue(payload.community)}`,\n    `priority: ${yamlValue(payload.priority)}`,\n    `effective_date: ${yamlValue(payload.current_date)}`,\n    `source: ${yamlValue(payload.source)}`,\n    `status: ${yamlValue(payload.status)}`,\n    `tags: ${yamlArray(payload.tags)}`,\n    `last_updated: ${yamlValue(payload.last_updated)}`,\n    `version: ${yamlValue(payload.version)}`,\n    `human_review_required: ${payload.human_review_required ? 'true' : 'false'}`,\n    '---',\n    '',\n    `# ${payload.title}`,\n    '',\n    '## Summary',\n    '',\n    sections.summary || 'No summary available.',\n    '',\n    '## Details',\n    '',\n    sections.details || 'No details available.',\n    '',\n    '## Agent Action',\n    '',\n    sections.agent_action || 'No agent action recorded.',\n    '',\n    '## QA Notes',\n    '',\n    sections.qa_notes || 'No QA notes recorded.',\n    '',\n    '## Open Questions',\n    '',\n    sectionList(sections.open_questions),\n    '',\n    '## Source Input',\n    '',\n    payload.body_text || payload.original_input_text || 'No source input provided.',\n    '',\n    '## Change History',\n    '',\n    `- ${payload.current_date}: Created by Phase 2 Minimal POW ingestion workflow.`,\n    ''\n  ].join('\\n');\n\n  return {\n    json: {\n      ...payload,\n      should_write: true,\n      final_markdown: markdown\n    }\n  };\n});"
+      },
+      "id": "5fc41187-7860-4a4b-9a5c-9449aa2ec66a",
+      "name": "Code - Build Final Markdown",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const path = require('path');\nconst vaultRoot = path.resolve('/data/vault');\nconst requiredFields = ['title', 'type', 'community', 'priority', 'effective_date', 'source', 'status', 'tags', 'last_updated', 'version', 'human_review_required'];\n\nfunction validateFrontmatter(markdown) {\n  const match = String(markdown || '').match(/^---\\n([\\s\\S]*?)\\n---\\n/);\n  if (!match) throw new Error('Final Markdown is missing YAML frontmatter.');\n  for (const field of requiredFields) {\n    if (!new RegExp(`^${field}:`, 'm').test(match[1])) {\n      throw new Error(`Final Markdown is missing required YAML field: ${field}`);\n    }\n  }\n}\n\nfunction validateFilename(filename) {\n  if (!filename || typeof filename !== 'string') throw new Error('Filename is required.');\n  if (!filename.endsWith('.md')) throw new Error('Filename must end with .md.');\n  if (/[\\\\/:*?\"<>|]/.test(filename)) throw new Error('Filename contains unsafe filesystem characters.');\n  if (filename.includes('..') || filename.includes(' ')) throw new Error('Filename contains path traversal or spaces.');\n}\n\nreturn items.map((item) => {\n  const payload = item.json;\n  if (!payload.should_write) {\n    return { json: { ...payload, validated: true, final_destination: null } };\n  }\n\n  const targetFolder = String(payload.target_folder || '').replace(/\\\\/g, '/');\n  if (!targetFolder.startsWith('vault/')) throw new Error('target_folder must start with vault/.');\n  if (targetFolder.includes('..') || path.isAbsolute(targetFolder)) throw new Error('Unsafe target_folder blocked.');\n\n  validateFilename(payload.suggested_filename);\n  validateFrontmatter(payload.final_markdown);\n\n  const relativeFolder = targetFolder.replace(/^vault\\//, '');\n  const folderPath = path.resolve(vaultRoot, relativeFolder);\n  const finalDestination = path.resolve(folderPath, payload.suggested_filename);\n  if (!folderPath.startsWith(`${vaultRoot}${path.sep}`) || !finalDestination.startsWith(`${vaultRoot}${path.sep}`)) {\n    throw new Error('Final destination must stay inside /data/vault.');\n  }\n\n  return {\n    json: {\n      ...payload,\n      validated: true,\n      final_destination: finalDestination,\n      relative_vault_path: path.posix.join(targetFolder, payload.suggested_filename)\n    }\n  };\n});"
+      },
+      "id": "80dd63da-6d6d-47db-9edb-58a0555f07d0",
+      "name": "Code - Validate Final Output and Safe Path",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst path = require('path');\nconst vaultRoot = path.resolve('/data/vault');\n\nfunction timestamp() {\n  const now = new Date();\n  const hh = String(now.getHours()).padStart(2, '0');\n  const mm = String(now.getMinutes()).padStart(2, '0');\n  const ss = String(now.getSeconds()).padStart(2, '0');\n  return `${hh}${mm}${ss}`;\n}\n\nreturn items.map((item) => {\n  const payload = item.json;\n  if (!payload.should_write) {\n    return {\n      json: {\n        ...payload,\n        write_status: 'skipped',\n        written_file: null,\n        written_filename: null\n      }\n    };\n  }\n\n  let destination = payload.final_destination;\n  let filename = payload.suggested_filename;\n  if (fs.existsSync(destination)) {\n    filename = filename.replace(/\\.md$/i, `-${timestamp()}.md`);\n    destination = path.resolve(path.dirname(destination), filename);\n    if (!destination.startsWith(`${vaultRoot}${path.sep}`)) throw new Error('Timestamped destination escaped /data/vault.');\n  }\n\n  fs.mkdirSync(path.dirname(destination), { recursive: true });\n  fs.writeFileSync(destination, payload.final_markdown, 'utf8');\n\n  return {\n    json: {\n      ...payload,\n      write_status: 'written',\n      written_file: destination,\n      written_filename: filename,\n      relative_vault_path: path.posix.join(payload.target_folder, filename)\n    }\n  };\n});"
+      },
+      "id": "92cf3914-11a5-4117-a43f-d02483d4167a",
+      "name": "Code - Write File Locally To Vault",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const payload = item.json;\n  if (payload.is_help) {\n    return {\n      json: {\n        status: 'ok',\n        command: '/help',\n        wrote_file: false,\n        usage: payload.help_usage\n      }\n    };\n  }\n\n  return {\n    json: {\n      status: 'accepted',\n      classification: payload.classification,\n      classification_source: payload.classification_source,\n      priority: payload.priority,\n      target_folder: payload.target_folder,\n      suggested_filename: payload.written_filename || payload.suggested_filename,\n      relative_vault_path: payload.relative_vault_path,\n      written_file: payload.written_file,\n      human_review_required: payload.human_review_required,\n      document_status: payload.status,\n      ai_cleanup_used: payload.ai_cleanup_used,\n      ai_cleanup_failed: payload.ai_cleanup_failed,\n      write_status: payload.write_status\n    }\n  };\n});"
+      },
+      "id": "f12f7afd-2d2d-4a57-b50a-ed5654f619be",
+      "name": "Code - Build Webhook Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "6fb59a7c-e2e5-467a-b2a3-075915a5ee53",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1320,
         0
       ]
     }
   ],
-  "connections": {},
+  "pinData": {},
+  "connections": {
+    "Webhook - Minimal POW Ingest": {
+      "main": [
+        [
+          {
+            "node": "Code - Build Canonical Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Build Canonical Payload": {
+      "main": [
+        [
+          {
+            "node": "Code - Deterministic Classification and Routing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Deterministic Classification and Routing": {
+      "main": [
+        [
+          {
+            "node": "HTTP - Optional DeepSeek Markdown Cleanup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Optional DeepSeek Markdown Cleanup": {
+      "main": [
+        [
+          {
+            "node": "Code - Safe Parse AI Response With Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Safe Parse AI Response With Fallback": {
+      "main": [
+        [
+          {
+            "node": "Code - Build Final Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Build Final Markdown": {
+      "main": [
+        [
+          {
+            "node": "Code - Validate Final Output and Safe Path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Validate Final Output and Safe Path": {
+      "main": [
+        [
+          {
+            "node": "Code - Write File Locally To Vault",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Write File Locally To Vault": {
+      "main": [
+        [
+          {
+            "node": "Code - Build Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Build Webhook Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
   "settings": {
-    "executionOrder": "v1"
-  }
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "versionId": "phase-2-minimal-pow-v2",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "Deterministic Phase 2 minimal proof-of-work ingestion workflow. DeepSeek is optional and used once only for Markdown section cleanup."
+  },
+  "tags": [
+    {
+      "name": "phase-2"
+    },
+    {
+      "name": "minimal-pow"
+    }
+  ]
 }
