@@ -5,13 +5,13 @@ Current status: WORKING PROOF OF WORK
 - Phase 3A retrieval works.
 - Phase 3B grounded answering works.
 - Phase 3D local API wrapper is available for HTTP access.
-- Open WebUI is not implemented yet.
+- Phase 3E documents Open WebUI as a presentation-only UI over FastAPI.
 
 Phase 3A tests whether local semantic search can retrieve the right Markdown chunks from `vault/`.
 
 Phase 3B adds minimal grounded answer generation using only retrieved vault chunks.
 
-This does not add Open WebUI, n8n integration, agents, automatic memory editing, Git automation, dashboards, or Phase 4 automations.
+This does not add Open WebUI-hosted retrieval, n8n integration, agents, automatic memory editing, Git automation, dashboards, or Phase 4 automations.
 
 ## Install
 
@@ -107,7 +107,7 @@ These are not blockers.
 7. Open Questions may contain generic AI filler.
 8. Git auto-commit remains deferred.
 
-Recommended next phase: PHASE 3C - RAG QUALITY HARDENING. After Phase 3C, consider Open WebUI integration.
+Recommended next phase after Phase 3E: keep Open WebUI presentation-only and validate the UI connection before considering any Phase 4 automation.
 
 ## Phase 3C Hardening
 
@@ -167,3 +167,21 @@ Invoke-RestMethod `
 ```
 
 The API is only a local interface wrapper. Markdown remains the source of truth and ChromaDB remains rebuildable derived data.
+
+## Phase 3E Open WebUI
+
+Open WebUI should call the local FastAPI endpoint:
+
+```text
+POST http://localhost:8000/ask
+```
+
+If Open WebUI runs in Docker and FastAPI runs on the host, use:
+
+```text
+POST http://host.docker.internal:8000/ask
+```
+
+Open WebUI is only the conversational UI. It should display the `answer`, `answer_citations`, `retrieval_confidence`, `confidence_reason`, `sources`, and `warnings` returned by FastAPI. It should not call ChromaDB directly, write Markdown, edit memory, or bypass the refusal behavior.
+
+Details: `openwebui/README.md`.
