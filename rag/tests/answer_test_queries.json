@@ -1,0 +1,18 @@
+[
+  {
+    "query": "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?",
+    "expected_behavior": "Answer should say request/reject digital ID based on physical ID requirement and cite Sierra Ridge QA/post order sources."
+  },
+  {
+    "query": "What happened with tailgating at Monterey?",
+    "expected_behavior": "Answer should summarize Monterey tailgating incident and cite incident Summary/Details."
+  },
+  {
+    "query": "What are Sierra Ridge overnight visitor ID rules?",
+    "expected_behavior": "Answer should mention overnight visitors must present physical ID before access and cite post order."
+  },
+  {
+    "query": "What is the rule for a community that is not in the vault?",
+    "expected_behavior": "Answer should say the vault does not contain enough information."
+  }
+]

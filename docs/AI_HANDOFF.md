@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 3A - MINIMAL RAG PROOF OF WORK is in progress. Phase 2 Minimal POW ingestion is working locally and must not be rewritten while Phase 3A is implemented.
+PHASE 3B - ANSWER GENERATION FROM RETRIEVED VAULT CONTEXT is in progress. Phase 2 Minimal POW ingestion and Phase 3A retrieval are working locally and must not be rewritten.
 
 ## What Exists
 
@@ -15,6 +15,7 @@ PHASE 3A - MINIMAL RAG PROOF OF WORK is in progress. Phase 2 Minimal POW ingesti
 - n8n setup and local testing documentation.
 - Phase 3A local RAG scripts under `rag/` for disposable ChromaDB indexing and retrieval-only querying.
 - Phase 3A retrieval quality refinement filters low-value sections by default and prioritizes useful evidence sections.
+- Phase 3B CLI answer generation in `rag/scripts/answer_vault.py`, grounded only in retrieved ChromaDB chunks.
 
 ## Continue From Here
 
@@ -35,9 +36,9 @@ Future AI work should:
 
 - Do not implement Open WebUI.
 - Do not add advanced automations beyond the documented Phase 2 ingestion workflow.
-- Do not add autonomous agents, advanced memory systems, or answer generation.
-- Do not use cloud embeddings or API keys for Phase 3A.
-- Do not start Phase 3B until Phase 3A retrieval ranking is validated.
+- Do not add autonomous agents, advanced memory systems, automatic memory editing, or dashboards.
+- Do not use cloud embeddings.
+- Do not expand Phase 3B beyond retrieved-context answer generation.
 - Do not commit secrets, real API keys, `.env`, `n8n_data`, or generated credential files.
 
 ## Phase 3A Exit Criteria
@@ -50,6 +51,16 @@ Phase 3A should only be marked validated after:
 - `query_vault.py` retrieves a Monterey `incident` chunk for tailgating questions;
 - low-value sections such as `Change History`, `Open Questions`, and `Source Input` do not pollute default top results;
 - retrieval quality is inspected before any answer generation is added.
+
+## Phase 3B Exit Criteria
+
+Phase 3B should only be marked validated after:
+
+- `DEEPSEEK_API_KEY` is handled through the environment only;
+- `answer_vault.py --no-ai --show-context` works without an API key;
+- generated answers cite source file and section;
+- insufficient context produces a safe refusal;
+- no Open WebUI, n8n changes, agents, or automation are added.
 
 ## Phase 2 Exit Criteria
 

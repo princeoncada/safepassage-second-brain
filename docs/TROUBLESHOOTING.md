@@ -176,3 +176,46 @@ pip install -r rag/requirements.txt
 ```
 
 Phase 3A uses local `sentence-transformers` embeddings and does not require API keys.
+
+## Phase 3B Missing DeepSeek Key
+
+If `answer_vault.py` says `DEEPSEEK_API_KEY` is not set, set it in PowerShell:
+
+```powershell
+$env:DEEPSEEK_API_KEY="your_key_here"
+```
+
+To validate retrieval without an API key:
+
+```powershell
+python rag/scripts/answer_vault.py "What are Sierra Ridge overnight visitor ID rules?" --no-ai --show-context
+```
+
+## Phase 3B Answer Has No Citations
+
+The answer is not valid unless it cites source file and section. Re-run with context visible:
+
+```powershell
+python rag/scripts/answer_vault.py "What are Sierra Ridge overnight visitor ID rules?" --show-context --top-k 5
+```
+
+Check that retrieved chunks are relevant before trusting the answer.
+
+## Phase 3B Invents A Policy
+
+Treat this as a failed validation. The prompt requires the model to answer only from retrieved context and to say:
+
+```text
+The vault does not contain enough information to answer this safely.
+```
+
+when context is insufficient. Improve vault source content or retrieval quality before expanding answer generation.
+
+## Phase 3B DeepSeek Request Fails
+
+Check:
+
+- `DEEPSEEK_API_KEY` is set in the current shell.
+- network access is available.
+- the ChromaDB index exists and was built with `python rag/scripts/index_vault.py`.
+- `--no-ai` still works for retrieval-only validation.

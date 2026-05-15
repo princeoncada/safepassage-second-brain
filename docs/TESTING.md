@@ -148,3 +148,28 @@ To debug excluded sections:
 python rag/scripts/index_vault.py --include-low-value-sections
 python rag/scripts/query_vault.py "What are Sierra Ridge physical ID rules?" --include-low-value-sections --top-k 5
 ```
+
+## Phase 3B Answer Validation
+
+Set the DeepSeek key in PowerShell:
+
+```powershell
+$env:DEEPSEEK_API_KEY="your_key_here"
+```
+
+Run grounded answer tests:
+
+```powershell
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What happened with tailgating at Monterey?" --top-k 5
+python rag/scripts/answer_vault.py "What are Sierra Ridge overnight visitor ID rules?" --top-k 5
+python rag/scripts/answer_vault.py "What is the rule for a community that is not in the vault?" --top-k 5
+```
+
+Retrieval-only validation:
+
+```powershell
+python rag/scripts/answer_vault.py "What are Sierra Ridge overnight visitor ID rules?" --no-ai --show-context
+```
+
+Expected results are documented in `rag/tests/answer_expected_results.md`. Phase 3B passes only when answers use retrieved context, cite source file and section, and refuse safely when context is insufficient.

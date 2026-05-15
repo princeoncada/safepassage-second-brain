@@ -23,6 +23,8 @@ Handles ingestion, formatting, routing, exports, GitHub commits, and future Chro
 ### DeepSeek API
 Used initially for classification, summarization, formatting, and structured ingestion.
 
+For Phase 3B, DeepSeek is used only for final answer generation from retrieved vault context. It must not retrieve, edit memory, or invent unsupported policy.
+
 ### ChromaDB
 Planned for Phase 3. Used for semantic retrieval and metadata-aware search.
 
@@ -31,7 +33,7 @@ For Phase 3A, ChromaDB is a local disposable index under `rag/chroma/`. It is re
 ### Open WebUI
 Planned later as the chat interface only. It is not the storage layer.
 
-Open WebUI is not part of Phase 3A.
+Open WebUI is not part of Phase 3A or Phase 3B.
 
 ## Phase 3A Retrieval Flow
 
@@ -42,6 +44,17 @@ Markdown files in `vault/`
 -> retrieval-only CLI query results
 
 Phase 3A does not generate answers. It validates retrieval quality before adding answer generation.
+
+## Phase 3B Answer Flow
+
+User question
+-> local sentence-transformers query embedding
+-> ChromaDB retrieves top vault chunks
+-> compact context packet is built
+-> DeepSeek generates a grounded answer from retrieved context only
+-> answer cites source file and section
+
+If retrieved context is insufficient, the answer must say the vault does not contain enough information to answer safely.
 
 ## Phase 1 Data Flow
 

@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 3A - MINIMAL RAG PROOF OF WORK
+PHASE 3B - ANSWER GENERATION FROM RETRIEVED VAULT CONTEXT
 
 ## Goal
 
@@ -70,13 +70,13 @@ IN PROGRESS
 - [x] Add safe ChromaDB reset script
 - [x] Add Phase 3A test query definitions
 - [x] Add Phase 3A documentation
-- [ ] Install RAG dependencies locally
-- [ ] Run vault indexing locally
-- [ ] Run Sierra Ridge physical ID query
-- [ ] Run Monterey tailgating query
-- [ ] Run digital ID QA query
-- [ ] Confirm relevant chunks are retrieved
-- [ ] Confirm no answer generation is implemented
+- [x] Install RAG dependencies locally
+- [x] Run vault indexing locally
+- [x] Run Sierra Ridge physical ID query
+- [x] Run Monterey tailgating query
+- [x] Run digital ID QA query
+- [x] Confirm relevant chunks are retrieved
+- [x] Confirm no answer generation was implemented in Phase 3A
 
 ## Phase 3A Retrieval Quality Refinement
 
@@ -85,11 +85,24 @@ IN PROGRESS
 - [x] Exclude low-value sections from default indexing
 - [x] Prefer Summary, Details, Agent Action, and QA Notes
 - [x] Reduce duplicate-looking retrieval results
-- [ ] Rebuild local ChromaDB index after refinement
-- [ ] Validate physical ID retrieval ranking
-- [ ] Validate Monterey tailgating retrieval ranking
-- [ ] Validate digital ID QA retrieval ranking
-- [ ] Keep Phase 3B answer generation unstarted
+- [x] Rebuild local ChromaDB index after refinement
+- [x] Validate physical ID retrieval ranking
+- [x] Validate Monterey tailgating retrieval ranking
+- [x] Validate digital ID QA retrieval ranking
+
+## Phase 3B Grounded Answer Generation
+
+- [x] Start Phase 3B answer generation layer
+- [x] Add strict answer-from-context prompt
+- [x] Add CLI answer script using retrieved ChromaDB chunks
+- [x] Add retrieval-only `--no-ai` mode
+- [x] Add missing API key handling for `DEEPSEEK_API_KEY`
+- [x] Add answer test queries and expected result criteria
+- [x] Add Phase 3B documentation
+- [ ] Validate DeepSeek grounded answers locally
+- [ ] Confirm citations include source file and section
+- [ ] Confirm insufficient context response is safe
+- [ ] Confirm no Open WebUI, n8n, agents, or automation were added
 
 ## Known Issues
 
@@ -98,7 +111,7 @@ IN PROGRESS
 
 ## Validation Status
 
-PHASE 3A RETRIEVAL WORKS; RANKING REFINEMENT IN PROGRESS; PHASE 3B ANSWER GENERATION NOT STARTED
+PHASE 3A RETRIEVAL POW PASSED; PHASE 3B ANSWERING STARTED AND IN PROGRESS; PHASE 3 COMPLETE NOT MARKED
 
 ## Ready for Next Phase
 
