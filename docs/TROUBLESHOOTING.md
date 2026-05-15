@@ -115,3 +115,42 @@ Then flag the item with `credential-risk`.
 ## Phase Boundary Confusion
 
 Phase 2 only covers structured ingestion. Do not add ChromaDB, RAG, Open WebUI, autonomous agents, vector databases, memory systems, semantic search, or advanced automation implementation until a later phase explicitly starts.
+
+## Phase 3A Index Has No Results
+
+Run:
+
+```powershell
+python rag/scripts/index_vault.py
+```
+
+Confirm `vault/` contains Markdown files and that they are not only under `vault/99_Archive`, which is skipped by default.
+
+## Phase 3A Query Fails Because Collection Is Missing
+
+The local ChromaDB index has not been built or was reset. Rebuild it:
+
+```powershell
+python rag/scripts/index_vault.py
+```
+
+## Phase 3A Retrieval Looks Wrong
+
+Check the source Markdown first. ChromaDB is disposable derived data, while `vault/` is the source of truth.
+
+Then reset and rebuild:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+## Phase 3A Dependency Install Fails
+
+Confirm Python and pip are available, then run:
+
+```powershell
+pip install -r rag/requirements.txt
+```
+
+Phase 3A uses local `sentence-transformers` embeddings and does not require API keys.

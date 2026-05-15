@@ -1,0 +1,17 @@
+[
+  {
+    "query": "What are Sierra Ridge physical ID rules?",
+    "expected_types": ["post_order", "qa_rule"],
+    "expected_communities": ["Sierra Ridge"]
+  },
+  {
+    "query": "What happened with tailgating at Monterey?",
+    "expected_types": ["incident"],
+    "expected_communities": ["Monterey"]
+  },
+  {
+    "query": "What should I do if a digital ID is accepted when physical ID is required?",
+    "expected_types": ["qa_rule"],
+    "expected_communities": ["Sierra Ridge"]
+  }
+]

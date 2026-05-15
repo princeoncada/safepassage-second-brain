@@ -26,8 +26,22 @@ Used initially for classification, summarization, formatting, and structured ing
 ### ChromaDB
 Planned for Phase 3. Used for semantic retrieval and metadata-aware search.
 
+For Phase 3A, ChromaDB is a local disposable index under `rag/chroma/`. It is rebuilt from Markdown in `vault/` and is not a source of truth.
+
 ### Open WebUI
 Planned later as the chat interface only. It is not the storage layer.
+
+Open WebUI is not part of Phase 3A.
+
+## Phase 3A Retrieval Flow
+
+Markdown files in `vault/`
+-> deterministic section chunking
+-> local sentence-transformers embeddings
+-> local ChromaDB collection `safepassage_vault_chunks`
+-> retrieval-only CLI query results
+
+Phase 3A does not generate answers. It validates retrieval quality before adding answer generation.
 
 ## Phase 1 Data Flow
 

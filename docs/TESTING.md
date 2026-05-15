@@ -103,3 +103,33 @@ The secret scan should return no real secrets. Placeholder values in `.env.examp
 ## Local Execution Status
 
 Do not mark Phase 2 complete until a human validates the workflow in local n8n. Repository-level JSON and script checks are not the same as confirming DeepSeek API calls, vault writes, or Git pushes.
+
+## Phase 3A RAG Validation
+
+Install dependencies:
+
+```powershell
+pip install -r rag/requirements.txt
+```
+
+Build the local disposable ChromaDB index:
+
+```powershell
+python rag/scripts/index_vault.py
+```
+
+Run retrieval-only test queries:
+
+```powershell
+python rag/scripts/query_vault.py "What are Sierra Ridge physical ID rules?"
+python rag/scripts/query_vault.py "What happened with tailgating at Monterey?"
+python rag/scripts/query_vault.py "What should I do if a digital ID is accepted when physical ID is required?"
+```
+
+Expected results are documented in `rag/tests/expected_results.md`. Phase 3A passes only when relevant chunks are retrieved; it does not generate AI answers.
+
+Reset the index when needed:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+```

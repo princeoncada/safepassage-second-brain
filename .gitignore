@@ -7,6 +7,8 @@ n8n_data/
 
 # ChromaDB future local data
 chroma_data/
+rag/chroma/*
+!rag/chroma/.gitkeep
 
 # Exports
 exports/docx/*.docx

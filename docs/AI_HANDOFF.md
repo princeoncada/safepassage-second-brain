@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 2 - STRUCTURED INGESTION is in progress.
+PHASE 3A - MINIMAL RAG PROOF OF WORK is in progress. Phase 2 Minimal POW ingestion is working locally and must not be rewritten while Phase 3A is implemented.
 
 ## What Exists
 
@@ -13,6 +13,7 @@ PHASE 2 - STRUCTURED INGESTION is in progress.
 - Importable n8n workflow export for local validation.
 - Helper scripts for filename sanitization, payload validation, metadata validation, Markdown writing, and Git commit/push.
 - n8n setup and local testing documentation.
+- Phase 3A local RAG scripts under `rag/` for disposable ChromaDB indexing and retrieval-only querying.
 
 ## Continue From Here
 
@@ -26,15 +27,26 @@ Future AI work should:
 6. Add or refine samples when document type behavior changes.
 7. Keep `docs/PHASE_LOG.md` accurate.
 8. Keep `workflows/n8n/phase_2_ingestion_workflow.json` inactive by default until local validation is complete.
+9. Treat `vault/` Markdown as the source of truth.
+10. Treat `rag/chroma/` as disposable derived data.
 
 ## Do Not Do Yet
 
-- Do not implement ChromaDB.
-- Do not implement RAG.
 - Do not implement Open WebUI.
 - Do not add advanced automations beyond the documented Phase 2 ingestion workflow.
-- Do not add autonomous agents, vector databases, memory systems, or semantic search.
+- Do not add autonomous agents, advanced memory systems, or answer generation.
+- Do not use cloud embeddings or API keys for Phase 3A.
 - Do not commit secrets, real API keys, `.env`, `n8n_data`, or generated credential files.
+
+## Phase 3A Exit Criteria
+
+Phase 3A should only be marked validated after:
+
+- dependencies install from `rag/requirements.txt`;
+- `python rag/scripts/index_vault.py` creates a local ChromaDB index;
+- `query_vault.py` retrieves Sierra Ridge `post_order` or `qa_rule` chunks for physical ID questions;
+- `query_vault.py` retrieves a Monterey `incident` chunk for tailgating questions;
+- retrieval quality is inspected before any answer generation is added.
 
 ## Phase 2 Exit Criteria
 

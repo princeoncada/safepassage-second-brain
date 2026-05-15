@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 2 - STRUCTURED INGESTION
+PHASE 3A - MINIMAL RAG PROOF OF WORK
 
 ## Goal
 
@@ -61,6 +61,23 @@ IN PROGRESS
 - [ ] Confirm files written to correct vault folders
 - [ ] Confirm DeepSeek failure still writes fallback Markdown
 
+## Phase 3A Minimal RAG Proof of Work
+
+- [x] Add local RAG script folder
+- [x] Add ChromaDB requirements
+- [x] Add deterministic vault indexing script
+- [x] Add retrieval-only query script
+- [x] Add safe ChromaDB reset script
+- [x] Add Phase 3A test query definitions
+- [x] Add Phase 3A documentation
+- [ ] Install RAG dependencies locally
+- [ ] Run vault indexing locally
+- [ ] Run Sierra Ridge physical ID query
+- [ ] Run Monterey tailgating query
+- [ ] Run digital ID QA query
+- [ ] Confirm relevant chunks are retrieved
+- [ ] Confirm no answer generation is implemented
+
 ## Known Issues
 
 - The n8n workflow export exists but has not been locally imported or executed yet.
@@ -68,7 +85,7 @@ IN PROGRESS
 
 ## Validation Status
 
-DOCUMENTATION AND TEST SAMPLES PRESENT
+PHASE 3A IMPLEMENTATION PRESENT; LOCAL RAG VALIDATION PENDING
 
 ## Ready for Next Phase
 
