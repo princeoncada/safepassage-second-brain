@@ -151,6 +151,11 @@ def extract_query_hints(query: str, config: dict[str, Any], candidate_communitie
         expected_types.add("incident")
     if any(term in normalized_query for term in ["visitor log", "tag", "vendor"]):
         expected_types.add("visitor_log")
+    if any(
+        term in normalized_query
+        for term in ["announcement", "reminder", "red zone", "nvr", "gate issue", "kiosk audio", "pickleball", "pre authorized", "preauthorized"]
+    ):
+        expected_types.add("announcement")
 
     return {
         "community": community_hint,
@@ -425,6 +430,8 @@ def main() -> int:
         print(f"Authority: {authority_level(metadata)}")
         print(f"Status: {metadata.get('status', '')}")
         print(f"Lifecycle Generation: {metadata.get('lifecycle_generation', '')}")
+        print(f"Category: {metadata.get('category', '')}")
+        print(f"Announcement ID: {metadata.get('announcement_id', '')}")
         print(f"Rule ID: {metadata.get('rule_id', '')}")
         print(f"Community: {metadata.get('community', '')}")
         print(f"Section: {metadata.get('section', '')}")
