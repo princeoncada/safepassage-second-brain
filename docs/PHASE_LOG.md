@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4C2 LEGACY POST ORDER MIGRATION / MANAGED SOURCE CONVERSION
+PHASE 4C3 ANNOUNCEMENT / REMINDER LIFECYCLE INGESTION
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, and Phase 4C1 lifecycle retrieval hardening with a known Sierra Ridge limitation. Phase 4C2 converts eligible legacy post orders into managed active post-order sources.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, and Phase 4C2 legacy post-order managed conversion. Phase 4C3 adds announcement and reminder lifecycle ingestion.
 
 ## Phase 2 Minimal POW
 
@@ -313,7 +313,7 @@ Known limitation:
 
 ## Phase 4C2 Legacy Post Order Migration / Managed Source Conversion
 
-IN PROGRESS
+PASSED
 
 - [x] Add deterministic legacy post-order migration utility
 - [x] Detect legacy `post_order` files missing managed lifecycle metadata
@@ -330,6 +330,30 @@ IN PROGRESS
 - [ ] User validates QA rules remain supporting context only
 - [ ] User validates Atlantis Bay refusal still works
 - [ ] User validates primary workflow fallback still works
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+## Phase 4C3 Announcement / Reminder Lifecycle Ingestion
+
+IN PROGRESS
+
+- [x] Add deterministic announcement refresh script
+- [x] Add sample announcement batch from cleaned reminder text
+- [x] Parse batch metadata: `batch_date`, `source_name`, `update_type`, `default_status`
+- [x] Split pasted reminder text into atomic announcement items
+- [x] Classify announcement categories without AI
+- [x] Extract community references from aliases and known phrases
+- [x] Generate managed announcement metadata
+- [x] Detect duplicate announcements by deterministic hash
+- [x] Generate announcement refresh reports
+- [x] Preserve announcement metadata in Chroma indexing and API schema
+- [x] Keep announcements below post orders and above primary workflow
+- [x] Document OCR as deferred
+- [ ] User runs announcement dry run manually
+- [ ] User runs announcement refresh manually
+- [ ] User rebuilds ChromaDB manually
+- [ ] User validates reminder retrieval manually
+- [ ] User validates post orders still outrank announcements manually
 - [ ] User reviews changes manually
 - [ ] User commits changes manually
 
