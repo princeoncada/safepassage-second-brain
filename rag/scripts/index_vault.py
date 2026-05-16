@@ -175,6 +175,17 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
         if not authority_level:
             authority_level = DEFAULT_AUTHORITY_BY_TYPE.get(normalize_key(doc_type).replace(" ", "_"), "")
         scope = normalize_metadata_value(frontmatter.get("scope"))
+        scope_key = normalize_metadata_value(frontmatter.get("scope_key"))
+        community_code = normalize_metadata_value(frontmatter.get("community_code"))
+        rule_id = normalize_metadata_value(frontmatter.get("rule_id"))
+        rule_hash = normalize_metadata_value(frontmatter.get("rule_hash"))
+        source_batch = normalize_metadata_value(frontmatter.get("source_batch"))
+        batch_date = normalize_metadata_value(frontmatter.get("batch_date"))
+        update_type = normalize_metadata_value(frontmatter.get("update_type"))
+        supersede_mode = normalize_metadata_value(frontmatter.get("supersede_mode"))
+        supersedes = normalize_metadata_value(frontmatter.get("supersedes"))
+        superseded_by = normalize_metadata_value(frontmatter.get("superseded_by"))
+        topic_key = normalize_metadata_value(frontmatter.get("topic_key"))
 
         for section, content in split_sections(body):
             normalized_section = normalize_section_name(section)
@@ -223,6 +234,17 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
                     "priority": priority,
                     "authority_level": authority_level,
                     "scope": scope,
+                    "scope_key": scope_key,
+                    "community_code": community_code,
+                    "rule_id": rule_id,
+                    "rule_hash": rule_hash,
+                    "source_batch": source_batch,
+                    "batch_date": batch_date,
+                    "update_type": update_type,
+                    "supersede_mode": supersede_mode,
+                    "supersedes": supersedes,
+                    "superseded_by": superseded_by,
+                    "topic_key": topic_key,
                     "tags": tags,
                     "status": status,
                     "is_low_value_section": str(is_low_value).lower(),
