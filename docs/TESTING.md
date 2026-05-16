@@ -552,7 +552,8 @@ python automation/ingestion/refresh_post_orders.py --input automation/ingestion/
 Expected:
 
 - parses Clearbrook Main with community code `CBK`;
-- parses all `POST ORDER (...)`, `POST ORDERS (...)`, `K&C`, and `K & C` entries;
+- parses all `POST ORDER (...)`, `POST ORDERS (...)`, `K&C`, `K & C`, and `K and C` entries;
+- maps `C` to concierge, not call center;
 - treats the batch as `update_type: partial`;
 - prints added, duplicate, superseded, conflict, possible changes/review, missing, and manual review sections;
 - skips missing-rule replacement handling because the batch is partial;
@@ -609,3 +610,74 @@ Expected:
 - Atlantis Bay still refuses safely;
 - default call attempts still uses primary workflow fallback;
 - no regression from Phase 4B2.
+
+## Phase 4C1 Lifecycle Retrieval Hardening Validation
+
+Rebuild:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Lifecycle and alias tests:
+
+```powershell
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+python rag/scripts/answer_vault.py "How many times do I call the resident by default?" --top-k 5
+python rag/scripts/answer_vault.py "What is the CBK rule for physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What is the emergency code for Clearbrook Main?" --top-k 5
+python rag/scripts/query_vault.py "Sierra Ridge physical ID" --top-k 10
+```
+
+Expected:
+
+- active lifecycle-managed post orders dominate normal retrieval;
+- legacy post-order documents are skipped by default and do not pollute top results;
+- Atlantis Bay still refuses safely;
+- primary workflow fallback still answers default/base workflow questions;
+- `CBK` expands to Clearbrook Main and reduces Sierra Ridge drift;
+- Clearbrook emergency code answers from the active code and warns that the newer `pending` code is advisory;
+- superseded and archived rules do not outrank active rules.
+
+## Phase 4C2 Legacy Post Order Migration Validation
+
+The user runs this validation manually after reviewing the migration output.
+
+Migration dry run:
+
+```powershell
+python automation/ingestion/migrate_legacy_post_orders.py --dry-run
+```
+
+Real migration:
+
+```powershell
+python automation/ingestion/migrate_legacy_post_orders.py
+```
+
+Rebuild:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Retrieval and answer checks:
+
+```powershell
+python rag/scripts/query_vault.py "Sierra Ridge physical ID" --top-k 10
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+python rag/scripts/answer_vault.py "How many times do I call the resident by default?" --top-k 5
+```
+
+Expected:
+
+- Sierra Ridge physical ID queries retrieve managed active `post_order` sources first;
+- the QA rule can still appear as supporting compliance context;
+- legacy source files remain preserved;
+- duplicate managed rules are skipped by `rule_hash`;
+- Atlantis Bay still refuses safely;
+- primary workflow fallback still works.
