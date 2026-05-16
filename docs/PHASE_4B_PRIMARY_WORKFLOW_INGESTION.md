@@ -109,6 +109,18 @@ python rag/scripts/answer_vault.py "How many times do I call the resident for At
 
 Expected: answer says no Atlantis Bay-specific source exists and may cite primary workflow only as default guidance.
 
+## Phase 4B2 Fallback Confidence Fix
+
+Primary workflow fallback uses a separate configurable threshold:
+
+```json
+"primary_workflow_default_threshold": 1.1
+```
+
+This threshold applies only when the query clearly asks for default, base, or primary workflow guidance and retrieved context includes global `authority_level: primary_workflow`.
+
+It does not weaken unknown community-specific refusal. For example, `How many times do I call the resident for Atlantis Bay?` should still refuse when no Atlantis Bay-specific source exists.
+
 ## What Not To Do
 
 - Do not treat primary workflow as equal to a post order.
