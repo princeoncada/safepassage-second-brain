@@ -34,9 +34,10 @@ POST ORDER (C): Call resident twice before denying unregistered visitor.
 Scope markers:
 
 - `K`: kiosk
-- `C`: call center
-- `K&C`: kiosk and call center
+- `C`: concierge
+- `K&C`: kiosk and concierge
 - `K & C`: also accepted and normalized to `K&C`
+- `K and C`: also accepted and normalized to `K&C`
 
 The sample batch uses `Clearbrook Main` with the letter code `CBK`. Numeric client codes are not required or stored by the refresh script.
 
@@ -163,6 +164,8 @@ Reports include:
 
 `rag/scripts/index_vault.py` preserves lifecycle metadata including `community_code`, `rule_id`, `rule_hash`, `source_batch`, `update_type`, `supersede_mode`, `supersedes`, and `superseded_by`.
 
+Generated managed post orders include `lifecycle_generation: managed`. Older freeform post-order documents without rule lifecycle metadata are treated as `lifecycle_generation: legacy` by the indexer.
+
 Retrieval prefers:
 
 - `authority_level: post_order`;
@@ -171,6 +174,10 @@ Retrieval prefers:
 - matching scope where query context supports it.
 
 Superseded, conflict, review, and inactive items are still indexable, but they receive retrieval penalties so active rules stay ahead.
+
+Phase 4C1 makes this stricter: legacy post-order documents are skipped by default during retrieval, active managed rules dominate, pending rules are advisory only, and archived rules are skipped by default.
+
+Phase 4C2 adds deterministic legacy post-order migration. Eligible old `type: post_order` files can be copied into managed active post-order documents with lifecycle metadata while preserving the old files. QA rules are not migrated into post orders.
 
 ## Validation
 
