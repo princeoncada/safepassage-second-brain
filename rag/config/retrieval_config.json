@@ -43,6 +43,7 @@
     "conflict": 0.85,
     "superseded": 1.2,
     "inactive": 1.2,
+    "expired": 1.2,
     "archived": 1.5
   },
   "lifecycle_generation_boosts": {
