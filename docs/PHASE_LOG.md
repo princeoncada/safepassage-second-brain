@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4D OPERATIONAL QUERY PARSER / INTENT EXTRACTION
+PHASE 4E OCR INTAKE LAYER
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, and Phase 4C3 announcement lifecycle ingestion. Phase 4D adds deterministic query intent parsing before retrieval.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, and Phase 4D query intent parsing. Phase 4E adds OCR intake artifacts for human review before ingestion.
 
 ## Phase 2 Minimal POW
 
@@ -125,16 +125,16 @@ These are not blockers.
 
 ## Next Recommended Step
 
-Finish Phase 4D manual validation.
+Finish Phase 4E manual validation.
 
 Scope:
 
-- confirm operational topics such as `Red Zone Protocol` are not treated as communities;
-- confirm unknown community questions such as Atlantis Bay still refuse safely;
-- confirm post orders, announcements, and primary workflow keep the established authority order;
-- keep parsing deterministic and non-LLM.
+- confirm local OCR can create raw and review Markdown artifacts from screenshots;
+- confirm OCR output stays under `automation/ocr/output/`;
+- confirm OCR does not write to `vault/` or call ingestion scripts;
+- confirm human review remains required before any extracted text enters announcement or post-order ingestion.
 
-After Phase 4D validation, consider the next narrow retrieval or ingestion hardening step. Do not jump to agents, OCR, direct vault editing, or Phase 5 without an explicit phase request.
+After Phase 4E validation, consider a narrow reviewed-OCR handoff improvement if needed. Do not jump to agents, direct vault editing, automatic OCR ingestion, or Phase 5 without an explicit phase request.
 
 ## Phase 3C RAG Quality Hardening
 
@@ -363,7 +363,7 @@ Known minor edge case:
 
 ## Phase 4D Operational Query Parser / Intent Extraction
 
-IN PROGRESS
+PASSED
 
 - [x] Add deterministic `QueryIntent` object
 - [x] Add configured operational topic dictionary
@@ -373,11 +373,36 @@ IN PROGRESS
 - [x] Extract expected document types for reminders, announcements, policies, incidents, visitor logs, default workflow, and emergency codes
 - [x] Integrate query intent into CLI retrieval and answering
 - [x] Preserve lifecycle scoring, authority scoring, community alias boosts, primary workflow fallback, pending advisory warnings, and citation behavior
-- [ ] User rebuilds ChromaDB if needed
-- [ ] User validates Red Zone Protocol reminder answer manually
-- [ ] User validates Atlantis Bay refusal manually
-- [ ] User validates Sierra Ridge post order priority manually
-- [ ] User validates default workflow fallback manually
+- [x] User rebuilds ChromaDB if needed
+- [x] User validates Red Zone Protocol reminder answer manually
+- [x] User validates Atlantis Bay refusal manually
+- [x] User validates Sierra Ridge post order priority manually
+- [x] User validates default workflow fallback manually
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+## Phase 4E OCR Intake Layer
+
+IN PROGRESS
+
+- [x] Add local OCR extraction script
+- [x] Support single-image OCR input
+- [x] Support folder OCR input
+- [x] Support `png`, `jpg`, `jpeg`, and `webp`
+- [x] Prefer PaddleOCR when available
+- [x] Fall back to pytesseract when available
+- [x] Add conservative preprocessing
+- [x] Write raw OCR text artifacts
+- [x] Write human-review Markdown artifacts
+- [x] Include OCR engine and confidence when available
+- [x] Preserve aliases during OCR cleanup without expanding them
+- [x] Document that OCR cannot write to `vault/`
+- [x] Document that OCR cannot trigger announcement or post-order refresh
+- [ ] User installs local OCR dependency manually
+- [ ] User runs single-image OCR manually
+- [ ] User runs folder OCR manually
+- [ ] User reviews generated OCR artifacts manually
+- [ ] User verifies reviewed OCR text can be copied into existing ingestion inputs
 - [ ] User reviews changes manually
 - [ ] User commits changes manually
 
