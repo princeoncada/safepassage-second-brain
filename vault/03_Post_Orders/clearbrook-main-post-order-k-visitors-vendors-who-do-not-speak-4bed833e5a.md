@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - Visitors Vendors Who Do Not Speak
 type: post_order
 authority_level: post_order
@@ -8,6 +8,7 @@ scope:
 - kiosk
 scope_key: k
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-k-visitors-vendors-who-do-not-speak-4bed833e5a
 rule_hash: 4bed833e5a03259a0ae0a9217dff80f244113c3c5c2bc9a516d7f6bca38e771a
 topic_key: visitors-vendors-who-do-not-speak

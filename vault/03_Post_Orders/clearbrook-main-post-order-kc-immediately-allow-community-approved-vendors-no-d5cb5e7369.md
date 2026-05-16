@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - Immediately Allow Community Approved Vendors No
 type: post_order
 authority_level: post_order
@@ -6,9 +6,10 @@ community: Clearbrook Main
 community_code: CBK
 scope:
 - kiosk
-- call_center
+- concierge
 scope_key: kc
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-kc-immediately-allow-community-approved-vendors-no-d5cb5e7369
 rule_hash: d5cb5e7369580b6294020e61b616f189f33736b9c2ef733211be2b1256fda4e4
 topic_key: immediately-allow-community-approved-vendors-no
@@ -41,7 +42,7 @@ Immediately allow Community approved vendors. No address or name requested; team
 
 - Marker: K&C
 - kiosk
-- call_center
+- concierge
 
 ## Source
 

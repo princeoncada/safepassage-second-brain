@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - Bridge Players Be Logged At Cca
 type: post_order
 authority_level: post_order
@@ -8,6 +8,7 @@ scope:
 - kiosk
 scope_key: k
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-k-bridge-players-be-logged-at-cca-001b952b98
 rule_hash: 001b952b9807bec606c5f97fad106b1862dc08f5d3c079696e60b8c0e7cb3928
 topic_key: bridge-players-be-logged-at-cca

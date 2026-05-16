@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - Non Listed Caller Says They Executor
 type: post_order
 authority_level: post_order
@@ -6,9 +6,10 @@ community: Clearbrook Main
 community_code: CBK
 scope:
 - kiosk
-- call_center
+- concierge
 scope_key: kc
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-kc-non-listed-caller-says-they-executor-59048dcdb8
 rule_hash: 59048dcdb82f71302107574fbc36aa246bf8830adabc430efd9b0743a4facbd3
 topic_key: non-listed-caller-says-they-executor
@@ -36,13 +37,13 @@ normalized_rule: "non-listed caller says they are the executor or poa. we submit
 
 ## Rule
 
-Non-listed caller says they are the Executor or POA. We submit a ‘Executor Confirmation’ or 'POA Confirmation' ticket for confirmation. As we await confirmation, the person can add a guest for up to 3 days.
+Non-listed caller says they are the Executor or POA. We submit a â€˜Executor Confirmationâ€™ or 'POA Confirmation' ticket for confirmation. As we await confirmation, the person can add a guest for up to 3 days.
 
 ## Scope
 
 - Marker: K&C
 - kiosk
-- call_center
+- concierge
 
 ## Source
 

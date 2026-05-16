@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - Community Events Add Event Cca Master
 type: post_order
 authority_level: post_order
@@ -6,9 +6,10 @@ community: Clearbrook Main
 community_code: CBK
 scope:
 - kiosk
-- call_center
+- concierge
 scope_key: kc
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-kc-community-events-add-event-cca-master-10913a6306
 rule_hash: 10913a63069abe9070d8200fc70e107f4b7a193573d0fb05c51bbcf999c5a633
 topic_key: community-events-add-event-cca-master
@@ -43,7 +44,7 @@ For community events add the event to 'CCA Master LIFESTYLE' only. Event name, d
 
 - Marker: K&C
 - kiosk
-- call_center
+- concierge
 
 ## Source
 

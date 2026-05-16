@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - You See Three Cars Stop Processing
 type: post_order
 authority_level: post_order
@@ -8,6 +8,7 @@ scope:
 - kiosk
 scope_key: k
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-k-you-see-three-cars-stop-processing-a4df4b987c
 rule_hash: a4df4b987c0d16d371ff96b5927d5c923f4a337f4cb91e66b3276cf6d1055adc
 topic_key: you-see-three-cars-stop-processing

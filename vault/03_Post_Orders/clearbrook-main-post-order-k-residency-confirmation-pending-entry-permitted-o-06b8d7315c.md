@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - Residency Confirmation Pending Entry Permitted
   O
 type: post_order
@@ -9,6 +9,7 @@ scope:
 - kiosk
 scope_key: k
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-k-residency-confirmation-pending-entry-permitted-o-06b8d7315c
 rule_hash: 06b8d7315ceafedc1746d284ea588de188305afcf28be90ec9123e7aa1d68266
 topic_key: residency-confirmation-pending-entry-permitted-o

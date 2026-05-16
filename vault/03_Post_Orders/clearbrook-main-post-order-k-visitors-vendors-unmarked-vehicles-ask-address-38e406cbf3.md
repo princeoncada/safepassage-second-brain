@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - Visitors Vendors Unmarked Vehicles Ask Address
 type: post_order
 authority_level: post_order
@@ -8,6 +8,7 @@ scope:
 - kiosk
 scope_key: k
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-k-visitors-vendors-unmarked-vehicles-ask-address-38e406cbf3
 rule_hash: 38e406cbf3b3140a6925142e94f8f5a09dcab9a49eb0cc79675ebeb695166f77
 topic_key: visitors-vendors-unmarked-vehicles-ask-address

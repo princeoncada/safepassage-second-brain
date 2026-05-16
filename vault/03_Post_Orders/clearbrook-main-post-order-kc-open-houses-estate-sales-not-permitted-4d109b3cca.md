@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - Open Houses Estate Sales Not Permitted
 type: post_order
 authority_level: post_order
@@ -6,9 +6,10 @@ community: Clearbrook Main
 community_code: CBK
 scope:
 - kiosk
-- call_center
+- concierge
 scope_key: kc
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-kc-open-houses-estate-sales-not-permitted-4d109b3cca
 rule_hash: 4d109b3cca74e9f3c6908a76934d78d2358aff7f4e7b2c2f39c550259f3e6950
 topic_key: open-houses-estate-sales-not-permitted
@@ -40,7 +41,7 @@ Open houses and estate sales are not permitted.
 
 - Marker: K&C
 - kiosk
-- call_center
+- concierge
 
 ## Source
 

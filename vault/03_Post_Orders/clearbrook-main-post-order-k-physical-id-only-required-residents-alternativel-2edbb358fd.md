@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - Physical Id Only Required Residents Alternativel
 type: post_order
 authority_level: post_order
@@ -8,6 +8,7 @@ scope:
 - kiosk
 scope_key: k
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-k-physical-id-only-required-residents-alternativel-2edbb358fd
 rule_hash: 2edbb358fd1d95a12fdf2a156124436bafb759895a84f0a94a80f386079bec5a
 topic_key: physical-id-only-required-residents-alternativel

@@ -1,4 +1,4 @@
----
+﻿---
 title: Clearbrook Main Post Order - Marked Vehicles Ask Address Res Name
 type: post_order
 authority_level: post_order
@@ -8,6 +8,7 @@ scope:
 - kiosk
 scope_key: k
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-k-marked-vehicles-ask-address-res-name-29df53bffd
 rule_hash: 29df53bffda353509de1dfbd2891aba32c732ac3d5362e99162a07ee80b65d3d
 topic_key: marked-vehicles-ask-address-res-name

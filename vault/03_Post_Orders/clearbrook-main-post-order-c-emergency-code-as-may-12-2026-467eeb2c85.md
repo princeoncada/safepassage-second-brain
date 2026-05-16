@@ -1,13 +1,14 @@
----
+﻿---
 title: Clearbrook Main Post Order - Emergency Code As May 12 2026
 type: post_order
 authority_level: post_order
 community: Clearbrook Main
 community_code: CBK
 scope:
-- call_center
+- concierge
 scope_key: c
-status: active
+status: pending
+lifecycle_generation: managed
 rule_id: clearbrook-main-c-emergency-code-as-may-12-2026-467eeb2c85
 rule_hash: 467eeb2c85add704f2d14ea9728cdbf9b80b5adab244dbb45ed08b74da7dc1f7
 topic_key: emergency-code-as-may-12-2026
@@ -38,7 +39,7 @@ Emergency Code as of May 12, 2026 - 9130* (Pending)
 ## Scope
 
 - Marker: C
-- call_center
+- concierge
 
 ## Source
 

@@ -1,13 +1,14 @@
----
+﻿---
 title: Clearbrook Main Post Order - Emergency Code As April 3 2026
 type: post_order
 authority_level: post_order
 community: Clearbrook Main
 community_code: CBK
 scope:
-- call_center
+- concierge
 scope_key: c
 status: active
+lifecycle_generation: managed
 rule_id: clearbrook-main-c-emergency-code-as-april-3-2026-3db4cf6686
 rule_hash: 3db4cf66866c8b5d58550279c3cf68e42ba6dc08a001b22d4b0e3e8dd85602ee
 topic_key: emergency-code-as-april-3-2026
@@ -38,7 +39,7 @@ Emergency Code as of April 3, 2026 - 9129*
 ## Scope
 
 - Marker: C
-- call_center
+- concierge
 
 ## Source
 
