@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 4C BATCH POST ORDER REFRESH + DIFFING. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, and Phase 4B2 fallback confidence are validated or mostly working.
+PHASE 4C2 LEGACY POST ORDER MIGRATION / MANAGED SOURCE CONVERSION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, and Phase 4C1 lifecycle retrieval hardening are validated or mostly working.
 
 ## What Exists
 
@@ -21,6 +21,8 @@ PHASE 4C BATCH POST ORDER REFRESH + DIFFING. Phase 2 Minimal POW, Phase 3A Retri
 - Phase 4A retrieval hardening in `query_vault.py`, `answer_vault.py`, and `api/service.py` for stronger dedupe, section weighting, and cleaner citations.
 - Phase 4B primary workflow ingestion under `automation/ingestion/` for global base kiosk workflow documents.
 - Phase 4C post order refresh under `automation/ingestion/refresh_post_orders.py`.
+- Phase 4C1 lifecycle-aware retrieval and community aliases under `rag/scripts/` and `rag/config/community_aliases.json`.
+- Phase 4C2 legacy post-order migration under `automation/ingestion/migrate_legacy_post_orders.py`.
 
 ## Current Stable Components
 
@@ -67,9 +69,9 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Finish Phase 4C validation.
+Finish Phase 4C2 validation.
 
-Focus on deterministic post order refresh, duplicate detection, supersede/report behavior, conflict reporting, ChromaDB reindexing, and retrieval sanity. Do not add autonomous agents, n8n rewrites, Open WebUI business logic, or AI-based diffing.
+Focus on managed source conversion for legacy post orders: original files preserved, managed copies used for operational retrieval, duplicate hashes skipped, ChromaDB reindexing, and Sierra Ridge physical ID retrieval sanity. Do not add autonomous agents, n8n rewrites, Open WebUI business logic, QA-rule migration, destructive cleanup, or AI-based diffing.
 
 ## Phase 3C Passed
 
@@ -210,6 +212,52 @@ Behavior:
 - old rules are never deleted.
 
 The user will manually review and commit. Do not run `git commit` or `git push`.
+
+## Phase 4C1 In Progress
+
+Phase 4C1 hardens retrieval over lifecycle-managed post orders.
+
+Key files:
+
+- `rag/config/community_aliases.json`
+- `rag/config/retrieval_config.json`
+- `rag/scripts/index_vault.py`
+- `rag/scripts/query_vault.py`
+- `rag/scripts/answer_vault.py`
+- `api/service.py`
+- `api/schemas.py`
+
+Behavior:
+
+- aliases such as `CBK`, `SR`, `MON`, and `OPB` expand before retrieval;
+- `lifecycle_generation: managed` post orders are preferred;
+- `lifecycle_generation: legacy` post orders are skipped by default;
+- `active` outranks `pending`, `review`, `needs_review`, `superseded`, and `archived`;
+- pending rules are advisory and must not override active rules;
+- unknown community refusal remains conservative.
+
+The user will manually review and commit. Do not run `git commit` or `git push`.
+
+## Phase 4C2 In Progress
+
+Phase 4C2 converts eligible legacy freeform post orders into lifecycle-managed active post-order documents.
+
+Key files:
+
+- `automation/ingestion/migrate_legacy_post_orders.py`
+- `vault/03_Post_Orders/sierra-ridge-managed-post-order-*.md`
+- `vault/08_Reports/post-order-migration/2026-05-16-legacy-post-order-migration.md`
+
+Behavior:
+
+- only `type: post_order` legacy files are eligible;
+- QA rules are not migrated into post orders;
+- original legacy files are preserved;
+- generated managed copies include `lifecycle_generation: managed`, `status: active`, `rule_id`, `rule_hash`, `source_legacy_file`, `source_migration`, and `migration_date`;
+- duplicate managed rules are skipped by `rule_hash`;
+- managed docs are the operational retrieval source of truth.
+
+The user will manually validate, review, and commit. Do not run `git commit` or `git push`.
 
 ## Phase 3A Exit Criteria
 
