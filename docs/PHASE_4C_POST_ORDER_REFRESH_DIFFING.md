@@ -179,6 +179,8 @@ Phase 4C1 makes this stricter: legacy post-order documents are skipped by defaul
 
 Phase 4C2 adds deterministic legacy post-order migration. Eligible old `type: post_order` files can be copied into managed active post-order documents with lifecycle metadata while preserving the old files. QA rules are not migrated into post orders.
 
+Phase 4C3 extends lifecycle ingestion to announcements and reminders. Announcements are separate `type: announcement` documents under `vault/05_Announcements/`; they are lower authority than post orders and higher authority than primary workflow.
+
 ## Validation
 
 ```powershell
