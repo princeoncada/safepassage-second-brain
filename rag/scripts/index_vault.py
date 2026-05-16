@@ -178,10 +178,17 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
         scope = normalize_metadata_value(frontmatter.get("scope"))
         scope_key = normalize_metadata_value(frontmatter.get("scope_key"))
         community_code = normalize_metadata_value(frontmatter.get("community_code"))
+        announcement_id = normalize_metadata_value(frontmatter.get("announcement_id"))
+        announcement_hash = normalize_metadata_value(frontmatter.get("announcement_hash"))
+        category = normalize_metadata_value(frontmatter.get("category"))
         rule_id = normalize_metadata_value(frontmatter.get("rule_id"))
         rule_hash = normalize_metadata_value(frontmatter.get("rule_hash"))
         source_batch = normalize_metadata_value(frontmatter.get("source_batch"))
+        source_name = normalize_metadata_value(frontmatter.get("source_name"))
         batch_date = normalize_metadata_value(frontmatter.get("batch_date"))
+        effective_date = normalize_metadata_value(frontmatter.get("effective_date"))
+        expires_on = normalize_metadata_value(frontmatter.get("expires_on"))
+        event_dates = normalize_metadata_value(frontmatter.get("event_dates"))
         update_type = normalize_metadata_value(frontmatter.get("update_type"))
         supersede_mode = normalize_metadata_value(frontmatter.get("supersede_mode"))
         supersedes = normalize_metadata_value(frontmatter.get("supersedes"))
@@ -243,10 +250,17 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
                     "scope": scope,
                     "scope_key": scope_key,
                     "community_code": community_code,
+                    "announcement_id": announcement_id,
+                    "announcement_hash": announcement_hash,
+                    "category": category,
                     "rule_id": rule_id,
                     "rule_hash": rule_hash,
                     "source_batch": source_batch,
+                    "source_name": source_name,
                     "batch_date": batch_date,
+                    "effective_date": effective_date,
+                    "expires_on": expires_on,
+                    "event_dates": event_dates,
                     "update_type": update_type,
                     "supersede_mode": supersede_mode,
                     "supersedes": supersedes,
