@@ -19,9 +19,13 @@ class Source(BaseModel):
     authority_level: str = ""
     scope: str = ""
     status: str = ""
+    lifecycle_generation: str = ""
     rule_id: str = ""
     rule_hash: str = ""
     source_batch: str = ""
+    source_legacy_file: str = ""
+    source_migration: str = ""
+    migration_date: str = ""
     supersedes: str = ""
     superseded_by: str = ""
     community: str
