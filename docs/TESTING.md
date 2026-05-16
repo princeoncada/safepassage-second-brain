@@ -492,3 +492,51 @@ Expected:
 - answer says no Atlantis Bay-specific source exists;
 - answer may mention primary workflow only as global default guidance;
 - answer does not invent Atlantis Bay-specific policy.
+
+## Phase 4B2 Primary Workflow Fallback Confidence Validation
+
+Default workflow fallback:
+
+```powershell
+python rag/scripts/answer_vault.py "How many times do I call the resident by default?" --top-k 5
+```
+
+Expected:
+
+- does not refuse;
+- cites `vault/09_SOPs/primary-call-attempts-by-community.md`;
+- says the default workflow is to call the resident twice;
+- warns that community post orders may differ.
+
+Unknown community-specific question:
+
+```powershell
+python rag/scripts/answer_vault.py "How many times do I call the resident for Atlantis Bay?" --top-k 5
+```
+
+Expected:
+
+- refuses safely;
+- says no Atlantis Bay-specific source exists;
+- does not invent Atlantis Bay policy.
+
+Higher authority still wins:
+
+```powershell
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+```
+
+Expected:
+
+- Sierra Ridge post order or QA rule remains prioritized;
+- primary workflow does not override post orders.
+
+Unrelated unknown community policy:
+
+```powershell
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+```
+
+Expected:
+
+- refuses safely.
