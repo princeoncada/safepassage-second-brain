@@ -206,9 +206,9 @@ Expected results are documented in `rag/tests/answer_expected_results.md`. Phase
 These are not blockers.
 
 1. Duplicate source files still appear in retrieval results. Future fix: stronger dedupe by normalized title + section + community, or clean duplicate test files.
-2. Citations currently list all retrieved chunks, including weak or less relevant chunks. Future fix: cite only chunks actually used.
-3. Retrieval ranking can place QA Notes above Summary or Details. Future fix: section weighting or reranking.
-4. Source numbering between generated answer and printed citation list can be confusing. Future fix: align citation numbering.
+2. Citations can still be incomplete if DeepSeek omits explicit source IDs. Future fix: stricter answer post-validation or retry.
+3. Retrieval ranking remains heuristic. Future fix: measured reranking tests over a larger vault.
+4. Source numbering depends on the model citing retrieved source IDs exactly. Future fix: reject or retry missing citation IDs.
 5. Titles and filenames are too verbose. Future fix: deterministic title and filename compression.
 6. Incident documents need richer structured fields. Future fix: add time, lane, vehicle details, action taken, escalation, and camera reference.
 7. Open Questions may contain generic AI filler. Future fix: include them only when confidence is low or required fields are missing.
@@ -356,3 +356,139 @@ Expected:
 - Atlantis Bay refuses safely;
 - no hallucinated policy appears;
 - existing CLI scripts and FastAPI `/ask` still work.
+
+## Phase 4A Retrieval Quality Hardening Validation
+
+Rebuild the disposable ChromaDB index:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Validate retrieval reranking and dedupe:
+
+```powershell
+python rag/scripts/query_vault.py "overnight visitors must present physical ID before access" --top-k 5
+python rag/scripts/query_vault.py "What happened with tailgating at Monterey?" --top-k 5
+python rag/scripts/query_vault.py "What should the agent do if digital ID is presented instead of physical ID?" --top-k 5
+```
+
+Expected:
+
+- Sierra Ridge `post_order` appears in top results for physical ID.
+- Monterey `incident` appears in top results for tailgating.
+- Sierra Ridge `qa_rule` and/or `post_order` appears in top results for digital ID.
+- `Agent Action`, `Summary`, and `Details` are preferred where available.
+- `QA Notes` can appear when relevant but should not dominate factual/policy queries.
+- `Open Questions`, `Source Input`, and `Change History` are excluded by default.
+- duplicate near-identical sources are reduced.
+
+Validate answer citation cleanup:
+
+```powershell
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What happened with tailgating at Monterey?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+```
+
+Expected:
+
+- generated answers cite only useful supporting sources;
+- only one `Sources` section appears in CLI/API-rendered output;
+- Source IDs in citations match retrieved Source IDs;
+- Atlantis Bay refuses safely and does not cite unrelated sources as support.
+
+Validate FastAPI compatibility:
+
+```powershell
+python -m uvicorn api.main:app --host 0.0.0.0 --port 8000
+```
+
+```powershell
+Invoke-RestMethod `
+  -Method POST `
+  -Uri "http://localhost:8000/ask" `
+  -ContentType "application/json" `
+  -Body '{
+    "question":"What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?",
+    "top_k":5
+  }'
+```
+
+Expected:
+
+- response still includes `status`, `question`, `answer`, `retrieval_confidence`, `confidence_reason`, `sources`, `answer_citations`, `used_ai`, and `warnings`;
+- `answer` does not contain a duplicate trailing `Sources:` block;
+- `answer_citations` contains only sources cited by the answer;
+- Open WebUI pipe compatibility is preserved.
+
+## Phase 4B Primary Workflow Ingestion Validation
+
+Create primary workflow Markdown from the structured sample:
+
+```powershell
+python automation/ingestion/ingest_primary_workflow.py
+```
+
+Expected:
+
+- files are written to `vault/09_SOPs/`;
+- filenames use the `primary-*.md` pattern;
+- frontmatter includes `type: "workflow"` and `authority_level: "primary_workflow"`;
+- existing files are skipped unless `--force` is passed.
+
+Rebuild the disposable index:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Validate default workflow retrieval:
+
+```powershell
+python rag/scripts/query_vault.py "What is the default process when a guest has no physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What is the default process when a guest has no physical ID?" --top-k 5
+```
+
+Expected:
+
+- retrieves `primary-no-physical-id`;
+- answer says "Based on the primary workflow" or "Default workflow says";
+- answer says no physical ID means deny entry, subject to higher-authority overrides.
+
+Validate community-specific override behavior:
+
+```powershell
+python rag/scripts/query_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+```
+
+Expected:
+
+- Sierra Ridge QA/post order sources outrank primary workflow;
+- primary workflow is not treated as equal authority.
+
+Validate default call attempts:
+
+```powershell
+python rag/scripts/answer_vault.py "How many times do I call the resident by default?" --top-k 5
+```
+
+Expected:
+
+- answer says default is twice;
+- answer says to check community post orders for accuracy.
+
+Validate unknown community fallback:
+
+```powershell
+python rag/scripts/answer_vault.py "How many times do I call the resident for Atlantis Bay?" --top-k 5
+```
+
+Expected:
+
+- answer says no Atlantis Bay-specific source exists;
+- answer may mention primary workflow only as global default guidance;
+- answer does not invent Atlantis Bay-specific policy.
