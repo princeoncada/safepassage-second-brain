@@ -23,6 +23,11 @@ CONFIG_PATH = REPO_ROOT / "rag" / "config" / "retrieval_config.json"
 DEFAULT_LOW_VALUE_SECTIONS = {"change history", "open questions", "source input"}
 DEFAULT_PREFERRED_SECTIONS = {"summary", "details", "agent action", "qa notes"}
 DEFAULT_NEAR_DUPLICATE_SIMILARITY_THRESHOLD = 0.9
+DEFAULT_AUTHORITY_BY_TYPE = {
+    "post_order": "post_order",
+    "announcement": "announcement",
+    "workflow": "primary_workflow",
+}
 
 
 def load_retrieval_config() -> dict[str, Any]:
@@ -166,6 +171,10 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
         priority = normalize_metadata_value(frontmatter.get("priority"))
         tags = normalize_metadata_value(frontmatter.get("tags"))
         status = normalize_metadata_value(frontmatter.get("status"))
+        authority_level = normalize_metadata_value(frontmatter.get("authority_level"))
+        if not authority_level:
+            authority_level = DEFAULT_AUTHORITY_BY_TYPE.get(normalize_key(doc_type).replace(" ", "_"), "")
+        scope = normalize_metadata_value(frontmatter.get("scope"))
 
         for section, content in split_sections(body):
             normalized_section = normalize_section_name(section)
@@ -212,6 +221,8 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
                     "type": doc_type,
                     "community": community,
                     "priority": priority,
+                    "authority_level": authority_level,
+                    "scope": scope,
                     "tags": tags,
                     "status": status,
                     "is_low_value_section": str(is_low_value).lower(),
