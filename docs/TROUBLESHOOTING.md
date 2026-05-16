@@ -460,6 +460,37 @@ How many times do I call the resident for Atlantis Bay?
 
 If the community-specific question does not have an indexed matching source, refusal is the correct behavior.
 
+## Phase 4C Refresh Creates No Files
+
+If dry run was used, no vault files should be written. Run without `--dry-run` to create Markdown and a report:
+
+```powershell
+python automation/ingestion/refresh_post_orders.py --input automation/ingestion/sample_post_order_batch.md
+```
+
+If the same batch was already applied, unchanged rules are reported as duplicates and no duplicate active files are created.
+
+## Phase 4C Superseded Rule Still Appears In Retrieval
+
+Rebuild ChromaDB after refresh:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Superseded rules are still indexable but receive a heavy retrieval penalty. If one ranks above an active rule, check that the active rule has `status: active` and `authority_level: post_order`.
+
+## Phase 4C Conflict Was Created
+
+Conflict files are expected when deterministic checks find contradictory patterns such as different resident call counts, save-tag contradictions, or physical-ID versus digital-ID acceptance. Review the generated report under:
+
+```text
+vault/08_Reports/post-order-refresh/
+```
+
+Do not rely on a `status: conflict` rule operationally until manually reviewed.
+
 ## Phase 3B Missing DeepSeek Key
 
 If `answer_vault.py` says `DEEPSEEK_API_KEY` is not set, set it in PowerShell:
