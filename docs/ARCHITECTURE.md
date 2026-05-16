@@ -268,6 +268,25 @@ Community extraction is intentionally strict. A phrase is treated as a community
 
 The query parser is deterministic and does not use an LLM. It does not replace authority scoring, lifecycle scoring, primary workflow fallback, or insufficient-context refusal checks.
 
+### Phase 4E OCR Intake Layer
+
+```text
+image screenshot
+-> local OCR extraction
+-> raw OCR text
+-> review Markdown artifact
+-> human review/edit
+-> existing deterministic ingestion pipeline
+-> vault Markdown
+-> ChromaDB rebuild
+```
+
+Phase 4E is intake-only. It helps convert reminder screenshots, Discord screenshots, post-order screenshots, and operational dashboard screenshots into reviewable text.
+
+OCR output is not operational memory. It must not write directly to `vault/`, call post-order or announcement refresh scripts, update lifecycle state, or rebuild ChromaDB. Human review is required before any extracted text enters the existing ingestion pipeline.
+
+The OCR layer prefers local PaddleOCR when available and can fall back to local pytesseract. It does not use cloud OCR, OpenAI OCR, or LLM cleanup.
+
 ## Phase 3A Retrieval Flow
 
 Markdown files in `vault/`
