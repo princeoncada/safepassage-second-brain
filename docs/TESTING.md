@@ -102,7 +102,7 @@ The secret scan should return no real secrets. Placeholder values in `.env.examp
 
 ## Current Checkpoint Status
 
-Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C post-order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, and Phase 4C3 announcement ingestion have passed or mostly passed local validation. Phase 4D query intent parsing is the current manual-validation phase. The system is a working proof of work, not a finished final product.
+Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C post-order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, and Phase 4D query intent parsing have passed or mostly passed local validation. Phase 4E OCR intake is the current manual-validation phase. The system is a working proof of work, not a finished final product.
 
 ## Phase 2 Minimal POW Validated Tests
 
@@ -772,3 +772,43 @@ Expected:
 - Sierra Ridge policy still prioritizes managed post orders and supporting QA context;
 - primary workflow fallback still answers explicit default workflow questions;
 - post orders still outrank announcements and primary workflow.
+
+## Phase 4E OCR Intake Validation
+
+The user runs this validation manually after installing a local OCR engine.
+
+Optional OCR dependencies:
+
+```powershell
+pip install paddleocr paddlepaddle pillow
+```
+
+Fallback option:
+
+```powershell
+pip install pytesseract pillow
+```
+
+Tesseract fallback also requires the local Tesseract binary installed on Windows.
+
+Single-image OCR:
+
+```powershell
+python automation/ocr/ocr_extract.py --input automation/ocr/sample_images/example.png
+```
+
+Folder OCR:
+
+```powershell
+python automation/ocr/ocr_extract.py --input-dir automation/ocr/sample_images
+```
+
+Expected:
+
+- one raw `.txt` file is written per image under `automation/ocr/output/`;
+- one review `.md` file is written per image under `automation/ocr/output/`;
+- review Markdown includes source image, created timestamp, OCR engine, confidence when available, extracted text, review notes, and raw OCR text;
+- OCR cleanup preserves aliases such as `CBK`, `PBP`, `SR`, `SSR`, and `OPB`;
+- OCR does not write to `vault/`;
+- OCR does not call announcement or post-order ingestion scripts;
+- human review is required before copied OCR text enters an ingestion input.
