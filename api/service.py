@@ -12,6 +12,7 @@ from rag.scripts.answer_vault import (
     chunks_by_ids,
     cited_source_ids,
     insufficient_context_answer,
+    lifecycle_advisory_note,
     retrieve_chunks,
     strip_sources_section,
 )
@@ -27,9 +28,13 @@ def chunk_to_source(chunk: dict[str, Any], show_context: bool) -> Source:
         authority_level=str(chunk.get("authority_level", "")),
         scope=str(chunk.get("scope", "")),
         status=str(chunk.get("status", "")),
+        lifecycle_generation=str(chunk.get("lifecycle_generation", "")),
         rule_id=str(chunk.get("rule_id", "")),
         rule_hash=str(chunk.get("rule_hash", "")),
         source_batch=str(chunk.get("source_batch", "")),
+        source_legacy_file=str(chunk.get("source_legacy_file", "")),
+        source_migration=str(chunk.get("source_migration", "")),
+        migration_date=str(chunk.get("migration_date", "")),
         supersedes=str(chunk.get("supersedes", "")),
         superseded_by=str(chunk.get("superseded_by", "")),
         community=str(chunk.get("community", "")),
@@ -90,6 +95,9 @@ def answer_question(request: AskRequest) -> AskResponse:
 
     if assessment.get("confidence") in {"weak", "none"}:
         warnings.append("retrieved context is weak")
+    advisory_note = lifecycle_advisory_note(chunks)
+    if advisory_note:
+        warnings.append("pending lifecycle context is present; active rules remain authoritative")
 
     if request.no_ai:
         return build_response(
@@ -135,7 +143,10 @@ def answer_question(request: AskRequest) -> AskResponse:
 
     prompt = PROMPT_PATH.read_text(encoding="utf-8")
     try:
-        answer = call_deepseek(api_key, request.question, context_packet, prompt, str(assessment.get("reason", "")))
+        retrieval_notes = [str(assessment.get("reason", ""))]
+        if advisory_note:
+            retrieval_notes.append(advisory_note)
+        answer = call_deepseek(api_key, request.question, context_packet, prompt, "\n\n".join(retrieval_notes))
     except SystemExit as error:
         return build_response(
             status="error",
