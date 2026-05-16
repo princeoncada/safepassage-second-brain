@@ -240,6 +240,8 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         str(level): float(boost)
         for level, boost in config.get("authority_boosts", {}).items()
     }
+    status_boosts = {str(status): float(boost) for status, boost in config.get("status_boosts", {}).items()}
+    status_penalties = {str(status): float(penalty) for status, penalty in config.get("status_penalties", {}).items()}
     primary_specific_community_penalty = float(config.get("primary_workflow_specific_community_penalty", 0.12))
     primary_default_boost = float(config.get("primary_workflow_default_query_boost", 0.1))
     weak_threshold = float(config.get("weak_context_distance_threshold", 0.95))
@@ -277,6 +279,9 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 adjusted_distance += type_mismatch_penalty
         authority = authority_level(metadata)
         adjusted_distance -= authority_boosts.get(authority, 0.0)
+        status = str(metadata.get("status", ""))
+        adjusted_distance -= status_boosts.get(status, 0.0)
+        adjusted_distance += status_penalties.get(status, 0.0)
         if authority == "primary_workflow" and hints["community"]:
             adjusted_distance += primary_specific_community_penalty
         if authority == "primary_workflow" and is_default_workflow_query(query):
@@ -335,6 +340,12 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 "type": str(metadata.get("type", "")),
                 "authority_level": authority_level(metadata),
                 "scope": str(metadata.get("scope", "")),
+                "status": str(metadata.get("status", "")),
+                "rule_id": str(metadata.get("rule_id", "")),
+                "rule_hash": str(metadata.get("rule_hash", "")),
+                "source_batch": str(metadata.get("source_batch", "")),
+                "supersedes": str(metadata.get("supersedes", "")),
+                "superseded_by": str(metadata.get("superseded_by", "")),
                 "community": str(metadata.get("community", "")),
                 "section": str(metadata.get("section", "")),
                 "source_file": str(metadata.get("source_file", "")),
@@ -362,6 +373,8 @@ def build_context_packet(chunks: list[dict[str, Any]]) -> str:
                     f"Type: {chunk['type']}",
                     f"Authority Level: {chunk.get('authority_level', '')}",
                     f"Scope: {chunk.get('scope', '')}",
+                    f"Status: {chunk.get('status', '')}",
+                    f"Rule ID: {chunk.get('rule_id', '')}",
                     f"Community: {chunk['community']}",
                     f"Section: {chunk['section']}",
                     f"Source File: {chunk['source_file']}",
@@ -382,7 +395,8 @@ def print_sources(chunks: list[dict[str, Any]], title: str = "Retrieved Sources"
         preview = shorten(" ".join(chunk["content"].split()), width=180, placeholder="...")
         print(
             f"[{chunk['source_id']}] distance={chunk['distance']} "
-            f"type={chunk['type']} authority={chunk.get('authority_level', '')} community={chunk['community']} "
+            f"type={chunk['type']} authority={chunk.get('authority_level', '')} "
+            f"status={chunk.get('status', '')} community={chunk['community']} "
             f"section={chunk['section']} source={chunk['source_file']}"
         )
         print(f"    {preview}")
