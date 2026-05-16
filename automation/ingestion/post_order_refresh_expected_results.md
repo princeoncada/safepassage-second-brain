@@ -15,7 +15,8 @@ Expected:
 - parses batch date `2026-05-16`;
 - parses `update_type: partial`;
 - parses `supersede_mode: conservative`;
-- parses fourteen rules, including `Post Order`, `POST ORDER`, `POST ORDERS`, `K&C`, and `K & C` variants;
+- parses fourteen rules, including `Post Order`, `POST ORDER`, `POST ORDERS`, `K&C`, `K & C`, and `K and C` variants;
+- maps `C` to concierge, not call center;
 - prints added, duplicate, superseded, conflict, possible changes/review, and missing sections;
 - skips missing-rule replacement handling because the batch is partial;
 - writes no vault files.
