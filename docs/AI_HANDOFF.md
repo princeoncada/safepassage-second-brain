@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 3E OPEN WEBUI INTEGRATION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, and Phase 3D Local API Wrapper are validated and passed.
+PHASE 4B PRIMARY WORKFLOW INGESTION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, and Phase 4A Retrieval Quality Hardening are validated and passed.
 
 ## What Exists
 
@@ -18,6 +18,8 @@ PHASE 3E OPEN WEBUI INTEGRATION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Ph
 - Phase 3B CLI answer generation in `rag/scripts/answer_vault.py`, grounded only in retrieved ChromaDB chunks.
 - Phase 3D FastAPI wrapper under `api/` for local HTTP access.
 - Phase 3E Open WebUI documentation under `openwebui/` for presentation-only UI integration.
+- Phase 4A retrieval hardening in `query_vault.py`, `answer_vault.py`, and `api/service.py` for stronger dedupe, section weighting, and cleaner citations.
+- Phase 4B primary workflow ingestion under `automation/ingestion/` for global base kiosk workflow documents.
 
 ## Current Stable Components
 
@@ -62,17 +64,15 @@ Future AI work should:
 - Do not expand Phase 3B beyond retrieved-context answer generation.
 - Do not commit secrets, real API keys, `.env`, `n8n_data`, or generated credential files.
 
-## Recommended Next Phase
+## Recommended Next Step
 
-PHASE 3C - RAG QUALITY HARDENING
+Finish Phase 4A validation.
 
-Focus on dedupe improvement, citation cleanup, section reranking, title/filename compression, answer citation alignment, and stronger insufficient-context filtering.
+Focus on retrieval dedupe, section weighting, citation cleanup, source ID alignment, and FastAPI/Open WebUI compatibility. After Phase 4A passes, do not start Phase 4B chat modes or Phase 4C continuous ingestion unless the user explicitly requests that phase.
 
-After Phase 3C, Phase 3D added FastAPI access and Phase 3E documents Open WebUI as a presentation-only client.
+## Phase 3C Passed
 
-## Phase 3C In Progress
-
-Current Phase 3C changes are intentionally narrow:
+Phase 3C changes are intentionally narrow:
 
 - stronger near-duplicate suppression;
 - section and metadata reranking;
@@ -82,7 +82,7 @@ Current Phase 3C changes are intentionally narrow:
 
 The user will manually review and commit. Do not run `git commit` or `git push`.
 
-## Phase 3D In Progress
+## Phase 3D Passed
 
 Phase 3D adds a local FastAPI wrapper only:
 
@@ -95,7 +95,7 @@ The `/ask` endpoint wraps the existing `rag/scripts/answer_vault.py` logic. It d
 
 The user will manually review and commit. Do not run `git commit` or `git push`.
 
-## Phase 3E In Progress
+## Phase 3E Passed
 
 Phase 3E documents Open WebUI as a presentation layer that calls the local FastAPI backend.
 
@@ -111,6 +111,58 @@ Open WebUI -> FastAPI -> retrieval -> grounded answering -> citations/refusal
 ```
 
 Do not move retrieval, embeddings, ChromaDB, memory, ingestion, or business logic into Open WebUI. Do not add agents, tool calling, automatic vault editing, workflow automation, or Git auto-commit.
+
+The user will manually review and commit. Do not run `git commit` or `git push`.
+
+## Phase 4A Passed With Minor Tuning
+
+Phase 4A is quality hardening only. It keeps the current architecture:
+
+```text
+Open WebUI -> FastAPI /ask -> ChromaDB retrieval -> Markdown vault -> DeepSeek grounded answer -> citations/refusal
+```
+
+Current changes:
+
+- retrieval scoring prefers `Agent Action`, `Summary`, `Details`, `Rule`, `Policy`, then `QA Notes`;
+- dedupe runs after reranking, so the strongest duplicate survives;
+- duplicate detection uses normalized title, community, type, section, content preview, and lightweight content similarity;
+- API answers strip trailing model-generated `Sources:` blocks and return citations through `answer_citations`;
+- refusal behavior remains conservative for missing community or weak context.
+
+Do not add agents, autonomous memory editing, n8n changes, Open WebUI custom UI changes, Git auto-commit, dashboards, voice, Phase 4B chat modes, or Phase 4C continuous ingestion.
+
+The user will manually review and commit. Do not run `git commit` or `git push`.
+
+## Phase 4B In Progress
+
+Phase 4B adds primary workflow ingestion only.
+
+Authority hierarchy:
+
+```text
+post_order > announcement > primary_workflow
+```
+
+Primary workflow documents are global default guidance. They must not override community post orders or announcements.
+
+Key files:
+
+- `automation/ingestion/primary_workflow_input_template.md`
+- `automation/ingestion/sample_primary_workflow_input.md`
+- `automation/ingestion/ingest_primary_workflow.py`
+- `docs/PHASE_4B_PRIMARY_WORKFLOW_INGESTION.md`
+- `rag/tests/primary_workflow_test_queries.json`
+
+RAG changes:
+
+- `index_vault.py` preserves `authority_level` and `scope`;
+- `query_vault.py` and `answer_vault.py` apply authority-aware scoring;
+- `answer_from_context.md` instructs DeepSeek to label primary workflow answers as default guidance;
+- unknown community workflow questions can fall back to global primary workflow when context is relevant;
+- community-specific post orders and announcements should outrank primary workflow.
+
+Do not add batch diffing, announcement automation, autonomous memory editing, n8n changes, Open WebUI UI changes, agents, Git automation, dashboards, or Phase 4C behavior.
 
 The user will manually review and commit. Do not run `git commit` or `git push`.
 
