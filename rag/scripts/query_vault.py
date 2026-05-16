@@ -10,6 +10,8 @@ from typing import Any
 import chromadb
 from sentence_transformers import SentenceTransformer
 
+from rag.query_intent import expand_query_with_intent, parse_query_intent
+
 
 COLLECTION_NAME = "safepassage_vault_chunks"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
@@ -202,7 +204,9 @@ def main() -> int:
     if not CHROMA_DIR.exists():
         raise SystemExit("Chroma index does not exist. Run: python rag/scripts/index_vault.py")
 
-    expanded_query, alias_community, alias = expand_query_with_alias(args.query)
+    config = load_retrieval_config()
+    initial_intent = parse_query_intent(args.query, set(config.get("known_communities", [])))
+    expanded_query = expand_query_with_intent(initial_intent)
     model = SentenceTransformer(MODEL_NAME)
     query_embedding = model.encode([expanded_query], normalize_embeddings=True).tolist()[0]
 
@@ -227,7 +231,6 @@ def main() -> int:
         print("No chunks returned.")
         return 0
 
-    config = load_retrieval_config()
     section_boosts = {
         normalize_section_name(section): float(boost)
         for section, boost in config.get("section_boosts", {}).items()
@@ -260,7 +263,9 @@ def main() -> int:
     primary_workflow_default_threshold = float(config.get("primary_workflow_default_threshold", 1.1))
     near_duplicate_threshold = float(config.get("near_duplicate_similarity_threshold", 0.9))
     candidate_communities = {str(metadata.get("community", "")) for metadata in metadatas if metadata}
-    hints = extract_query_hints(args.query, config, candidate_communities)
+    known_communities = set(config.get("known_communities", [])) | candidate_communities
+    intent = parse_query_intent(args.query, known_communities)
+    hints = intent.as_hints()
     if hints["community"]:
         try:
             community_results = collection.get(
@@ -326,7 +331,7 @@ def main() -> int:
         adjusted_distance += lifecycle_penalties.get(lifecycle_generation, 0.0)
         if authority == "primary_workflow" and hints["community"]:
             adjusted_distance += primary_specific_community_penalty
-        if authority == "primary_workflow" and is_default_workflow_query(args.query):
+        if authority == "primary_workflow" and hints.get("is_default_workflow_query"):
             adjusted_distance -= primary_default_boost
         raw_candidates.append((adjusted_distance, float(distance), str(document), metadata))
 
@@ -406,10 +411,11 @@ def main() -> int:
         weak_threshold,
         primary_workflow_default_threshold,
         has_global_primary_workflow(candidates),
-        is_default_workflow_query(args.query),
+        bool(hints.get("is_default_workflow_query")),
     )
     print(f"Retrieval Confidence: {confidence}")
     print(f"Confidence Reason: {reason}")
+    print(f"Intent Category: {hints.get('intent_category', '')}")
     if hints["community"]:
         print(f"Community Hint: {hints['community']}")
     if hints.get("community_alias"):
@@ -418,6 +424,10 @@ def main() -> int:
         print(f"Community Hint: {hints['missing_community']} (not found in indexed metadata)")
     if hints["expected_types"]:
         print(f"Expected Types: {', '.join(sorted(hints['expected_types']))}")
+    if hints.get("topic_terms"):
+        print(f"Topic Terms: {', '.join(hints['topic_terms'])}")
+    if hints.get("scope_hint"):
+        print(f"Scope Hint: {hints['scope_hint']}")
     print("-" * 80)
 
     for index, (_adjusted_distance, distance, document, metadata) in enumerate(candidates[: args.top_k], start=1):
