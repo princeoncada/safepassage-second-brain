@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 3E OPEN WEBUI INTEGRATION
+PHASE 4B PRIMARY WORKFLOW INGESTION
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, and local API access. Phase 3E documents Open WebUI as the presentation-only interface.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, and Phase 4A retrieval hardening. Phase 4B adds primary workflow ingestion as the base/default authority layer.
 
 ## Phase 2 Minimal POW
 
@@ -102,14 +102,14 @@ These are not blockers.
    Cause: multiple generated test files contain nearly identical Sierra Ridge post orders.
    Future fix: add stronger dedupe by normalized title + section + community, or clean duplicate test files.
 
-2. Citations currently list all retrieved chunks, including weak or less relevant chunks.
-   Future fix: only cite chunks actually used in the generated answer.
+2. Citations can still be incomplete if DeepSeek omits explicit source IDs.
+   Future fix: improve prompt enforcement or add stricter answer post-validation.
 
-3. Retrieval ranking can place QA Notes above Summary or Details.
-   Future fix: add section weighting or reranking so Summary, Details, and Agent Action are preferred for factual answers.
+3. Retrieval ranking remains heuristic.
+   Future fix: add measured reranking tests once more real vault documents exist.
 
-4. Source numbering between generated answer and printed citation list can be confusing.
-   Future fix: standardize final answer citation numbering to match retrieved source IDs exactly.
+4. Source numbering depends on the model citing retrieved source IDs exactly.
+   Future fix: reject or retry generated answers that cite missing IDs.
 
 5. Titles and filenames are too verbose.
    Future fix: add deterministic title compression and filename compression.
@@ -173,22 +173,71 @@ No Open WebUI, n8n changes, agents, autonomous memory editing, Git auto-commit, 
 
 ## Phase 3E Open WebUI Integration
 
-IN PROGRESS
+PASSED
 
 - [x] Add Open WebUI setup documentation
 - [x] Add Open WebUI connection example
 - [x] Document FastAPI as the operational backend
 - [x] Document UI formatting for answers, citations, confidence, and warnings
 - [x] Document Open WebUI operational boundaries
-- [ ] User configures Open WebUI to call local FastAPI
-- [ ] User validates Sierra Ridge ID rules prompt
-- [ ] User validates Sierra Ridge digital ID prompt
-- [ ] User validates Monterey tailgating prompt
-- [ ] User validates Atlantis Bay refusal prompt
-- [ ] User reviews changes manually
+- [x] User configures Open WebUI to call local FastAPI
+- [x] User validates Sierra Ridge ID rules prompt
+- [x] User validates Sierra Ridge digital ID prompt
+- [x] User validates Monterey tailgating prompt
+- [x] User validates Atlantis Bay refusal prompt
+- [x] User reviews changes manually
 - [ ] User commits changes manually
 
 Open WebUI is presentation-only. No agents, automatic vault editing, memory rewriting, tool calling, workflow automation, Git auto-commit, dashboards, or Phase 4 automations were added.
+
+## Phase 4A Retrieval Quality Hardening
+
+PASSED WITH MINOR TUNING
+
+- [x] Prefer operational sections in retrieval scoring: `Agent Action`, `Summary`, `Details`, `Rule`, `Policy`, then `QA Notes`
+- [x] Keep low-value sections below useful sections when explicitly included
+- [x] Deduplicate after reranking so the strongest near-duplicate source survives
+- [x] Dedupe by normalized title, community, type, section, content preview, and lightweight content similarity
+- [x] Strip model-generated trailing Sources blocks from API answers
+- [x] Keep `answer_citations` separate from `sources`
+- [x] Preserve source ID alignment between retrieved context and answer citations
+- [x] Preserve conservative insufficient-context refusal behavior
+- [x] User rebuilds ChromaDB and validates retrieval locally
+- [x] User validates FastAPI/Open WebUI answer formatting
+- [x] User reviews changes manually
+- [ ] User commits changes manually
+
+No agents, autonomous memory editing, n8n changes, Open WebUI custom UI changes, Git auto-commit, dashboards, voice, Phase 4B chat modes, or Phase 4C continuous ingestion were added.
+
+## Phase 4B Primary Workflow Ingestion
+
+IN PROGRESS
+
+- [x] Add primary workflow input template
+- [x] Add structured sample primary workflow input
+- [x] Add deterministic primary workflow ingestion script
+- [x] Generate workflow documents with `authority_level: primary_workflow`
+- [x] Preserve source document, source section, source page, and authority note
+- [x] Add authority metadata to ChromaDB indexing
+- [x] Add authority-aware retrieval ranking
+- [x] Add primary workflow fallback behavior for unknown communities
+- [x] Update answer prompt rules for authority hierarchy
+- [ ] User runs primary workflow ingestion
+- [ ] User rebuilds ChromaDB
+- [ ] User validates primary workflow fallback answers
+- [ ] User validates post orders still outrank primary workflow
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+Authority hierarchy:
+
+```text
+post_order
+announcement
+primary_workflow
+```
+
+No batch post order diffing, announcement diffing, autonomous memory editing, n8n changes, Open WebUI UI changes, agents, Git automation, dashboards, or Phase 4C behavior were added.
 
 ## Deferred
 
@@ -198,6 +247,8 @@ Open WebUI is presentation-only. No agents, automatic vault editing, memory rewr
 - Git auto-commit
 - dashboards
 - voice/UI
+- Phase 4B chat modes
+- Phase 4C continuous ingestion
 - Phase 4 automations
 
 ## Ready For Final Project Completion
