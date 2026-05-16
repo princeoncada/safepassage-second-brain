@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 4B2 PRIMARY WORKFLOW FALLBACK CONFIDENCE FIX. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, and Phase 4B Primary Workflow Ingestion are validated or mostly working.
+PHASE 4C BATCH POST ORDER REFRESH + DIFFING. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, and Phase 4B2 fallback confidence are validated or mostly working.
 
 ## What Exists
 
@@ -20,6 +20,7 @@ PHASE 4B2 PRIMARY WORKFLOW FALLBACK CONFIDENCE FIX. Phase 2 Minimal POW, Phase 3
 - Phase 3E Open WebUI documentation under `openwebui/` for presentation-only UI integration.
 - Phase 4A retrieval hardening in `query_vault.py`, `answer_vault.py`, and `api/service.py` for stronger dedupe, section weighting, and cleaner citations.
 - Phase 4B primary workflow ingestion under `automation/ingestion/` for global base kiosk workflow documents.
+- Phase 4C post order refresh under `automation/ingestion/refresh_post_orders.py`.
 
 ## Current Stable Components
 
@@ -66,9 +67,9 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Finish Phase 4A validation.
+Finish Phase 4C validation.
 
-Focus on retrieval dedupe, section weighting, citation cleanup, source ID alignment, and FastAPI/Open WebUI compatibility. After Phase 4A passes, do not start Phase 4B chat modes or Phase 4C continuous ingestion unless the user explicitly requests that phase.
+Focus on deterministic post order refresh, duplicate detection, supersede/report behavior, conflict reporting, ChromaDB reindexing, and retrieval sanity. Do not add autonomous agents, n8n rewrites, Open WebUI business logic, or AI-based diffing.
 
 ## Phase 3C Passed
 
@@ -177,7 +178,38 @@ What changed:
 - unknown community-specific questions still refuse when no community source exists;
 - post orders and announcements remain higher authority than primary workflow.
 
-Do not globally raise `weak_context_distance_threshold`. Do not add Phase 4C, batch diffing, lifecycle automation, agents, n8n changes, or Open WebUI architecture changes.
+Do not globally raise `weak_context_distance_threshold`. Do not expand 4B2 beyond the narrow fallback-confidence rule.
+
+## Phase 4C In Progress
+
+Phase 4C implements deterministic batch post order refresh only.
+
+Key files:
+
+- `automation/ingestion/refresh_post_orders.py`
+- `automation/ingestion/sample_post_order_batch.md`
+- `automation/ingestion/post_order_refresh_expected_results.md`
+- `docs/PHASE_4C_POST_ORDER_REFRESH_DIFFING.md`
+
+Lifecycle metadata:
+
+- `rule_id`
+- `rule_hash`
+- `topic_key`
+- `source_batch`
+- `batch_date`
+- `supersedes`
+- `superseded_by`
+
+Behavior:
+
+- duplicate active hashes are not duplicated;
+- same community/scope/topic with a changed hash supersedes the old managed active rule unless a simple conflict is detected;
+- conflicts are written as `status: conflict` and reported;
+- missing active managed rules are report-only;
+- old rules are never deleted.
+
+The user will manually review and commit. Do not run `git commit` or `git push`.
 
 ## Phase 3A Exit Criteria
 
