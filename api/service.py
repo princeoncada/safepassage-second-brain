@@ -82,7 +82,7 @@ def answer_question(request: AskRequest) -> AskResponse:
 
     context_packet = build_context_packet(chunks)
 
-    if assessment.get("confidence") != "strong":
+    if assessment.get("confidence") in {"weak", "none"}:
         warnings.append("retrieved context is weak")
 
     if request.no_ai:
