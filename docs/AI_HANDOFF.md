@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 4B PRIMARY WORKFLOW INGESTION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, and Phase 4A Retrieval Quality Hardening are validated and passed.
+PHASE 4B2 PRIMARY WORKFLOW FALLBACK CONFIDENCE FIX. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, and Phase 4B Primary Workflow Ingestion are validated or mostly working.
 
 ## What Exists
 
@@ -165,6 +165,19 @@ RAG changes:
 Do not add batch diffing, announcement automation, autonomous memory editing, n8n changes, Open WebUI UI changes, agents, Git automation, dashboards, or Phase 4C behavior.
 
 The user will manually review and commit. Do not run `git commit` or `git push`.
+
+## Phase 4B2 In Progress
+
+Phase 4B2 is a narrow confidence/refusal refinement.
+
+What changed:
+
+- `primary_workflow_default_threshold` allows slightly higher distances for explicit default/base workflow questions;
+- fallback confidence requires global `authority_level: primary_workflow` context;
+- unknown community-specific questions still refuse when no community source exists;
+- post orders and announcements remain higher authority than primary workflow.
+
+Do not globally raise `weak_context_distance_threshold`. Do not add Phase 4C, batch diffing, lifecycle automation, agents, n8n changes, or Open WebUI architecture changes.
 
 ## Phase 3A Exit Criteria
 
