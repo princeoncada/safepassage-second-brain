@@ -284,3 +284,30 @@ Expected:
 
 - default query can answer from `primary-call-attempts-by-community.md`;
 - Atlantis Bay community-specific query still refuses if no Atlantis Bay source exists.
+
+## Phase 4C Post Order Refresh
+
+Phase 4C adds deterministic batch refresh for highest-authority post orders.
+
+Dry run:
+
+```powershell
+python automation/ingestion/refresh_post_orders.py --input automation/ingestion/sample_post_order_batch.md --dry-run
+```
+
+Real run:
+
+```powershell
+python automation/ingestion/refresh_post_orders.py --input automation/ingestion/sample_post_order_batch.md
+```
+
+Then rebuild:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Indexing preserves `rule_id`, `rule_hash`, `source_batch`, `supersedes`, and `superseded_by`. Retrieval boosts active rules and penalizes `superseded`, `conflict`, `review`, and `inactive` rules.
+
+Details: `docs/PHASE_4C_POST_ORDER_REFRESH_DIFFING.md`.
