@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4C BATCH POST ORDER REFRESH + DIFFING
+PHASE 4C2 LEGACY POST ORDER MIGRATION / MANAGED SOURCE CONVERSION
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, and Phase 4B2 fallback confidence. Phase 4C adds deterministic batch post order refresh and diffing.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, and Phase 4C1 lifecycle retrieval hardening with a known Sierra Ridge limitation. Phase 4C2 converts eligible legacy post orders into managed active post-order sources.
 
 ## Phase 2 Minimal POW
 
@@ -211,7 +211,7 @@ No agents, autonomous memory editing, n8n changes, Open WebUI custom UI changes,
 
 ## Phase 4B Primary Workflow Ingestion
 
-IN PROGRESS
+PASSED
 
 - [x] Add primary workflow input template
 - [x] Add structured sample primary workflow input
@@ -259,10 +259,10 @@ This does not globally weaken `weak_context_distance_threshold`. It adds a separ
 
 ## Phase 4C Batch Post Order Refresh + Diffing
 
-IN PROGRESS
+PASSED
 
 - [x] Add deterministic post order batch parser
-- [x] Support `POST ORDER (K)`, `POST ORDER (C)`, and `POST ORDER (K&C)`
+- [x] Support `POST ORDER (K)`, `POST ORDER (C)`, `POST ORDER (K&C)`, `POST ORDER (K & C)`, and `POST ORDER (K and C)`
 - [x] Normalize atomic rules without AI
 - [x] Add SHA-256 `rule_hash`
 - [x] Add stable `rule_id` and `topic_key`
@@ -283,6 +283,55 @@ IN PROGRESS
 - [ ] User commits changes manually
 
 No autonomous agents, n8n rewrite, Open WebUI business logic, AI diffing, deletion of old post orders, or global lifecycle for every document type was added.
+
+## Phase 4C1 Lifecycle Retrieval Hardening
+
+PASSED WITH KNOWN LIMITATION
+
+- [x] Add deterministic community alias configuration
+- [x] Expand letter-prefix community aliases before semantic retrieval
+- [x] Preserve lifecycle generation metadata in ChromaDB indexing
+- [x] Treat lifecycle-managed post orders as operational retrieval source of truth
+- [x] Skip legacy post-order lifecycle documents by default
+- [x] Strengthen lifecycle status order: active, pending, review/needs_review, superseded, archived
+- [x] Keep pending rules advisory and below active rules
+- [x] Preserve Atlantis Bay unknown-community refusal behavior
+- [x] Preserve primary workflow default fallback behavior
+- [ ] User rebuilds ChromaDB
+- [ ] User validates Sierra Ridge digital ID answer
+- [ ] User validates Atlantis Bay refusal
+- [ ] User validates default call-attempt primary workflow fallback
+- [ ] User validates CBK physical ID alias retrieval
+- [ ] User validates Clearbrook emergency active/pending warning
+- [ ] User validates active managed docs rank above legacy review docs
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+Known limitation:
+
+- Sierra Ridge previously had no managed active post-order docs, so physical ID retrieval could fall back to a `qa_rule` with `status: needs_review`. Phase 4C2 addresses this by converting eligible Sierra Ridge legacy post orders into managed active post-order docs.
+
+## Phase 4C2 Legacy Post Order Migration / Managed Source Conversion
+
+IN PROGRESS
+
+- [x] Add deterministic legacy post-order migration utility
+- [x] Detect legacy `post_order` files missing managed lifecycle metadata
+- [x] Preserve original legacy post-order files
+- [x] Generate managed active post-order copies with `lifecycle_generation: managed`
+- [x] Add `source_legacy_file`, `source_migration`, and `migration_date` metadata
+- [x] Reuse Phase 4C normalization, hashing, topic, and rule ID helpers
+- [x] Prevent duplicate managed rules by `rule_hash`
+- [x] Generate migration report path under `vault/08_Reports/post-order-migration/`
+- [x] Convert initial Sierra Ridge physical ID legacy post orders
+- [x] Preserve migration metadata in ChromaDB indexing and API source schema
+- [ ] User rebuilds ChromaDB
+- [ ] User validates Sierra Ridge digital ID answer retrieves managed active post orders first
+- [ ] User validates QA rules remain supporting context only
+- [ ] User validates Atlantis Bay refusal still works
+- [ ] User validates primary workflow fallback still works
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
 
 ## Deferred
 
