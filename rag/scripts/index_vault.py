@@ -61,6 +61,7 @@ def jaccard_similarity(left: str, right: str) -> float:
 
 
 def parse_frontmatter(markdown: str) -> tuple[dict[str, Any], str]:
+    markdown = markdown.lstrip("\ufeff")
     match = re.match(r"^---\s*\n([\s\S]*?)\n---\s*\n?", markdown)
     if not match:
         return {}, markdown
@@ -186,6 +187,12 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
         supersedes = normalize_metadata_value(frontmatter.get("supersedes"))
         superseded_by = normalize_metadata_value(frontmatter.get("superseded_by"))
         topic_key = normalize_metadata_value(frontmatter.get("topic_key"))
+        source_legacy_file = normalize_metadata_value(frontmatter.get("source_legacy_file"))
+        source_migration = normalize_metadata_value(frontmatter.get("source_migration"))
+        migration_date = normalize_metadata_value(frontmatter.get("migration_date"))
+        lifecycle_generation = normalize_metadata_value(frontmatter.get("lifecycle_generation"))
+        if not lifecycle_generation and normalize_key(doc_type).replace(" ", "_") == "post_order":
+            lifecycle_generation = "managed" if rule_id or rule_hash or source_batch else "legacy"
 
         for section, content in split_sections(body):
             normalized_section = normalize_section_name(section)
@@ -245,6 +252,10 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
                     "supersedes": supersedes,
                     "superseded_by": superseded_by,
                     "topic_key": topic_key,
+                    "source_legacy_file": source_legacy_file,
+                    "source_migration": source_migration,
+                    "migration_date": migration_date,
+                    "lifecycle_generation": lifecycle_generation,
                     "tags": tags,
                     "status": status,
                     "is_low_value_section": str(is_low_value).lower(),
