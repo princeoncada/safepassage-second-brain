@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 4C2 LEGACY POST ORDER MIGRATION / MANAGED SOURCE CONVERSION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, and Phase 4C1 lifecycle retrieval hardening are validated or mostly working.
+PHASE 4C3 ANNOUNCEMENT / REMINDER LIFECYCLE INGESTION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, and Phase 4C2 managed post-order conversion are validated or mostly working.
 
 ## What Exists
 
@@ -23,6 +23,7 @@ PHASE 4C2 LEGACY POST ORDER MIGRATION / MANAGED SOURCE CONVERSION. Phase 2 Minim
 - Phase 4C post order refresh under `automation/ingestion/refresh_post_orders.py`.
 - Phase 4C1 lifecycle-aware retrieval and community aliases under `rag/scripts/` and `rag/config/community_aliases.json`.
 - Phase 4C2 legacy post-order migration under `automation/ingestion/migrate_legacy_post_orders.py`.
+- Phase 4C3 announcement refresh under `automation/ingestion/refresh_announcements.py`.
 
 ## Current Stable Components
 
@@ -69,9 +70,9 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Finish Phase 4C2 validation.
+Finish Phase 4C3 validation.
 
-Focus on managed source conversion for legacy post orders: original files preserved, managed copies used for operational retrieval, duplicate hashes skipped, ChromaDB reindexing, and Sierra Ridge physical ID retrieval sanity. Do not add autonomous agents, n8n rewrites, Open WebUI business logic, QA-rule migration, destructive cleanup, or AI-based diffing.
+Focus on announcement lifecycle ingestion from cleaned pasted text: managed announcement docs, duplicate detection, community alias extraction, report generation, ChromaDB reindexing, and authority behavior. Announcements outrank primary workflow but never override post orders. OCR is deferred. Do not add autonomous agents, n8n rewrites, Open WebUI business logic, screenshot parsing, destructive cleanup, or AI-based parsing.
 
 ## Phase 3C Passed
 
@@ -256,6 +257,30 @@ Behavior:
 - generated managed copies include `lifecycle_generation: managed`, `status: active`, `rule_id`, `rule_hash`, `source_legacy_file`, `source_migration`, and `migration_date`;
 - duplicate managed rules are skipped by `rule_hash`;
 - managed docs are the operational retrieval source of truth.
+
+The user will manually validate, review, and commit. Do not run `git commit` or `git push`.
+
+## Phase 4C3 In Progress
+
+Phase 4C3 ingests daily reminder and announcement text as managed lifecycle documents.
+
+Key files:
+
+- `automation/ingestion/refresh_announcements.py`
+- `automation/ingestion/sample_announcement_batch.md`
+- `vault/05_Announcements/`
+- `vault/08_Reports/announcement-refresh/`
+
+Behavior:
+
+- parses cleaned pasted text only;
+- OCR and screenshot parsing are deferred;
+- creates `type: announcement` documents with `authority_level: announcement`;
+- announcement authority is below post orders and above primary workflow;
+- active announcements are usable context;
+- pending announcements are advisory;
+- expired and archived announcements are penalized or skipped by retrieval;
+- post orders must still win when they conflict with announcements.
 
 The user will manually validate, review, and commit. Do not run `git commit` or `git push`.
 
