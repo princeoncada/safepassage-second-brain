@@ -262,3 +262,25 @@ Expected:
 - unknown communities are not hallucinated as community-specific policy.
 
 Details: `docs/PHASE_4B_PRIMARY_WORKFLOW_INGESTION.md`.
+
+## Phase 4B2 Primary Workflow Fallback Confidence
+
+Phase 4B2 adds a separate fallback threshold for explicit default workflow questions:
+
+```json
+"primary_workflow_default_threshold": 1.1
+```
+
+This allows a global primary workflow source to answer when it is slightly above the normal weak-context threshold, but only for default/base/primary workflow queries.
+
+Validation:
+
+```powershell
+python rag/scripts/answer_vault.py "How many times do I call the resident by default?" --top-k 5
+python rag/scripts/answer_vault.py "How many times do I call the resident for Atlantis Bay?" --top-k 5
+```
+
+Expected:
+
+- default query can answer from `primary-call-attempts-by-community.md`;
+- Atlantis Bay community-specific query still refuses if no Atlantis Bay source exists.
