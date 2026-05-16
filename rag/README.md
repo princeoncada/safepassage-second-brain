@@ -151,6 +151,34 @@ Generated managed migration docs include:
 
 After migration, rebuild ChromaDB from Markdown so managed post-order copies can become the operational retrieval source of truth.
 
+## Phase 4C3 Announcement Lifecycle Ingestion
+
+Phase 4C3 ingests cleaned pasted reminder text into managed announcement documents.
+
+```powershell
+python automation/ingestion/refresh_announcements.py --input automation/ingestion/sample_announcement_batch.md --dry-run
+python automation/ingestion/refresh_announcements.py --input automation/ingestion/sample_announcement_batch.md
+```
+
+Announcements use:
+
+- `type: announcement`
+- `authority_level: announcement`
+- `lifecycle_generation: managed`
+- `announcement_id`
+- `announcement_hash`
+- `category`
+- `status`
+- `expires_on` when detected
+
+Announcements sit between post orders and primary workflow:
+
+```text
+post_order > announcement > primary_workflow
+```
+
+OCR is not included in Phase 4C3. The script expects cleaned pasted text.
+
 Details: `rag/docs/PHASE_3C_RAG_QUALITY_HARDENING.md`.
 
 ## Phase 3D Local API
