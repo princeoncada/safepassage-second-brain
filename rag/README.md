@@ -128,6 +128,29 @@ python rag/scripts/query_vault.py "overnight visitors must present physical ID b
 python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
 ```
 
+## Phase 4C2 Legacy Post Order Migration
+
+Phase 4C2 converts eligible legacy freeform post orders into managed active post-order copies.
+
+```powershell
+python automation/ingestion/migrate_legacy_post_orders.py --dry-run
+python automation/ingestion/migrate_legacy_post_orders.py
+```
+
+The script only targets `type: post_order` legacy files. It does not migrate QA rules into post orders and does not delete old files.
+
+Generated managed migration docs include:
+
+- `lifecycle_generation: managed`
+- `status: active`
+- `rule_id`
+- `rule_hash`
+- `source_legacy_file`
+- `source_migration: legacy_post_order`
+- `migration_date`
+
+After migration, rebuild ChromaDB from Markdown so managed post-order copies can become the operational retrieval source of truth.
+
 Details: `rag/docs/PHASE_3C_RAG_QUALITY_HARDENING.md`.
 
 ## Phase 3D Local API
@@ -311,3 +334,46 @@ python rag/scripts/index_vault.py
 Indexing preserves `rule_id`, `rule_hash`, `source_batch`, `supersedes`, and `superseded_by`. Retrieval boosts active rules and penalizes `superseded`, `conflict`, `review`, and `inactive` rules.
 
 Details: `docs/PHASE_4C_POST_ORDER_REFRESH_DIFFING.md`.
+
+## Phase 4C1 Lifecycle Retrieval Hardening
+
+Phase 4C1 strengthens retrieval now that post-order lifecycle metadata exists.
+
+Lifecycle priority:
+
+```text
+active
+pending
+review / needs_review
+superseded
+archived
+```
+
+Active managed post orders are the operational retrieval source of truth. Pending rules are advisory and should trigger a warning when relevant. Legacy freeform post-order documents are skipped by default instead of deleted.
+
+Community aliases live in:
+
+```text
+rag/config/community_aliases.json
+```
+
+Examples:
+
+```text
+CBK -> Clearbrook Main
+SR -> Sierra Ridge
+MON -> Monterey
+OPB -> Old Pelican Bay
+```
+
+Numeric client-code portions are ignored. Alias expansion happens before semantic retrieval so community metadata can be boosted deterministically.
+
+Validation:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+python rag/scripts/answer_vault.py "What is the CBK rule for physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What is the emergency code for Clearbrook Main?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+```
