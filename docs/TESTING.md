@@ -540,3 +540,72 @@ python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?
 Expected:
 
 - refuses safely.
+
+## Phase 4C Batch Post Order Refresh Validation
+
+Dry run:
+
+```powershell
+python automation/ingestion/refresh_post_orders.py --input automation/ingestion/sample_post_order_batch.md --dry-run
+```
+
+Expected:
+
+- parses Clearbrook Main with community code `CBK`;
+- parses all `POST ORDER (...)`, `POST ORDERS (...)`, `K&C`, and `K & C` entries;
+- treats the batch as `update_type: partial`;
+- prints added, duplicate, superseded, conflict, possible changes/review, missing, and manual review sections;
+- skips missing-rule replacement handling because the batch is partial;
+- writes no vault files.
+
+Real run:
+
+```powershell
+python automation/ingestion/refresh_post_orders.py --input automation/ingestion/sample_post_order_batch.md
+```
+
+Expected:
+
+- creates active post order Markdown files or identifies duplicates;
+- writes near-topic conservative changes as `status: review` instead of silently superseding;
+- writes a refresh report under `vault/08_Reports/post-order-refresh/`;
+- does not delete old files.
+
+Re-run same batch:
+
+```powershell
+python automation/ingestion/refresh_post_orders.py --input automation/ingestion/sample_post_order_batch.md
+```
+
+Expected:
+
+- no duplicate active rules are created;
+- report says unchanged/duplicate.
+
+Reindex:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Expected:
+
+- new post order lifecycle metadata does not break indexing;
+- active post orders are indexed;
+- superseded/conflict/review/inactive rules are penalized in retrieval.
+
+Retrieval sanity:
+
+```powershell
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+python rag/scripts/answer_vault.py "How many times do I call the resident by default?" --top-k 5
+```
+
+Expected:
+
+- Sierra Ridge still uses post orders;
+- Atlantis Bay still refuses safely;
+- default call attempts still uses primary workflow fallback;
+- no regression from Phase 4B2.
