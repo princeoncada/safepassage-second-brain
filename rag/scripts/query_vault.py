@@ -204,6 +204,8 @@ def main() -> int:
         str(level): float(boost)
         for level, boost in config.get("authority_boosts", {}).items()
     }
+    status_boosts = {str(status): float(boost) for status, boost in config.get("status_boosts", {}).items()}
+    status_penalties = {str(status): float(penalty) for status, penalty in config.get("status_penalties", {}).items()}
     primary_specific_community_penalty = float(config.get("primary_workflow_specific_community_penalty", 0.12))
     primary_default_boost = float(config.get("primary_workflow_default_query_boost", 0.1))
     weak_threshold = float(config.get("weak_context_distance_threshold", 0.95))
@@ -240,6 +242,9 @@ def main() -> int:
                 adjusted_distance += type_mismatch_penalty
         authority = authority_level(metadata)
         adjusted_distance -= authority_boosts.get(authority, 0.0)
+        status = str(metadata.get("status", ""))
+        adjusted_distance -= status_boosts.get(status, 0.0)
+        adjusted_distance += status_penalties.get(status, 0.0)
         if authority == "primary_workflow" and hints["community"]:
             adjusted_distance += primary_specific_community_penalty
         if authority == "primary_workflow" and is_default_workflow_query(args.query):
@@ -328,6 +333,8 @@ def main() -> int:
         print(f"Title: {metadata.get('title', '')}")
         print(f"Type: {metadata.get('type', '')}")
         print(f"Authority: {authority_level(metadata)}")
+        print(f"Status: {metadata.get('status', '')}")
+        print(f"Rule ID: {metadata.get('rule_id', '')}")
         print(f"Community: {metadata.get('community', '')}")
         print(f"Section: {metadata.get('section', '')}")
         print(f"Source: {metadata.get('source_file', '')}")
