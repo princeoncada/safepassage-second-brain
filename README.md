@@ -8,7 +8,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4C2 validation, with Phase 4C3 announcement lifecycle ingestion in progress:
+Working proof of work through Phase 4C3 validation, with Phase 4D operational query intent parsing in progress:
 
 - Phase 2 Minimal POW ingestion: passed
 - Phase 3A retrieval: passed
@@ -22,7 +22,8 @@ Working proof of work through Phase 4C2 validation, with Phase 4C3 announcement 
 - Phase 4C batch post order refresh/diffing: passed
 - Phase 4C1 lifecycle retrieval hardening: passed with known limitation
 - Phase 4C2 legacy post order migration / managed source conversion: passed
-- Phase 4C3 announcement / reminder lifecycle ingestion: in progress
+- Phase 4C3 announcement / reminder lifecycle ingestion: passed with minor retrieval edge case
+- Phase 4D operational query parser / intent extraction: in progress
 
 Current architecture:
 
@@ -49,6 +50,8 @@ Community aliases are resolved deterministically before retrieval. Letter prefix
 Phase 4C2 converts eligible legacy freeform post orders into managed active post-order documents while preserving the original legacy files. This is used first for Sierra Ridge physical ID post orders so policy retrieval can come from managed `post_order` sources instead of weaker QA support notes.
 
 Phase 4C3 adds deterministic announcement and reminder ingestion from cleaned pasted text. Announcements are managed lifecycle documents under `vault/05_Announcements` and sit between post orders and primary workflow in authority: `post_order > announcement > primary_workflow`. OCR is deferred.
+
+Phase 4D adds deterministic query intent parsing before retrieval. It extracts known community aliases, operational topics, expected document types, scope hints, and default/global intent so phrases like `Red Zone Protocol` are treated as announcement topics instead of missing communities.
 
 ## Post Order Batch Refresh
 
