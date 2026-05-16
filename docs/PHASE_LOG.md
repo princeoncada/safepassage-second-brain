@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4C3 ANNOUNCEMENT / REMINDER LIFECYCLE INGESTION
+PHASE 4D OPERATIONAL QUERY PARSER / INTENT EXTRACTION
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, and Phase 4C2 legacy post-order managed conversion. Phase 4C3 adds announcement and reminder lifecycle ingestion.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, and Phase 4C3 announcement lifecycle ingestion. Phase 4D adds deterministic query intent parsing before retrieval.
 
 ## Phase 2 Minimal POW
 
@@ -125,16 +125,16 @@ These are not blockers.
 
 ## Next Recommended Step
 
-Finish Phase 3E validation in Open WebUI.
+Finish Phase 4D manual validation.
 
 Scope:
 
-- configure Open WebUI to call the local FastAPI `/ask` endpoint;
-- validate grounded answers and citations in the UI;
-- validate Atlantis Bay insufficient-context refusal;
-- keep Open WebUI presentation-only.
+- confirm operational topics such as `Red Zone Protocol` are not treated as communities;
+- confirm unknown community questions such as Atlantis Bay still refuse safely;
+- confirm post orders, announcements, and primary workflow keep the established authority order;
+- keep parsing deterministic and non-LLM.
 
-After Phase 3E validation, consider the next hardening or integration phase. Do not jump to agents, direct vault editing, or Phase 4 automations without an explicit phase request.
+After Phase 4D validation, consider the next narrow retrieval or ingestion hardening step. Do not jump to agents, OCR, direct vault editing, or Phase 5 without an explicit phase request.
 
 ## Phase 3C RAG Quality Hardening
 
@@ -335,7 +335,7 @@ PASSED
 
 ## Phase 4C3 Announcement / Reminder Lifecycle Ingestion
 
-IN PROGRESS
+PASSED WITH MINOR RETRIEVAL EDGE CASE
 
 - [x] Add deterministic announcement refresh script
 - [x] Add sample announcement batch from cleaned reminder text
@@ -349,11 +349,35 @@ IN PROGRESS
 - [x] Preserve announcement metadata in Chroma indexing and API schema
 - [x] Keep announcements below post orders and above primary workflow
 - [x] Document OCR as deferred
-- [ ] User runs announcement dry run manually
-- [ ] User runs announcement refresh manually
-- [ ] User rebuilds ChromaDB manually
-- [ ] User validates reminder retrieval manually
-- [ ] User validates post orders still outrank announcements manually
+- [x] User runs announcement dry run manually
+- [x] User runs announcement refresh manually
+- [x] User rebuilds ChromaDB manually
+- [x] User validates reminder retrieval manually
+- [x] User validates post orders still outrank announcements manually
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+Known minor edge case:
+
+- `Red Zone Protocol` could be treated as a missing community hint instead of an operational topic. Phase 4D addresses this with a deterministic query intent parser.
+
+## Phase 4D Operational Query Parser / Intent Extraction
+
+IN PROGRESS
+
+- [x] Add deterministic `QueryIntent` object
+- [x] Add configured operational topic dictionary
+- [x] Keep community extraction limited to known names, aliases, and configured synonyms
+- [x] Prevent operational phrases such as `Red Zone Protocol`, `Support Room`, `Physical ID`, and `Emergency Code` from becoming fake communities
+- [x] Preserve unknown-community refusal for real community-style questions such as Atlantis Bay
+- [x] Extract expected document types for reminders, announcements, policies, incidents, visitor logs, default workflow, and emergency codes
+- [x] Integrate query intent into CLI retrieval and answering
+- [x] Preserve lifecycle scoring, authority scoring, community alias boosts, primary workflow fallback, pending advisory warnings, and citation behavior
+- [ ] User rebuilds ChromaDB if needed
+- [ ] User validates Red Zone Protocol reminder answer manually
+- [ ] User validates Atlantis Bay refusal manually
+- [ ] User validates Sierra Ridge post order priority manually
+- [ ] User validates default workflow fallback manually
 - [ ] User reviews changes manually
 - [ ] User commits changes manually
 
