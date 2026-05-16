@@ -6,12 +6,27 @@ Current status: WORKING PROOF OF WORK
 - Phase 3B grounded answering works.
 - Phase 3D local API wrapper is available for HTTP access.
 - Phase 3E documents Open WebUI as a presentation-only UI over FastAPI.
+- Phase 4D adds deterministic query intent parsing before retrieval.
 
 Phase 3A tests whether local semantic search can retrieve the right Markdown chunks from `vault/`.
 
 Phase 3B adds minimal grounded answer generation using only retrieved vault chunks.
 
 This does not add Open WebUI-hosted retrieval, n8n integration, agents, automatic memory editing, Git automation, dashboards, or Phase 4 automations.
+
+## Query Intent Parsing
+
+Phase 4D parses operational questions before semantic retrieval.
+
+The parser extracts:
+
+- known community names and letter-code aliases;
+- missing community hints only when the query clearly asks about an unknown community;
+- operational topics such as `Red Zone Protocol`, `Emergency Code`, `Physical ID`, `Support Room`, and `Pickleball Tournament`;
+- expected document types such as `announcement`, `post_order`, `qa_rule`, `incident`, `visitor_log`, and primary workflow fallback;
+- default/global workflow intent.
+
+This prevents global operational topics from being treated as fake communities while keeping Atlantis Bay-style unknown-community refusal behavior conservative. The parser is deterministic and does not use an LLM.
 
 ## Install
 
