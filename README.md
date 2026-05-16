@@ -8,7 +8,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4C1 validation, with Phase 4C2 legacy post-order migration in progress:
+Working proof of work through Phase 4C2 validation, with Phase 4C3 announcement lifecycle ingestion in progress:
 
 - Phase 2 Minimal POW ingestion: passed
 - Phase 3A retrieval: passed
@@ -21,7 +21,8 @@ Working proof of work through Phase 4C1 validation, with Phase 4C2 legacy post-o
 - Phase 4B2 primary workflow fallback confidence fix: passed
 - Phase 4C batch post order refresh/diffing: passed
 - Phase 4C1 lifecycle retrieval hardening: passed with known limitation
-- Phase 4C2 legacy post order migration / managed source conversion: in progress
+- Phase 4C2 legacy post order migration / managed source conversion: passed
+- Phase 4C3 announcement / reminder lifecycle ingestion: in progress
 
 Current architecture:
 
@@ -47,6 +48,8 @@ Community aliases are resolved deterministically before retrieval. Letter prefix
 
 Phase 4C2 converts eligible legacy freeform post orders into managed active post-order documents while preserving the original legacy files. This is used first for Sierra Ridge physical ID post orders so policy retrieval can come from managed `post_order` sources instead of weaker QA support notes.
 
+Phase 4C3 adds deterministic announcement and reminder ingestion from cleaned pasted text. Announcements are managed lifecycle documents under `vault/05_Announcements` and sit between post orders and primary workflow in authority: `post_order > announcement > primary_workflow`. OCR is deferred.
+
 ## Post Order Batch Refresh
 
 Dry run:
@@ -59,6 +62,13 @@ Real run:
 
 ```powershell
 python automation/ingestion/refresh_post_orders.py --input automation/ingestion/sample_post_order_batch.md
+```
+
+## Announcement Batch Refresh
+
+```powershell
+python automation/ingestion/refresh_announcements.py --input automation/ingestion/sample_announcement_batch.md --dry-run
+python automation/ingestion/refresh_announcements.py --input automation/ingestion/sample_announcement_batch.md
 ```
 
 ## Local RAG API
