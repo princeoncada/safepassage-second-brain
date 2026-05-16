@@ -99,9 +99,9 @@ The first three answer from retrieved context. Atlantis Bay refuses with insuffi
 These are not blockers.
 
 1. Duplicate source files still appear in retrieval results.
-2. Citations currently list all retrieved chunks, including weak or less relevant chunks.
-3. Retrieval ranking can place QA Notes above Summary or Details.
-4. Source numbering between generated answer and printed citation list can be confusing.
+2. Citations can still be incomplete if DeepSeek omits explicit source IDs.
+3. Retrieval ranking remains heuristic and depends on available Markdown quality.
+4. Source numbering depends on the model citing retrieved source IDs exactly.
 5. Titles and filenames are too verbose.
 6. Incident documents need richer structured fields.
 7. Open Questions may contain generic AI filler.
@@ -185,3 +185,80 @@ POST http://host.docker.internal:8000/ask
 Open WebUI is only the conversational UI. It should display the `answer`, `answer_citations`, `retrieval_confidence`, `confidence_reason`, `sources`, and `warnings` returned by FastAPI. It should not call ChromaDB directly, write Markdown, edit memory, or bypass the refusal behavior.
 
 Details: `openwebui/README.md`.
+
+## Phase 4A Retrieval Quality Hardening
+
+Phase 4A improves retrieval and citation quality without changing the architecture.
+
+What changed:
+
+- section weighting now prefers `Agent Action`, `Summary`, `Details`, `Rule`, `Policy`, then `QA Notes`;
+- low-value sections remain excluded by default and penalized when explicitly included;
+- dedupe happens after reranking so the strongest near-duplicate source is kept;
+- duplicate detection uses normalized title, community, type, section, content preview, and lightweight content similarity;
+- generated answer text is cleaned so API/UI clients render only one Sources section;
+- `answer_citations` contains only source IDs explicitly cited by the generated answer.
+
+Validation:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+python rag/scripts/query_vault.py "overnight visitors must present physical ID before access" --top-k 5
+python rag/scripts/query_vault.py "What happened with tailgating at Monterey?" --top-k 5
+python rag/scripts/query_vault.py "What should the agent do if digital ID is presented instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+```
+
+Known limitations:
+
+- retrieval quality still depends on Markdown quality;
+- generated test files can still pollute results if they are meaningfully different;
+- section weighting is heuristic;
+- refusal behavior remains conservative by design;
+- no agents, automatic vault cleanup, or Phase 4B chat modes are included.
+
+## Phase 4B Primary Workflow Ingestion
+
+Phase 4B adds global base kiosk workflow content as fallback authority.
+
+Authority hierarchy:
+
+```text
+post_order
+announcement
+primary_workflow
+```
+
+Primary workflow is default guidance only. It should not override post orders or announcements.
+
+Ingest the structured sample:
+
+```powershell
+python automation/ingestion/ingest_primary_workflow.py
+```
+
+Then rebuild the index:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Validate:
+
+```powershell
+python rag/scripts/query_vault.py "What is the default process when a guest has no physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "How many times do I call the resident by default?" --top-k 5
+python rag/scripts/answer_vault.py "How many times do I call the resident for Atlantis Bay?" --top-k 5
+```
+
+Expected:
+
+- default workflow questions can retrieve `primary-*.md`;
+- answers from primary workflow say they are based on default or primary workflow guidance;
+- Sierra Ridge post order and QA rule sources still outrank primary workflow;
+- unknown communities are not hallucinated as community-specific policy.
+
+Details: `docs/PHASE_4B_PRIMARY_WORKFLOW_INGESTION.md`.
