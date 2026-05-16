@@ -31,6 +31,7 @@ def load_retrieval_config() -> dict[str, Any]:
                 "QA Notes": 0.06,
             },
             "weak_context_distance_threshold": 0.95,
+            "primary_workflow_default_threshold": 1.1,
         }
     with CONFIG_PATH.open("r", encoding="utf-8") as file:
         return json.load(file)
@@ -72,6 +73,14 @@ def authority_level(metadata: dict[str, Any]) -> str:
 def is_default_workflow_query(query: str) -> bool:
     normalized = normalize_key(query)
     return any(term in normalized for term in ["default", "base workflow", "primary workflow", "by default"])
+
+
+def has_global_primary_workflow(candidates: list[tuple[float, float, str, dict[str, Any]]]) -> bool:
+    return any(
+        authority_level(candidate[3]) == "primary_workflow"
+        and normalize_key(str(candidate[3].get("community", ""))) == "global"
+        for candidate in candidates
+    )
 
 
 def token_set(value: str) -> set[str]:
@@ -119,13 +128,26 @@ def extract_query_hints(query: str, config: dict[str, Any], candidate_communitie
     }
 
 
-def retrieval_confidence(best_distance: float | None, has_mismatch: bool, threshold: float) -> tuple[str, str]:
+def retrieval_confidence(
+    best_distance: float | None,
+    has_mismatch: bool,
+    threshold: float,
+    primary_workflow_default_threshold: float,
+    has_primary_workflow: bool,
+    is_default_query: bool,
+) -> tuple[str, str]:
     if best_distance is None:
         return "none", "no chunks returned"
     if has_mismatch:
         return "weak", "query metadata did not match retrieved metadata"
     if best_distance <= threshold:
         return "strong", f"best distance {best_distance:.4f} is within threshold {threshold}"
+    if is_default_query and has_primary_workflow and best_distance <= primary_workflow_default_threshold:
+        return (
+            "fallback",
+            f"best distance {best_distance:.4f} is above standard threshold {threshold} "
+            f"but within primary workflow default threshold {primary_workflow_default_threshold}",
+        )
     return "weak", f"best distance {best_distance:.4f} is above threshold {threshold}"
 
 
@@ -185,6 +207,7 @@ def main() -> int:
     primary_specific_community_penalty = float(config.get("primary_workflow_specific_community_penalty", 0.12))
     primary_default_boost = float(config.get("primary_workflow_default_query_boost", 0.1))
     weak_threshold = float(config.get("weak_context_distance_threshold", 0.95))
+    primary_workflow_default_threshold = float(config.get("primary_workflow_default_threshold", 1.1))
     near_duplicate_threshold = float(config.get("near_duplicate_similarity_threshold", 0.9))
     candidate_communities = {str(metadata.get("community", "")) for metadata in metadatas if metadata}
     hints = extract_query_hints(args.query, config, candidate_communities)
@@ -279,7 +302,14 @@ def main() -> int:
         bool(hints["expected_types"])
         and all(str(candidate[3].get("type", "")) not in hints["expected_types"] for candidate in candidates)
     )
-    confidence, reason = retrieval_confidence(best_distance, has_mismatch, weak_threshold)
+    confidence, reason = retrieval_confidence(
+        best_distance,
+        has_mismatch,
+        weak_threshold,
+        primary_workflow_default_threshold,
+        has_global_primary_workflow(candidates),
+        is_default_workflow_query(args.query),
+    )
     print(f"Retrieval Confidence: {confidence}")
     print(f"Confidence Reason: {reason}")
     if hints["community"]:
