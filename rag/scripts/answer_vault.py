@@ -149,6 +149,11 @@ def extract_query_hints(query: str, config: dict[str, Any], candidate_communitie
         expected_types.add("incident")
     if any(term in normalized_query for term in ["visitor log", "tag", "vendor"]):
         expected_types.add("visitor_log")
+    if any(
+        term in normalized_query
+        for term in ["announcement", "reminder", "red zone", "nvr", "gate issue", "kiosk audio", "pickleball", "pre authorized", "preauthorized"]
+    ):
+        expected_types.add("announcement")
 
     return {
         "community": community_hint,
@@ -430,9 +435,16 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 "scope": str(metadata.get("scope", "")),
                 "status": str(metadata.get("status", "")),
                 "lifecycle_generation": str(metadata.get("lifecycle_generation", "")),
+                "announcement_id": str(metadata.get("announcement_id", "")),
+                "announcement_hash": str(metadata.get("announcement_hash", "")),
+                "category": str(metadata.get("category", "")),
                 "rule_id": str(metadata.get("rule_id", "")),
                 "rule_hash": str(metadata.get("rule_hash", "")),
                 "source_batch": str(metadata.get("source_batch", "")),
+                "source_name": str(metadata.get("source_name", "")),
+                "effective_date": str(metadata.get("effective_date", "")),
+                "expires_on": str(metadata.get("expires_on", "")),
+                "event_dates": str(metadata.get("event_dates", "")),
                 "source_legacy_file": str(metadata.get("source_legacy_file", "")),
                 "source_migration": str(metadata.get("source_migration", "")),
                 "migration_date": str(metadata.get("migration_date", "")),
@@ -467,6 +479,8 @@ def build_context_packet(chunks: list[dict[str, Any]]) -> str:
                     f"Scope: {chunk.get('scope', '')}",
                     f"Status: {chunk.get('status', '')}",
                     f"Lifecycle Generation: {chunk.get('lifecycle_generation', '')}",
+                    f"Category: {chunk.get('category', '')}",
+                    f"Announcement ID: {chunk.get('announcement_id', '')}",
                     f"Rule ID: {chunk.get('rule_id', '')}",
                     f"Community: {chunk['community']}",
                     f"Section: {chunk['section']}",
@@ -491,6 +505,7 @@ def print_sources(chunks: list[dict[str, Any]], title: str = "Retrieved Sources"
             f"type={chunk['type']} authority={chunk.get('authority_level', '')} "
             f"status={chunk.get('status', '')} community={chunk['community']} "
             f"lifecycle={chunk.get('lifecycle_generation', '')} "
+            f"category={chunk.get('category', '')} "
             f"section={chunk['section']} source={chunk['source_file']}"
         )
         print(f"    {preview}")
