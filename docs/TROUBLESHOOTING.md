@@ -438,6 +438,28 @@ For community-specific questions, post orders and announcements should outrank g
 
 Unknown-community fallback must not invent community-specific policy. The answer should say no source exists for that community and only use primary workflow as default guidance when relevant.
 
+## Phase 4B2 Default Workflow Query Refuses
+
+If a default workflow question retrieves the correct global primary workflow source but refuses because the distance is slightly above `weak_context_distance_threshold`, check:
+
+```json
+"primary_workflow_default_threshold": 1.1
+```
+
+This threshold should only apply to explicit default/base/primary workflow queries such as:
+
+```text
+How many times do I call the resident by default?
+```
+
+It should not be used for community-specific questions such as:
+
+```text
+How many times do I call the resident for Atlantis Bay?
+```
+
+If the community-specific question does not have an indexed matching source, refusal is the correct behavior.
+
 ## Phase 3B Missing DeepSeek Key
 
 If `answer_vault.py` says `DEEPSEEK_API_KEY` is not set, set it in PowerShell:
