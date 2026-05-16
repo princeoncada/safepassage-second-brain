@@ -8,7 +8,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 3E integration documentation:
+Working proof of work through Phase 4C implementation:
 
 - Phase 2 Minimal POW ingestion: passed
 - Phase 3A retrieval: passed
@@ -17,7 +17,9 @@ Working proof of work through Phase 3E integration documentation:
 - Phase 3D local FastAPI wrapper: passed
 - Phase 3E Open WebUI integration: passed
 - Phase 4A retrieval quality hardening: passed with minor tuning
-- Phase 4B primary workflow ingestion: in progress
+- Phase 4B primary workflow ingestion: mostly validated
+- Phase 4B2 primary workflow fallback confidence fix: passed
+- Phase 4C batch post order refresh/diffing: in progress
 
 Current architecture:
 
@@ -34,6 +36,22 @@ Open WebUI is presentation-only. Markdown in `vault/` remains the source of trut
 Phase 4A keeps this architecture and improves only retrieval ranking, dedupe, source selection, and citation cleanup.
 
 Phase 4B adds the SafePassage primary kiosk workflow as global default guidance below post orders and announcements.
+
+Phase 4C adds deterministic batch post order refresh and diffing so incoming post-order batches can be compared against active vault rules before new Markdown is created.
+
+## Post Order Batch Refresh
+
+Dry run:
+
+```powershell
+python automation/ingestion/refresh_post_orders.py --input automation/ingestion/sample_post_order_batch.md --dry-run
+```
+
+Real run:
+
+```powershell
+python automation/ingestion/refresh_post_orders.py --input automation/ingestion/sample_post_order_batch.md
+```
 
 ## Local RAG API
 
