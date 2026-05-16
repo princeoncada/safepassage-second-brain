@@ -37,6 +37,7 @@ def load_retrieval_config() -> dict[str, Any]:
                 "QA Notes": 0.06,
             },
             "weak_context_distance_threshold": 0.95,
+            "primary_workflow_default_threshold": 1.1,
         }
     with CONFIG_PATH.open("r", encoding="utf-8") as file:
         return json.load(file)
@@ -125,21 +126,35 @@ def extract_query_hints(query: str, config: dict[str, Any], candidate_communitie
     }
 
 
-def retrieval_assessment(chunks: list[dict[str, Any]], hints: dict[str, Any], threshold: float) -> dict[str, Any]:
+def has_global_primary_workflow(chunks: list[dict[str, Any]]) -> bool:
+    return any(
+        chunk.get("authority_level") == "primary_workflow"
+        and normalize_key(str(chunk.get("community", ""))) == "global"
+        for chunk in chunks
+    )
+
+
+def has_higher_authority_community_match(chunks: list[dict[str, Any]], community: str) -> bool:
+    normalized_community = normalize_key(community)
+    return any(
+        chunk.get("authority_level") in {"post_order", "announcement"}
+        and normalize_key(str(chunk.get("community", ""))) == normalized_community
+        for chunk in chunks
+    )
+
+
+def retrieval_assessment(
+    chunks: list[dict[str, Any]],
+    hints: dict[str, Any],
+    threshold: float,
+    primary_workflow_default_threshold: float,
+    is_default_query: bool,
+) -> dict[str, Any]:
     if not chunks:
         return {"confidence": "none", "refuse": True, "reason": "no chunks returned"}
     best_distance = min(float(chunk["distance"]) for chunk in chunks)
-    has_primary_workflow = any(chunk.get("authority_level") == "primary_workflow" for chunk in chunks)
+    has_primary_workflow = has_global_primary_workflow(chunks)
     if hints["missing_community"]:
-        if has_primary_workflow and best_distance <= threshold and not hints["expected_types"]:
-            return {
-                "confidence": "fallback",
-                "refuse": False,
-                "reason": (
-                    f"no indexed source matched community hint '{hints['missing_community']}'; "
-                    "using global primary workflow as default guidance"
-                ),
-            }
         return {
             "confidence": "weak",
             "refuse": True,
@@ -152,6 +167,22 @@ def retrieval_assessment(chunks: list[dict[str, Any]], hints: dict[str, Any], th
             "reason": f"no retrieved source matched community hint '{hints['community']}'",
         }
     if best_distance > threshold:
+        if (
+            is_default_query
+            and has_primary_workflow
+            and best_distance <= primary_workflow_default_threshold
+            and not hints["community"]
+            and not hints["missing_community"]
+            and not has_higher_authority_community_match(chunks, str(hints.get("community", "")))
+        ):
+            return {
+                "confidence": "fallback",
+                "refuse": False,
+                "reason": (
+                    f"best distance {best_distance:.4f} is above standard threshold {threshold} "
+                    f"but within primary workflow default threshold {primary_workflow_default_threshold}"
+                ),
+            }
         return {
             "confidence": "weak",
             "refuse": True,
@@ -212,6 +243,7 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     primary_specific_community_penalty = float(config.get("primary_workflow_specific_community_penalty", 0.12))
     primary_default_boost = float(config.get("primary_workflow_default_query_boost", 0.1))
     weak_threshold = float(config.get("weak_context_distance_threshold", 0.95))
+    primary_workflow_default_threshold = float(config.get("primary_workflow_default_threshold", 1.1))
     near_duplicate_threshold = float(config.get("near_duplicate_similarity_threshold", 0.9))
     candidate_communities = {str(metadata.get("community", "")) for metadata in metadatas if metadata}
     hints = extract_query_hints(query, config, candidate_communities)
@@ -309,7 +341,13 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 "content": document,
             }
         )
-    assessment = retrieval_assessment(chunks, hints, weak_threshold)
+    assessment = retrieval_assessment(
+        chunks,
+        hints,
+        weak_threshold,
+        primary_workflow_default_threshold,
+        is_default_workflow_query(query),
+    )
     return chunks, hints, assessment
 
 
@@ -467,7 +505,7 @@ def main() -> int:
     print()
     print_sources(chunks)
 
-    if assessment["confidence"] != "strong":
+    if assessment["confidence"] in {"weak", "none"}:
         print()
         print("Warning: retrieved context is weak.")
 
