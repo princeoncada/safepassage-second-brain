@@ -1,0 +1,22 @@
+[
+  {
+    "query": "What is the default process when a guest has no physical ID?",
+    "expected_sources": ["primary-no-physical-id"],
+    "expected_behavior": "Retrieve primary workflow fallback and answer that default workflow says deny entry if no physical ID."
+  },
+  {
+    "query": "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?",
+    "expected_sources": ["Sierra Ridge post_order", "Sierra Ridge qa_rule"],
+    "expected_behavior": "Prefer Sierra Ridge QA/post order over primary workflow."
+  },
+  {
+    "query": "How many times do I call the resident by default?",
+    "expected_sources": ["primary-call-attempts-by-community"],
+    "expected_behavior": "Answer default twice and say to check post orders for accuracy."
+  },
+  {
+    "query": "How many times do I call the resident for Atlantis Bay?",
+    "expected_sources": ["primary-call-attempts-by-community"],
+    "expected_behavior": "Say no Atlantis Bay-specific source exists. May mention default primary workflow only as default, not community-specific policy."
+  }
+]
