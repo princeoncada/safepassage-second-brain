@@ -318,6 +318,126 @@ python rag/scripts/index_vault.py
 
 Open WebUI should never bypass FastAPI or call ChromaDB directly.
 
+## Phase 4A Duplicate Sources In Open WebUI
+
+Phase 4A separates retrieved `sources` from `answer_citations` and strips trailing model-generated `Sources:` blocks from the API `answer`. The Open WebUI connector should render one Sources section from `answer_citations`.
+
+If duplicate source lists still appear, check the Open WebUI connector template and make sure it is not rendering both:
+
+- a model-generated `Sources:` block inside `answer`;
+- a second manually formatted list from `answer_citations`.
+
+## Phase 4A Duplicate Retrieval Results
+
+Phase 4A dedupes after reranking so the strongest near-duplicate survives. It compares normalized title, community, type, section, content preview, and lightweight content similarity.
+
+Duplicates can still appear when files are similar but not effectively identical. Generated test files can still pollute the vault until they are manually cleaned or archived.
+
+## Phase 4A Section Ranking Looks Wrong
+
+The section weighting is heuristic. Preferred sections are:
+
+```text
+Agent Action
+Summary
+Details
+Rule
+Policy
+QA Notes
+```
+
+`QA Notes` should still appear when relevant, but should not dominate factual or policy questions when stronger operational sections are available. Rebuild the index before evaluating:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+## Phase 4A Citation List Is Empty
+
+If DeepSeek answers without explicit source IDs like `[1]`, the API cannot safely infer which sources were actually used. The response will include a warning and leave `answer_citations` empty rather than citing unrelated chunks.
+
+Re-run with retrieval context visible:
+
+```powershell
+python rag/scripts/answer_vault.py "your question" --no-ai --show-context --top-k 5
+```
+
+## Phase 4A Refusal Still Happens
+
+This can be correct. Phase 4A does not weaken conservative refusal behavior. Community mismatch, missing community sources, weak distance, or expected type mismatch can still trigger:
+
+```text
+The vault does not contain enough information to answer this safely.
+```
+
+## Phase 4B Primary Workflow Files Are Not Created
+
+Run the deterministic ingester:
+
+```powershell
+python automation/ingestion/ingest_primary_workflow.py
+```
+
+If files already exist, the script skips them. Re-run with `--force` only when you intentionally want to overwrite generated primary workflow files:
+
+```powershell
+python automation/ingestion/ingest_primary_workflow.py --force
+```
+
+## Phase 4B PDF Text Extraction Is Unreliable
+
+OCR is not required. Manually paste extracted text into:
+
+```text
+automation/ingestion/sample_primary_workflow_input.md
+```
+
+Use the blank structure in:
+
+```text
+automation/ingestion/primary_workflow_input_template.md
+```
+
+Then run the ingester.
+
+## Phase 4B Primary Workflow Does Not Appear In Retrieval
+
+Confirm generated files exist in:
+
+```text
+vault/09_SOPs/
+```
+
+Then rebuild ChromaDB:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Check that indexed chunks include `authority_level: primary_workflow` in retrieved output:
+
+```powershell
+python rag/scripts/query_vault.py "What is the default process when a guest has no physical ID?" --top-k 5
+```
+
+## Phase 4B Primary Workflow Overrides A Post Order
+
+Treat this as a failed validation. The authority hierarchy is:
+
+```text
+post_order
+announcement
+primary_workflow
+```
+
+For community-specific questions, post orders and announcements should outrank global primary workflow. Check retrieved source authority levels and confirm the community-specific document is indexed.
+
+## Phase 4B Unknown Community Answer Sounds Too Specific
+
+Unknown-community fallback must not invent community-specific policy. The answer should say no source exists for that community and only use primary workflow as default guidance when relevant.
+
 ## Phase 3B Missing DeepSeek Key
 
 If `answer_vault.py` says `DEEPSEEK_API_KEY` is not set, set it in PowerShell:
