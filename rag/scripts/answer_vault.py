@@ -13,6 +13,8 @@ from typing import Any
 import chromadb
 from sentence_transformers import SentenceTransformer
 
+from rag.query_intent import expand_query_with_intent, parse_query_intent
+
 
 COLLECTION_NAME = "safepassage_vault_chunks"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
@@ -242,7 +244,9 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     if not CHROMA_DIR.exists():
         raise SystemExit("Chroma index does not exist. Run: python rag/scripts/index_vault.py")
 
-    expanded_query, _alias_community, _alias = expand_query_with_alias(query)
+    config = load_retrieval_config()
+    intent = parse_query_intent(query, set(config.get("known_communities", [])))
+    expanded_query = expand_query_with_intent(intent)
     model = SentenceTransformer(MODEL_NAME)
     query_embedding = model.encode([expanded_query], normalize_embeddings=True).tolist()[0]
 
@@ -263,7 +267,6 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     metadatas = results.get("metadatas", [[]])[0]
     distances = results.get("distances", [[]])[0]
 
-    config = load_retrieval_config()
     section_boosts = {
         normalize_section_name(section): float(boost)
         for section, boost in config.get("section_boosts", {}).items()
@@ -296,7 +299,8 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     primary_workflow_default_threshold = float(config.get("primary_workflow_default_threshold", 1.1))
     near_duplicate_threshold = float(config.get("near_duplicate_similarity_threshold", 0.9))
     candidate_communities = {str(metadata.get("community", "")) for metadata in metadatas if metadata}
-    hints = extract_query_hints(query, config, candidate_communities)
+    intent = parse_query_intent(query, set(config.get("known_communities", [])) | candidate_communities)
+    hints = intent.as_hints()
     if hints["community"]:
         try:
             community_results = collection.get(
@@ -363,7 +367,7 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         adjusted_distance += lifecycle_penalties.get(lifecycle_generation, 0.0)
         if authority == "primary_workflow" and hints["community"]:
             adjusted_distance += primary_specific_community_penalty
-        if authority == "primary_workflow" and is_default_workflow_query(query):
+        if authority == "primary_workflow" and hints.get("is_default_workflow_query"):
             adjusted_distance -= primary_default_boost
         raw_candidates.append((adjusted_distance, distance, str(document), metadata))
 
@@ -461,7 +465,7 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         hints,
         weak_threshold,
         primary_workflow_default_threshold,
-        is_default_workflow_query(query),
+        bool(hints.get("is_default_workflow_query")),
     )
     return chunks, hints, assessment
 
@@ -646,6 +650,7 @@ def main() -> int:
     print()
     print(f"Retrieval Confidence: {assessment['confidence']}")
     print(f"Confidence Reason: {assessment['reason']}")
+    print(f"Intent Category: {hints.get('intent_category', '')}")
     if hints["community"]:
         print(f"Community Hint: {hints['community']}")
     if hints.get("community_alias"):
@@ -654,6 +659,10 @@ def main() -> int:
         print(f"Community Hint: {hints['missing_community']} (not found in indexed metadata)")
     if hints["expected_types"]:
         print(f"Expected Types: {', '.join(sorted(hints['expected_types']))}")
+    if hints.get("topic_terms"):
+        print(f"Topic Terms: {', '.join(hints['topic_terms'])}")
+    if hints.get("scope_hint"):
+        print(f"Scope Hint: {hints['scope_hint']}")
     print()
     print_sources(chunks)
 
