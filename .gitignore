@@ -26,3 +26,25 @@ tmp/
 temp/
 
 validation_output.md
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OCR outputs
+automation/ocr/output/
+
+# ChromaDB
+rag/chroma/
+
+# Environment files
+.env
+.env.*
+
+# OS junk
+.DS_Store
+Thumbs.db
