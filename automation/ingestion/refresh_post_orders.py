@@ -17,7 +17,7 @@ REPORT_DIR = REPO_ROOT / "vault" / "08_Reports" / "post-order-refresh"
 
 DECORATIVE_LINE = re.compile(r"^\s*[-=_*]{3,}\s*$")
 POST_ORDER_PATTERN = re.compile(
-    r"(?:^\s*\d{1,2}/\d{1,2}/\d{4}\s*\n)?\s*POST\s+ORDERS?\s*\((K\s*&\s*C|K&C|K|C)\)\s*:\s*(.*?)(?=\n\s*(?:\d{1,2}/\d{1,2}/\d{4}\s*\n)?\s*POST\s+ORDERS?\s*\(|\Z)",
+    r"(?:^\s*\d{1,2}/\d{1,2}/\d{4}\s*\n)?\s*POST\s+ORDERS?\s*\((K\s*(?:&|AND)\s*C|K&C|K|C)\)\s*:\s*(.*?)(?=\n\s*(?:\d{1,2}/\d{1,2}/\d{4}\s*\n)?\s*POST\s+ORDERS?\s*\(|\Z)",
     re.IGNORECASE | re.DOTALL,
 )
 STOPWORDS = {
@@ -90,12 +90,12 @@ def scope_from_marker(marker: str) -> tuple[list[str], str]:
     if normalized == "K":
         return ["kiosk"], "k"
     if normalized == "C":
-        return ["call_center"], "c"
-    return ["kiosk", "call_center"], "kc"
+        return ["concierge"], "c"
+    return ["kiosk", "concierge"], "kc"
 
 
 def normalize_scope_marker(marker: str) -> str:
-    normalized = re.sub(r"\s+", "", marker.upper())
+    normalized = re.sub(r"\s+", "", marker.upper()).replace("AND", "&")
     if normalized == "K&C":
         return "K&C"
     return normalized
@@ -194,11 +194,11 @@ def metadata_scope_key(value: Any) -> str:
         values = {str(item) for item in value}
     else:
         values = {part.strip() for part in str(value or "").split(",") if part.strip()}
-    if {"kiosk", "call_center"} <= values:
+    if {"kiosk", "concierge"} <= values:
         return "kc"
     if "kiosk" in values:
         return "k"
-    if "call_center" in values:
+    if "concierge" in values:
         return "c"
     return slugify(",".join(sorted(values)), 12)
 
@@ -310,6 +310,7 @@ def yaml_frontmatter(metadata: dict[str, Any]) -> str:
 def build_rule_markdown(incoming: IncomingRule, status: str, input_file: Path, supersedes: str = "") -> str:
     created = now_iso()
     title = f"{incoming.community} Post Order - {incoming.topic_key.replace('-', ' ').title()}"
+    effective_status = "pending" if status == "active" and "pending" in incoming.normalized_text else status
     metadata = {
         "title": title,
         "type": "post_order",
@@ -318,7 +319,8 @@ def build_rule_markdown(incoming: IncomingRule, status: str, input_file: Path, s
         "community_code": incoming.community_code,
         "scope": incoming.scope,
         "scope_key": incoming.scope_key,
-        "status": status,
+        "status": effective_status,
+        "lifecycle_generation": "managed",
         "rule_id": incoming.rule_id,
         "rule_hash": incoming.rule_hash,
         "topic_key": incoming.topic_key,
