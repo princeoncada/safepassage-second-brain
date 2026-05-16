@@ -156,6 +156,19 @@ primary_workflow
 
 When a question mentions a community, retrieval should prefer matching community post orders first, matching community announcements second, and global primary workflow only as fallback. If no community-specific source exists, the answer may use primary workflow only when it is clearly labeled as default guidance.
 
+### Phase 4B2 Primary Workflow Fallback Confidence
+
+Phase 4B2 keeps the global refusal threshold conservative and adds a separate fallback threshold for explicit default/base workflow questions.
+
+Primary workflow fallback can be treated as usable only when:
+
+- the query asks for default, base, or primary workflow guidance;
+- retrieved context includes global `authority_level: primary_workflow`;
+- no community-specific higher-authority source is being overridden;
+- the best distance is within `primary_workflow_default_threshold`.
+
+Unknown community-specific questions still refuse when no indexed community source exists. Global primary workflow must not be converted into community-specific policy.
+
 ## Phase 3A Retrieval Flow
 
 Markdown files in `vault/`
