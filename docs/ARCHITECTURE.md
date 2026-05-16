@@ -186,6 +186,48 @@ Phase 4C starts lifecycle handling with `post_order` only because post orders ar
 
 Post order lifecycle metadata includes `rule_id`, `rule_hash`, `source_batch`, `batch_date`, `supersedes`, and `superseded_by`. Retrieval prefers `status: active` and penalizes `superseded`, `conflict`, `review`, and `inactive` documents if they are indexed.
 
+### Phase 4C1 Lifecycle Retrieval Hardening
+
+```text
+question
+-> deterministic community alias expansion
+-> ChromaDB candidate retrieval
+-> lifecycle-aware filtering
+-> metadata-aware reranking
+-> grounded answer with active/pending awareness
+```
+
+Lifecycle priority is:
+
+```text
+active
+pending
+review / needs_review
+superseded
+archived
+```
+
+Active managed post orders dominate normal retrieval. Pending rules do not override active operational rules; they are advisory context and should trigger a warning when relevant. Superseded and archived rules are not allowed to outrank active rules.
+
+Post-order documents with `lifecycle_generation: managed` are the operational retrieval source of truth. Legacy freeform post-order documents are skipped by default during query and answer retrieval, but remain in the vault for history.
+
+Community aliases are configured in `rag/config/community_aliases.json`. Letter prefixes such as `CBK`, `SR`, `MON`, and `OPB` expand to deterministic community names before semantic retrieval. Numeric client-code portions are ignored.
+
+### Phase 4C2 Legacy Post Order Migration
+
+```text
+legacy post_order Markdown
+-> deterministic migration parser
+-> managed active post_order copy
+-> original legacy file preserved
+-> migration report
+-> ChromaDB rebuild
+```
+
+Phase 4C2 converts eligible older post-order notes into lifecycle-managed post-order documents. It does not migrate QA rules into post orders, does not delete legacy files, and does not use AI or semantic diffing.
+
+Generated managed migration documents include `source_legacy_file`, `source_migration: legacy_post_order`, `migration_date`, `rule_id`, and `rule_hash`. These managed documents become the operational retrieval source of truth while the old files remain historical source material.
+
 ## Phase 3A Retrieval Flow
 
 Markdown files in `vault/`
