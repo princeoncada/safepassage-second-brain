@@ -102,7 +102,7 @@ The secret scan should return no real secrets. Placeholder values in `.env.examp
 
 ## Current Checkpoint Status
 
-Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, and Phase 3D Local API Wrapper passed on 2026-05-15. Phase 3E Open WebUI integration is documentation and local UI configuration over the existing FastAPI backend. The system is a working proof of work, not a finished final product.
+Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C post-order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, and Phase 4C3 announcement ingestion have passed or mostly passed local validation. Phase 4D query intent parsing is the current manual-validation phase. The system is a working proof of work, not a finished final product.
 
 ## Phase 2 Minimal POW Validated Tests
 
@@ -722,3 +722,53 @@ Expected:
 - global reminders retrieve as `community: global`;
 - pending or expired announcements are advisory or penalized;
 - post orders still outrank announcements for policy questions.
+
+## Phase 4D Operational Query Parser Validation
+
+The user runs this validation manually after reviewing the query intent changes.
+
+Rebuild only if announcement or vault content changed:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Red Zone Protocol topic parsing:
+
+```powershell
+python rag/scripts/query_vault.py "What is the Red Zone Protocol reminder?" --top-k 5
+python rag/scripts/answer_vault.py "What is the Red Zone Protocol reminder?" --top-k 5
+```
+
+Expected:
+
+- intent category is `temporary_protocol` or announcement/reminder-related;
+- `Red Zone Protocol` is shown as a topic term, not a missing community;
+- expected type includes `announcement`;
+- answer uses the global announcement context if indexed.
+
+Unknown community refusal:
+
+```powershell
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+```
+
+Expected:
+
+- Atlantis Bay is treated as a missing community hint;
+- the answer refuses safely;
+- no Atlantis Bay policy is invented.
+
+Authority and fallback regression checks:
+
+```powershell
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "How many times do I call the resident by default?" --top-k 5
+```
+
+Expected:
+
+- Sierra Ridge policy still prioritizes managed post orders and supporting QA context;
+- primary workflow fallback still answers explicit default workflow questions;
+- post orders still outrank announcements and primary workflow.
