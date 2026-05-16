@@ -62,6 +62,7 @@ n8n webhook
 ```text
 vault Markdown
 -> section-based chunking
+-> deterministic query intent parsing
 -> local embeddings
 -> ChromaDB
 -> query_vault.py retrieval
@@ -249,6 +250,23 @@ primary_workflow
 Announcements can provide reminders, temporary protocols, event notices, gate issues, NVR issues, approved vendor notes, and operational warnings. They do not override active post orders. Active announcements can answer relevant questions, pending announcements are advisory, and expired or archived announcements are penalized or skipped by normal retrieval.
 
 Phase 4C3 expects cleaned pasted text only. OCR and screenshot parsing are deferred to a later phase.
+
+### Phase 4D Operational Query Intent Parsing
+
+```text
+question
+-> deterministic QueryIntent parser
+-> community alias and known community matching
+-> operational topic detection
+-> expected document type hints
+-> ChromaDB retrieval and authority/lifecycle reranking
+```
+
+Phase 4D prevents operational proper nouns from being treated as missing communities. For example, `Red Zone Protocol`, `Support Room`, `Community Approved List`, `Physical ID`, `Pickleball Tournament`, and `Emergency Code` are parsed as topics, protocols, or policies before semantic retrieval.
+
+Community extraction is intentionally strict. A phrase is treated as a community only when it matches a configured alias, a known community name, or a narrow unknown-community pattern such as `policy for Atlantis Bay`. This keeps unknown-community refusals conservative without blocking global announcement topics.
+
+The query parser is deterministic and does not use an LLM. It does not replace authority scoring, lifecycle scoring, primary workflow fallback, or insufficient-context refusal checks.
 
 ## Phase 3A Retrieval Flow
 
