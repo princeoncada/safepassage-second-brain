@@ -18,6 +18,12 @@ class Source(BaseModel):
     type: str
     authority_level: str = ""
     scope: str = ""
+    status: str = ""
+    rule_id: str = ""
+    rule_hash: str = ""
+    source_batch: str = ""
+    supersedes: str = ""
+    superseded_by: str = ""
     community: str
     section: str
     source_file: str
