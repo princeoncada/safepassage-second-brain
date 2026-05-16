@@ -34,20 +34,71 @@
   "primary_workflow_default_query_boost": 0.1,
   "primary_workflow_default_threshold": 1.1,
   "status_boosts": {
-    "active": 0.12
+    "active": 0.35,
+    "pending": 0.08
   },
   "status_penalties": {
-    "needs_review": 0.04,
-    "review": 0.2,
-    "conflict": 0.5,
-    "superseded": 0.75,
-    "inactive": 0.75
+    "needs_review": 0.65,
+    "review": 0.55,
+    "conflict": 0.85,
+    "superseded": 1.2,
+    "inactive": 1.2,
+    "archived": 1.5
   },
+  "lifecycle_generation_boosts": {
+    "managed": 0.28
+  },
+  "lifecycle_generation_penalties": {
+    "legacy": 1.25
+  },
+  "skip_legacy_lifecycle_by_default": true,
+  "skip_archived_by_default": true,
+  "pending_advisory_statuses": [
+    "pending"
+  ],
   "weak_context_distance_threshold": 0.95,
   "near_duplicate_similarity_threshold": 0.82,
   "content_preview_dedupe_words": 32,
   "known_communities": [
+    "Floral Lakes",
     "Sierra Ridge",
-    "Monterey"
+    "Monterey",
+    "The Glen (Tamiment)",
+    "Deep Canyon Tennis Club",
+    "Environ",
+    "Clearbrook Main",
+    "Clearbrook East",
+    "Clearbrook North",
+    "Royal Highlands",
+    "(Kings Point) Clairmont Fairfax",
+    "(Kings Point) Weldon",
+    "Lacuna (Atlantic National)",
+    "Tuscany Bay",
+    "Palm Beach Main",
+    "Palm Beach Greenwood (Manor)",
+    "Palm Beach Back (Pioneer)",
+    "Rolling Hills",
+    "Victoria",
+    "Paloma",
+    "Clarewood",
+    "Old Pelican Bay",
+    "Sandpiper",
+    "Blue Bell Main",
+    "Blue Bell Morris RD",
+    "Blue Bell North Wales",
+    "Bellechase",
+    "Heritage Palms",
+    "Heritage Palms Dunbar",
+    "Heritage Palms Miles",
+    "Heritage Palms North",
+    "Heritage Palms South",
+    "Heritage Palms Wal",
+    "Dulaney Towers",
+    "Somerset",
+    "Silver Sands",
+    "Palm Isles",
+    "Palm Isles Main",
+    "Palm Isles Condo 3",
+    "Gateway Towers"
   ]
 }
