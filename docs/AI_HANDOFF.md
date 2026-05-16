@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 4D OPERATIONAL QUERY PARSER / INTENT EXTRACTION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, and Phase 4C3 announcement ingestion are validated or mostly working.
+PHASE 4E OCR INTAKE LAYER. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, and Phase 4D query parsing are validated or mostly working.
 
 ## What Exists
 
@@ -25,6 +25,7 @@ PHASE 4D OPERATIONAL QUERY PARSER / INTENT EXTRACTION. Phase 2 Minimal POW, Phas
 - Phase 4C2 legacy post-order migration under `automation/ingestion/migrate_legacy_post_orders.py`.
 - Phase 4C3 announcement refresh under `automation/ingestion/refresh_announcements.py`.
 - Phase 4D deterministic query parser in `rag/query_intent.py` with topic config in `rag/config/query_topics.json`.
+- Phase 4E OCR intake scripts under `automation/ocr/`.
 
 ## Current Stable Components
 
@@ -71,11 +72,11 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Finish Phase 4D manual validation.
+Finish Phase 4E manual validation.
 
-Focus on deterministic query parsing before retrieval. The immediate failure being addressed is that `Red Zone Protocol` could be interpreted as a missing community even though it is a global operational announcement topic. The parser should identify known communities and aliases strictly, identify configured operational topics, and preserve Atlantis Bay-style unknown-community refusals.
+Focus on local OCR intake only. OCR should turn screenshots into raw and reviewable text artifacts for a human to edit before using the existing announcement or post-order ingestion scripts.
 
-OCR is still deferred. Do not add autonomous agents, n8n rewrites, Open WebUI business logic, screenshot parsing, destructive cleanup, or AI-based parsing.
+OCR must not directly modify operational memory. Do not add automatic OCR-to-vault ingestion, autonomous agents, n8n rewrites, Open WebUI business logic, destructive cleanup, or AI-based parsing.
 
 ## Phase 3C Passed
 
@@ -287,7 +288,7 @@ Behavior:
 
 Phase 4C3 is treated as passed with a minor retrieval edge case: `Red Zone Protocol` needed to be parsed as an operational topic instead of a missing community. Phase 4D addresses that parser issue. Do not run `git commit` or `git push`.
 
-## Phase 4D In Progress
+## Phase 4D Passed
 
 Phase 4D adds deterministic query intent extraction before retrieval.
 
@@ -306,7 +307,34 @@ Behavior:
 - global announcement topics do not require a community hint;
 - unknown community-specific questions still refuse safely when no matching community source exists.
 
-The parser must not replace lifecycle scoring, authority hierarchy, primary workflow fallback, or grounded-answer refusal behavior. The user will manually validate, review, and commit. Do not run `git commit` or `git push`.
+The parser must not replace lifecycle scoring, authority hierarchy, primary workflow fallback, or grounded-answer refusal behavior. Do not run `git commit` or `git push`.
+
+## Phase 4E In Progress
+
+Phase 4E adds local OCR intake only.
+
+Key files:
+
+- `automation/ocr/ocr_extract.py`
+- `automation/ocr/ocr_review_formatter.py`
+- `automation/ocr/output/`
+- `automation/ocr/sample_images/`
+- `docs/OCR_WORKFLOW.md`
+
+Behavior:
+
+- accepts `png`, `jpg`, `jpeg`, and `webp`;
+- supports one image or an input directory;
+- prefers PaddleOCR and falls back to pytesseract when available;
+- writes raw text and review Markdown artifacts;
+- includes OCR engine and confidence when available;
+- performs conservative whitespace cleanup only;
+- preserves community aliases such as `CBK`, `PBP`, `SR`, `SSR`, and `OPB`;
+- never writes to `vault/`;
+- never calls `refresh_announcements.py` or `refresh_post_orders.py`;
+- never bypasses human review.
+
+The future direction is reviewed OCR handoff into existing deterministic ingestion inputs, not autonomous memory editing.
 
 ## Phase 3A Exit Criteria
 
