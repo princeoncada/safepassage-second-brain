@@ -104,6 +104,58 @@ Open WebUI
 
 Phase 3E uses Open WebUI only as the conversational presentation layer. Open WebUI must not own retrieval, embeddings, ChromaDB, ingestion, memory, or operational business logic.
 
+### Phase 4A Retrieval Quality Hardening
+
+```text
+question
+-> ChromaDB candidate retrieval
+-> metadata-aware reranking
+-> section weighting
+-> near-duplicate suppression
+-> selected context packet
+-> grounded answer
+-> answer citations only for used sources
+```
+
+Phase 4A keeps the same architecture and improves quality inside the retrieval and answer-selection layer. It does not add agents, new databases, n8n changes, Open WebUI custom UI changes, automatic memory editing, or workflow automation.
+
+Section weighting prefers operationally useful sections in this order:
+
+```text
+Agent Action
+Summary
+Details
+Rule
+Policy
+QA Notes
+```
+
+Low-value sections such as `Open Questions`, `Source Input`, and `Change History` remain excluded by default. When included for debugging, they are penalized so they do not dominate operational answers.
+
+The API keeps retrieved `sources` separate from `answer_citations`. This lets Open WebUI render a single clean Sources section and avoids duplicated source lists in chat output.
+
+### Phase 4B Primary Workflow Authority Layer
+
+```text
+primary workflow input
+-> deterministic primary workflow ingester
+-> vault/09_SOPs/primary-*.md
+-> ChromaDB index
+-> retrieval as default/base fallback
+```
+
+Primary workflow documents represent the base kiosk workflow. They are global default guidance and are lower authority than community-specific post orders and announcements.
+
+Authority hierarchy:
+
+```text
+post_order
+announcement
+primary_workflow
+```
+
+When a question mentions a community, retrieval should prefer matching community post orders first, matching community announcements second, and global primary workflow only as fallback. If no community-specific source exists, the answer may use primary workflow only when it is clearly labeled as default guidance.
+
 ## Phase 3A Retrieval Flow
 
 Markdown files in `vault/`
