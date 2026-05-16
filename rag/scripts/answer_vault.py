@@ -21,6 +21,7 @@ DEEPSEEK_MODEL = "deepseek-chat"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CHROMA_DIR = REPO_ROOT / "rag" / "chroma"
 CONFIG_PATH = REPO_ROOT / "rag" / "config" / "retrieval_config.json"
+ALIASES_PATH = REPO_ROOT / "rag" / "config" / "community_aliases.json"
 PROMPT_PATH = REPO_ROOT / "rag" / "prompts" / "answer_from_context.md"
 
 
@@ -43,12 +44,40 @@ def load_retrieval_config() -> dict[str, Any]:
         return json.load(file)
 
 
+def load_community_aliases() -> dict[str, str]:
+    if not ALIASES_PATH.exists():
+        return {}
+    with ALIASES_PATH.open("r", encoding="utf-8") as file:
+        parsed = json.load(file)
+    return {str(key).upper(): str(value) for key, value in parsed.items()}
+
+
 def normalize_section_name(section: str) -> str:
     return re.sub(r"\s+", " ", str(section or "").strip()).lower()
 
 
 def normalize_key(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+
+
+def alias_tokens(query: str) -> list[str]:
+    tokens = re.findall(r"\b[A-Za-z]{2,6}\d*\b", query)
+    return [re.match(r"[A-Za-z]+", token).group(0).upper() for token in tokens if re.match(r"[A-Za-z]+", token)]
+
+
+def alias_community_hint(query: str) -> tuple[str, str]:
+    aliases = load_community_aliases()
+    for token in alias_tokens(query):
+        if token in aliases:
+            return aliases[token], token
+    return "", ""
+
+
+def expand_query_with_alias(query: str) -> tuple[str, str, str]:
+    community, alias = alias_community_hint(query)
+    if not community:
+        return query, "", ""
+    return f"{query} {community}", community, alias
 
 
 def normalize_text(text: str) -> str:
@@ -95,14 +124,16 @@ def jaccard_similarity(left: str, right: str) -> float:
 
 def extract_query_hints(query: str, config: dict[str, Any], candidate_communities: set[str]) -> dict[str, Any]:
     normalized_query = normalize_key(query)
+    alias_community, alias = alias_community_hint(query)
     communities = {normalize_key(community): community for community in config.get("known_communities", [])}
     communities.update({normalize_key(community): community for community in candidate_communities if community})
-    community_hint = ""
+    community_hint = alias_community
     missing_community_hint = ""
-    for normalized_community, original in communities.items():
-        if normalized_community and normalized_community in normalized_query:
-            community_hint = original
-            break
+    if not community_hint:
+        for normalized_community, original in communities.items():
+            if normalized_community and normalized_community in normalized_query:
+                community_hint = original
+                break
     if not community_hint:
         proper_phrases = re.findall(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b", query)
         ignored = {"What", "Source Input", "Open Questions", "Change History", "Agent Action"}
@@ -112,7 +143,7 @@ def extract_query_hints(query: str, config: dict[str, Any], candidate_communitie
                 break
 
     expected_types: set[str] = set()
-    if any(term in normalized_query for term in ["post order", "rule", "policy"]):
+    if any(term in normalized_query for term in ["post order", "rule", "policy", "physical id", "digital id"]):
         expected_types.update({"post_order", "qa_rule"})
     if any(term in normalized_query for term in ["incident", "happened", "tailgating", "tailgate"]):
         expected_types.add("incident")
@@ -121,6 +152,7 @@ def extract_query_hints(query: str, config: dict[str, Any], candidate_communitie
 
     return {
         "community": community_hint,
+        "community_alias": alias,
         "missing_community": missing_community_hint,
         "expected_types": expected_types,
     }
@@ -205,8 +237,9 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     if not CHROMA_DIR.exists():
         raise SystemExit("Chroma index does not exist. Run: python rag/scripts/index_vault.py")
 
+    expanded_query, _alias_community, _alias = expand_query_with_alias(query)
     model = SentenceTransformer(MODEL_NAME)
-    query_embedding = model.encode([query], normalize_embeddings=True).tolist()[0]
+    query_embedding = model.encode([expanded_query], normalize_embeddings=True).tolist()[0]
 
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
     try:
@@ -214,7 +247,7 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     except Exception as error:
         raise SystemExit("Chroma collection is missing. Run: python rag/scripts/index_vault.py") from error
 
-    fetch_count = max(top_k * 4, 20)
+    fetch_count = max(top_k * 20, 100)
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=fetch_count,
@@ -242,6 +275,16 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     }
     status_boosts = {str(status): float(boost) for status, boost in config.get("status_boosts", {}).items()}
     status_penalties = {str(status): float(penalty) for status, penalty in config.get("status_penalties", {}).items()}
+    lifecycle_boosts = {
+        str(generation): float(boost)
+        for generation, boost in config.get("lifecycle_generation_boosts", {}).items()
+    }
+    lifecycle_penalties = {
+        str(generation): float(penalty)
+        for generation, penalty in config.get("lifecycle_generation_penalties", {}).items()
+    }
+    skip_legacy = bool(config.get("skip_legacy_lifecycle_by_default", True))
+    skip_archived = bool(config.get("skip_archived_by_default", True))
     primary_specific_community_penalty = float(config.get("primary_workflow_specific_community_penalty", 0.12))
     primary_default_boost = float(config.get("primary_workflow_default_query_boost", 0.1))
     weak_threshold = float(config.get("weak_context_distance_threshold", 0.95))
@@ -249,6 +292,30 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     near_duplicate_threshold = float(config.get("near_duplicate_similarity_threshold", 0.9))
     candidate_communities = {str(metadata.get("community", "")) for metadata in metadatas if metadata}
     hints = extract_query_hints(query, config, candidate_communities)
+    if hints["community"]:
+        try:
+            community_results = collection.get(
+                where={"community": hints["community"]},
+                include=["documents", "metadatas"],
+            )
+            seen = {
+                (str(metadata.get("source_file", "")), str(metadata.get("section", "")))
+                for metadata in metadatas
+                if metadata
+            }
+            for document, metadata in zip(
+                community_results.get("documents", []),
+                community_results.get("metadatas", []),
+            ):
+                key = (str(metadata.get("source_file", "")), str(metadata.get("section", "")))
+                if key in seen:
+                    continue
+                documents.append(document)
+                metadatas.append(metadata)
+                distances.append(1.25)
+                seen.add(key)
+        except Exception:
+            pass
 
     raw_candidates: list[tuple[float, float, str, dict[str, Any]]] = []
 
@@ -261,6 +328,12 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         if not include_low_value_sections and (
             truthy(metadata.get("is_low_value_section")) or normalized_section in low_value_sections
         ):
+            continue
+        status = str(metadata.get("status", ""))
+        lifecycle_generation = str(metadata.get("lifecycle_generation", ""))
+        if skip_archived and status == "archived":
+            continue
+        if skip_legacy and lifecycle_generation == "legacy":
             continue
 
         distance = float(distances[index]) if index < len(distances) else 999.0
@@ -279,9 +352,10 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 adjusted_distance += type_mismatch_penalty
         authority = authority_level(metadata)
         adjusted_distance -= authority_boosts.get(authority, 0.0)
-        status = str(metadata.get("status", ""))
         adjusted_distance -= status_boosts.get(status, 0.0)
         adjusted_distance += status_penalties.get(status, 0.0)
+        adjusted_distance -= lifecycle_boosts.get(lifecycle_generation, 0.0)
+        adjusted_distance += lifecycle_penalties.get(lifecycle_generation, 0.0)
         if authority == "primary_workflow" and hints["community"]:
             adjusted_distance += primary_specific_community_penalty
         if authority == "primary_workflow" and is_default_workflow_query(query):
@@ -289,6 +363,20 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         raw_candidates.append((adjusted_distance, distance, str(document), metadata))
 
     raw_candidates.sort(key=lambda candidate: (candidate[0], candidate[1]))
+    if hints["expected_types"]:
+        type_matched = [
+            candidate for candidate in raw_candidates if str(candidate[3].get("type", "")) in hints["expected_types"]
+        ]
+        if type_matched:
+            raw_candidates = type_matched
+    if hints["community"]:
+        community_matched = [
+            candidate
+            for candidate in raw_candidates
+            if normalize_key(str(candidate[3].get("community", ""))) == normalize_key(hints["community"])
+        ]
+        if community_matched:
+            raw_candidates = community_matched
 
     preview_words = int(config.get("content_preview_dedupe_words", 32))
     candidates: list[tuple[float, float, str, dict[str, Any]]] = []
@@ -341,9 +429,13 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 "authority_level": authority_level(metadata),
                 "scope": str(metadata.get("scope", "")),
                 "status": str(metadata.get("status", "")),
+                "lifecycle_generation": str(metadata.get("lifecycle_generation", "")),
                 "rule_id": str(metadata.get("rule_id", "")),
                 "rule_hash": str(metadata.get("rule_hash", "")),
                 "source_batch": str(metadata.get("source_batch", "")),
+                "source_legacy_file": str(metadata.get("source_legacy_file", "")),
+                "source_migration": str(metadata.get("source_migration", "")),
+                "migration_date": str(metadata.get("migration_date", "")),
                 "supersedes": str(metadata.get("supersedes", "")),
                 "superseded_by": str(metadata.get("superseded_by", "")),
                 "community": str(metadata.get("community", "")),
@@ -374,6 +466,7 @@ def build_context_packet(chunks: list[dict[str, Any]]) -> str:
                     f"Authority Level: {chunk.get('authority_level', '')}",
                     f"Scope: {chunk.get('scope', '')}",
                     f"Status: {chunk.get('status', '')}",
+                    f"Lifecycle Generation: {chunk.get('lifecycle_generation', '')}",
                     f"Rule ID: {chunk.get('rule_id', '')}",
                     f"Community: {chunk['community']}",
                     f"Section: {chunk['section']}",
@@ -397,6 +490,7 @@ def print_sources(chunks: list[dict[str, Any]], title: str = "Retrieved Sources"
             f"[{chunk['source_id']}] distance={chunk['distance']} "
             f"type={chunk['type']} authority={chunk.get('authority_level', '')} "
             f"status={chunk.get('status', '')} community={chunk['community']} "
+            f"lifecycle={chunk.get('lifecycle_generation', '')} "
             f"section={chunk['section']} source={chunk['source_file']}"
         )
         print(f"    {preview}")
@@ -443,6 +537,33 @@ def insufficient_context_answer(reason: str) -> str:
             "The vault does not contain enough information to answer this safely.",
             "",
             f"Reason: {reason}",
+        ]
+    )
+
+
+def lifecycle_advisory_note(chunks: list[dict[str, Any]]) -> str:
+    pending = [chunk for chunk in chunks if str(chunk.get("status", "")) == "pending"]
+    if not pending:
+        return ""
+    active = [chunk for chunk in chunks if str(chunk.get("status", "")) == "active"]
+    if not active:
+        return ""
+    pending_lines = [
+        f"- Pending Source {chunk['source_id']}: {chunk['title']} ({chunk['source_file']} - {chunk['section']})"
+        for chunk in pending
+    ]
+    active_lines = [
+        f"- Active Source {chunk['source_id']}: {chunk['title']} ({chunk['source_file']} - {chunk['section']})"
+        for chunk in active[:3]
+    ]
+    return "\n".join(
+        [
+            "Lifecycle advisory: active rules outrank pending rules.",
+            "If a pending rule is operationally relevant, mention it as a pending update warning and do not treat it as active.",
+            "Active context:",
+            *active_lines,
+            "Pending context:",
+            *pending_lines,
         ]
     )
 
@@ -512,6 +633,8 @@ def main() -> int:
     print(f"Confidence Reason: {assessment['reason']}")
     if hints["community"]:
         print(f"Community Hint: {hints['community']}")
+    if hints.get("community_alias"):
+        print(f"Community Alias: {hints['community_alias']} -> {hints['community']}")
     if hints["missing_community"]:
         print(f"Community Hint: {hints['missing_community']} (not found in indexed metadata)")
     if hints["expected_types"]:
@@ -522,6 +645,10 @@ def main() -> int:
     if assessment["confidence"] in {"weak", "none"}:
         print()
         print("Warning: retrieved context is weak.")
+    advisory_note = lifecycle_advisory_note(chunks)
+    if advisory_note:
+        print()
+        print("Warning: pending lifecycle context is present.")
 
     if args.show_context:
         print()
@@ -551,7 +678,10 @@ def main() -> int:
         return 1
 
     prompt = PROMPT_PATH.read_text(encoding="utf-8")
-    answer = call_deepseek(api_key, args.question, context_packet, prompt, str(assessment["reason"]))
+    retrieval_notes = [str(assessment["reason"])]
+    if advisory_note:
+        retrieval_notes.append(advisory_note)
+    answer = call_deepseek(api_key, args.question, context_packet, prompt, "\n\n".join(retrieval_notes))
     source_ids = cited_source_ids(answer, chunks)
     cited_chunks = chunks_by_ids(chunks, source_ids)
     cleaned_answer = strip_sources_section(answer)
