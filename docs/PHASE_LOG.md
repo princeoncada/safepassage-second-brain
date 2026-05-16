@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4B2 PRIMARY WORKFLOW FALLBACK CONFIDENCE FIX
+PHASE 4C BATCH POST ORDER REFRESH + DIFFING
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, and Phase 4B primary workflow ingestion. Phase 4B2 narrows primary workflow fallback confidence so default/base workflow answers can pass without weakening unknown-community refusals.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, and Phase 4B2 fallback confidence. Phase 4C adds deterministic batch post order refresh and diffing.
 
 ## Phase 2 Minimal POW
 
@@ -241,7 +241,7 @@ No batch post order diffing, announcement diffing, autonomous memory editing, n8
 
 ## Phase 4B2 Primary Workflow Fallback Confidence Fix
 
-IN PROGRESS
+PASSED
 
 - [x] Add configurable `primary_workflow_default_threshold`
 - [x] Allow fallback confidence only for explicit default/base/primary workflow queries
@@ -249,13 +249,40 @@ IN PROGRESS
 - [x] Keep unknown community-specific questions on the conservative refusal path
 - [x] Preserve `post_order > announcement > primary_workflow`
 - [x] Preserve API response compatibility
-- [ ] User validates default call-attempt answer
-- [ ] User validates Atlantis Bay community-specific refusal
-- [ ] User validates Sierra Ridge post order priority
+- [x] User validates default call-attempt answer
+- [x] User validates Atlantis Bay community-specific refusal
+- [x] User validates Sierra Ridge post order priority
 - [ ] User reviews changes manually
 - [ ] User commits changes manually
 
 This does not globally weaken `weak_context_distance_threshold`. It adds a separate fallback threshold only for default workflow questions.
+
+## Phase 4C Batch Post Order Refresh + Diffing
+
+IN PROGRESS
+
+- [x] Add deterministic post order batch parser
+- [x] Support `POST ORDER (K)`, `POST ORDER (C)`, and `POST ORDER (K&C)`
+- [x] Normalize atomic rules without AI
+- [x] Add SHA-256 `rule_hash`
+- [x] Add stable `rule_id` and `topic_key`
+- [x] Add metadata for `source_batch`, `batch_date`, `supersedes`, and `superseded_by`
+- [x] Detect exact duplicates by active rule hash
+- [x] Supersede same-topic active managed rules conservatively
+- [x] Detect simple deterministic conflicts
+- [x] Report missing active managed rules without deleting them
+- [x] Generate Markdown refresh reports
+- [x] Preserve lifecycle metadata in Chroma indexing
+- [x] Penalize superseded/conflict/review/inactive rules in retrieval
+- [ ] User validates dry run
+- [ ] User validates real run
+- [ ] User validates same-batch re-run duplicate behavior
+- [ ] User rebuilds ChromaDB
+- [ ] User validates retrieval sanity
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+No autonomous agents, n8n rewrite, Open WebUI business logic, AI diffing, deletion of old post orders, or global lifecycle for every document type was added.
 
 ## Deferred
 
