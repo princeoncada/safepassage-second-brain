@@ -23,9 +23,11 @@ def load_retrieval_config() -> dict[str, Any]:
         return {
             "low_value_sections": ["Change History", "Open Questions", "Source Input"],
             "section_boosts": {
-                "Summary": 0.14,
-                "Details": 0.12,
-                "Agent Action": 0.1,
+                "Agent Action": 0.18,
+                "Summary": 0.16,
+                "Details": 0.14,
+                "Rule": 0.12,
+                "Policy": 0.12,
                 "QA Notes": 0.06,
             },
             "weak_context_distance_threshold": 0.95,
@@ -46,8 +48,30 @@ def normalize_preview(document: str) -> str:
     return re.sub(r"\s+", " ", str(document or "").lower()).strip()
 
 
+def normalized_preview_key(document: str, word_count: int) -> str:
+    words = normalize_preview(document).split()
+    return " ".join(words[:word_count])
+
+
 def truthy(value: Any) -> bool:
     return str(value).lower() == "true"
+
+
+def authority_level(metadata: dict[str, Any]) -> str:
+    explicit = str(metadata.get("authority_level", "")).strip()
+    if explicit:
+        return explicit
+    doc_type = str(metadata.get("type", "")).strip()
+    if doc_type in {"post_order", "announcement"}:
+        return doc_type
+    if doc_type == "workflow":
+        return "primary_workflow"
+    return ""
+
+
+def is_default_workflow_query(query: str) -> bool:
+    normalized = normalize_key(query)
+    return any(term in normalized for term in ["default", "base workflow", "primary workflow", "by default"])
 
 
 def token_set(value: str) -> set[str]:
@@ -154,15 +178,18 @@ def main() -> int:
     community_mismatch_penalty = float(config.get("community_mismatch_penalty", 0.45))
     type_match_boost = float(config.get("type_match_boost", 0.1))
     type_mismatch_penalty = float(config.get("type_mismatch_penalty", 0.18))
+    authority_boosts = {
+        str(level): float(boost)
+        for level, boost in config.get("authority_boosts", {}).items()
+    }
+    primary_specific_community_penalty = float(config.get("primary_workflow_specific_community_penalty", 0.12))
+    primary_default_boost = float(config.get("primary_workflow_default_query_boost", 0.1))
     weak_threshold = float(config.get("weak_context_distance_threshold", 0.95))
     near_duplicate_threshold = float(config.get("near_duplicate_similarity_threshold", 0.9))
     candidate_communities = {str(metadata.get("community", "")) for metadata in metadatas if metadata}
     hints = extract_query_hints(args.query, config, candidate_communities)
 
-    candidates = []
-    seen_keys: set[tuple[str, str, str]] = set()
-    seen_content: set[str] = set()
-    seen_near_duplicates: list[dict[str, str]] = []
+    raw_candidates = []
     for index, document in enumerate(documents):
         metadata = metadatas[index] or {}
         section = str(metadata.get("section", ""))
@@ -173,38 +200,6 @@ def main() -> int:
             truthy(metadata.get("is_low_value_section")) or normalized_section in low_value_sections
         ):
             continue
-
-        dedupe_key = (
-            str(metadata.get("source_file", "")),
-            str(metadata.get("normalized_title") or normalize_key(str(metadata.get("title", "")))),
-            normalized_section,
-        )
-        content_key = str(metadata.get("content_fingerprint") or normalize_preview(document))
-        if dedupe_key in seen_keys or content_key in seen_content:
-            continue
-        near_duplicate = False
-        for existing in seen_near_duplicates:
-            if existing["community"] != normalized_community:
-                continue
-            if existing["type"] != normalized_type:
-                continue
-            if existing["section"] != normalized_section:
-                continue
-            if jaccard_similarity(existing["document"], str(document)) >= near_duplicate_threshold:
-                near_duplicate = True
-                break
-        if near_duplicate:
-            continue
-        seen_keys.add(dedupe_key)
-        seen_content.add(content_key)
-        seen_near_duplicates.append(
-            {
-                "community": normalized_community,
-                "type": normalized_type,
-                "section": normalized_section,
-                "document": str(document),
-            }
-        )
 
         distance = distances[index] if index < len(distances) else 999.0
         adjusted_distance = float(distance) - section_boosts.get(normalized_section, 0.0)
@@ -220,9 +215,56 @@ def main() -> int:
                 adjusted_distance -= type_match_boost
             else:
                 adjusted_distance += type_mismatch_penalty
-        candidates.append((adjusted_distance, float(distance), document, metadata))
+        authority = authority_level(metadata)
+        adjusted_distance -= authority_boosts.get(authority, 0.0)
+        if authority == "primary_workflow" and hints["community"]:
+            adjusted_distance += primary_specific_community_penalty
+        if authority == "primary_workflow" and is_default_workflow_query(args.query):
+            adjusted_distance -= primary_default_boost
+        raw_candidates.append((adjusted_distance, float(distance), str(document), metadata))
 
-    candidates.sort(key=lambda candidate: (candidate[0], candidate[1]))
+    raw_candidates.sort(key=lambda candidate: (candidate[0], candidate[1]))
+
+    preview_words = int(config.get("content_preview_dedupe_words", 32))
+    candidates = []
+    seen_identity_keys: set[tuple[str, str, str, str]] = set()
+    seen_preview_keys: set[tuple[str, str, str, str]] = set()
+    seen_near_duplicates: list[dict[str, str]] = []
+    for adjusted_distance, distance, document, metadata in raw_candidates:
+        normalized_title = str(metadata.get("normalized_title") or normalize_key(str(metadata.get("title", ""))))
+        normalized_community = normalize_key(str(metadata.get("community", "")))
+        normalized_type = normalize_key(str(metadata.get("type", "")))
+        normalized_section = normalize_section_name(str(metadata.get("section", "")))
+        identity_key = (normalized_title, normalized_community, normalized_type, normalized_section)
+        preview_key = (
+            normalized_community,
+            normalized_type,
+            normalized_section,
+            normalized_preview_key(document, preview_words),
+        )
+        if identity_key in seen_identity_keys or preview_key in seen_preview_keys:
+            continue
+
+        if any(
+            existing["community"] == normalized_community
+            and existing["type"] == normalized_type
+            and existing["section"] == normalized_section
+            and jaccard_similarity(existing["document"], document) >= near_duplicate_threshold
+            for existing in seen_near_duplicates
+        ):
+            continue
+
+        seen_identity_keys.add(identity_key)
+        seen_preview_keys.add(preview_key)
+        seen_near_duplicates.append(
+            {
+                "community": normalized_community,
+                "type": normalized_type,
+                "section": normalized_section,
+                "document": document,
+            }
+        )
+        candidates.append((adjusted_distance, distance, document, metadata))
 
     if not candidates:
         print("No chunks returned after filtering and dedupe.")
@@ -255,6 +297,7 @@ def main() -> int:
         print(f"Distance: {distance}")
         print(f"Title: {metadata.get('title', '')}")
         print(f"Type: {metadata.get('type', '')}")
+        print(f"Authority: {authority_level(metadata)}")
         print(f"Community: {metadata.get('community', '')}")
         print(f"Section: {metadata.get('section', '')}")
         print(f"Source: {metadata.get('source_file', '')}")
