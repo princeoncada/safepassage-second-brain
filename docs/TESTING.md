@@ -681,3 +681,44 @@ Expected:
 - duplicate managed rules are skipped by `rule_hash`;
 - Atlantis Bay still refuses safely;
 - primary workflow fallback still works.
+
+## Phase 4C3 Announcement / Reminder Lifecycle Ingestion Validation
+
+The user runs this validation manually after reviewing the announcement refresh output.
+
+Announcement dry run:
+
+```powershell
+python automation/ingestion/refresh_announcements.py --input automation/ingestion/sample_announcement_batch.md --dry-run
+```
+
+Real announcement refresh:
+
+```powershell
+python automation/ingestion/refresh_announcements.py --input automation/ingestion/sample_announcement_batch.md
+```
+
+Rebuild:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+```
+
+Retrieval and answer checks:
+
+```powershell
+python rag/scripts/query_vault.py "What is the Red Zone Protocol expiration?" --top-k 5
+python rag/scripts/query_vault.py "What are the CBK pickleball tournament reminders?" --top-k 5
+python rag/scripts/answer_vault.py "What should I know about SR kiosk audio?" --top-k 5
+python rag/scripts/answer_vault.py "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?" --top-k 5
+```
+
+Expected:
+
+- announcement documents are created under `vault/05_Announcements/`;
+- refresh report is created under `vault/08_Reports/announcement-refresh/`;
+- `CBK` maps to Clearbrook Main and `SR` maps to Sierra Ridge;
+- global reminders retrieve as `community: global`;
+- pending or expired announcements are advisory or penalized;
+- post orders still outrank announcements for policy questions.
