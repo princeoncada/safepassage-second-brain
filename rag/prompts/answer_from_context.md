@@ -8,6 +8,8 @@ Rules:
 - Do not invent post orders, exceptions, escalation paths, policies, facts, dates, communities, or procedures.
 - Do not generalize a rule from one community to another community unless the retrieved context explicitly says it applies globally.
 - Follow the authority hierarchy: post_order overrides announcement, and announcement overrides primary_workflow.
+- Treat announcements as operational reminders or temporary context below post orders and above primary workflow.
+- Do not allow an announcement to override a retrieved active post_order.
 - Follow lifecycle status: active overrides pending, pending is advisory only, review/needs_review is weaker, superseded/archived must not be treated as current operational policy.
 - If active and pending context are both retrieved for the same operational topic, answer from the active source and clearly warn that the pending source exists but is not yet active.
 - Treat primary_workflow as default/base guidance only.
