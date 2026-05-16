@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4B PRIMARY WORKFLOW INGESTION
+PHASE 4B2 PRIMARY WORKFLOW FALLBACK CONFIDENCE FIX
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, and Phase 4A retrieval hardening. Phase 4B adds primary workflow ingestion as the base/default authority layer.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, and Phase 4B primary workflow ingestion. Phase 4B2 narrows primary workflow fallback confidence so default/base workflow answers can pass without weakening unknown-community refusals.
 
 ## Phase 2 Minimal POW
 
@@ -238,6 +238,24 @@ primary_workflow
 ```
 
 No batch post order diffing, announcement diffing, autonomous memory editing, n8n changes, Open WebUI UI changes, agents, Git automation, dashboards, or Phase 4C behavior were added.
+
+## Phase 4B2 Primary Workflow Fallback Confidence Fix
+
+IN PROGRESS
+
+- [x] Add configurable `primary_workflow_default_threshold`
+- [x] Allow fallback confidence only for explicit default/base/primary workflow queries
+- [x] Require global `authority_level: primary_workflow` context for fallback confidence
+- [x] Keep unknown community-specific questions on the conservative refusal path
+- [x] Preserve `post_order > announcement > primary_workflow`
+- [x] Preserve API response compatibility
+- [ ] User validates default call-attempt answer
+- [ ] User validates Atlantis Bay community-specific refusal
+- [ ] User validates Sierra Ridge post order priority
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+This does not globally weaken `weak_context_distance_threshold`. It adds a separate fallback threshold only for default workflow questions.
 
 ## Deferred
 
