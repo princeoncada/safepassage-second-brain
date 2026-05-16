@@ -29,9 +29,11 @@ def load_retrieval_config() -> dict[str, Any]:
         return {
             "low_value_sections": ["Change History", "Open Questions", "Source Input"],
             "section_boosts": {
-                "Summary": 0.14,
-                "Details": 0.12,
-                "Agent Action": 0.1,
+                "Agent Action": 0.18,
+                "Summary": 0.16,
+                "Details": 0.14,
+                "Rule": 0.12,
+                "Policy": 0.12,
                 "QA Notes": 0.06,
             },
             "weak_context_distance_threshold": 0.95,
@@ -52,8 +54,30 @@ def normalize_text(text: str) -> str:
     return re.sub(r"\s+", " ", str(text or "").lower()).strip()
 
 
+def normalized_preview_key(document: str, word_count: int) -> str:
+    words = normalize_text(document).split()
+    return " ".join(words[:word_count])
+
+
 def truthy(value: Any) -> bool:
     return str(value).lower() == "true"
+
+
+def authority_level(metadata: dict[str, Any]) -> str:
+    explicit = str(metadata.get("authority_level", "")).strip()
+    if explicit:
+        return explicit
+    doc_type = str(metadata.get("type", "")).strip()
+    if doc_type in {"post_order", "announcement"}:
+        return doc_type
+    if doc_type == "workflow":
+        return "primary_workflow"
+    return ""
+
+
+def is_default_workflow_query(query: str) -> bool:
+    normalized = normalize_key(query)
+    return any(term in normalized for term in ["default", "base workflow", "primary workflow", "by default"])
 
 
 def token_set(value: str) -> set[str]:
@@ -105,7 +129,17 @@ def retrieval_assessment(chunks: list[dict[str, Any]], hints: dict[str, Any], th
     if not chunks:
         return {"confidence": "none", "refuse": True, "reason": "no chunks returned"}
     best_distance = min(float(chunk["distance"]) for chunk in chunks)
+    has_primary_workflow = any(chunk.get("authority_level") == "primary_workflow" for chunk in chunks)
     if hints["missing_community"]:
+        if has_primary_workflow and best_distance <= threshold and not hints["expected_types"]:
+            return {
+                "confidence": "fallback",
+                "refuse": False,
+                "reason": (
+                    f"no indexed source matched community hint '{hints['missing_community']}'; "
+                    "using global primary workflow as default guidance"
+                ),
+            }
         return {
             "confidence": "weak",
             "refuse": True,
@@ -171,15 +205,18 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     community_mismatch_penalty = float(config.get("community_mismatch_penalty", 0.45))
     type_match_boost = float(config.get("type_match_boost", 0.1))
     type_mismatch_penalty = float(config.get("type_mismatch_penalty", 0.18))
+    authority_boosts = {
+        str(level): float(boost)
+        for level, boost in config.get("authority_boosts", {}).items()
+    }
+    primary_specific_community_penalty = float(config.get("primary_workflow_specific_community_penalty", 0.12))
+    primary_default_boost = float(config.get("primary_workflow_default_query_boost", 0.1))
     weak_threshold = float(config.get("weak_context_distance_threshold", 0.95))
     near_duplicate_threshold = float(config.get("near_duplicate_similarity_threshold", 0.9))
     candidate_communities = {str(metadata.get("community", "")) for metadata in metadatas if metadata}
     hints = extract_query_hints(query, config, candidate_communities)
 
-    candidates: list[tuple[float, float, str, dict[str, Any]]] = []
-    seen_keys: set[tuple[str, str, str]] = set()
-    seen_content: set[str] = set()
-    seen_near_duplicates: list[dict[str, str]] = []
+    raw_candidates: list[tuple[float, float, str, dict[str, Any]]] = []
 
     for index, document in enumerate(documents):
         metadata = metadatas[index] or {}
@@ -191,38 +228,6 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
             truthy(metadata.get("is_low_value_section")) or normalized_section in low_value_sections
         ):
             continue
-
-        dedupe_key = (
-            str(metadata.get("source_file", "")),
-            str(metadata.get("normalized_title") or normalize_key(str(metadata.get("title", "")))),
-            normalized_section,
-        )
-        content_key = str(metadata.get("content_fingerprint") or normalize_text(document))
-        if dedupe_key in seen_keys or content_key in seen_content:
-            continue
-        near_duplicate = False
-        for existing in seen_near_duplicates:
-            if existing["community"] != normalized_community:
-                continue
-            if existing["type"] != normalized_type:
-                continue
-            if existing["section"] != normalized_section:
-                continue
-            if jaccard_similarity(existing["document"], str(document)) >= near_duplicate_threshold:
-                near_duplicate = True
-                break
-        if near_duplicate:
-            continue
-        seen_keys.add(dedupe_key)
-        seen_content.add(content_key)
-        seen_near_duplicates.append(
-            {
-                "community": normalized_community,
-                "type": normalized_type,
-                "section": normalized_section,
-                "document": str(document),
-            }
-        )
 
         distance = float(distances[index]) if index < len(distances) else 999.0
         adjusted_distance = distance - section_boosts.get(normalized_section, 0.0)
@@ -238,9 +243,55 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 adjusted_distance -= type_match_boost
             else:
                 adjusted_distance += type_mismatch_penalty
-        candidates.append((adjusted_distance, distance, str(document), metadata))
+        authority = authority_level(metadata)
+        adjusted_distance -= authority_boosts.get(authority, 0.0)
+        if authority == "primary_workflow" and hints["community"]:
+            adjusted_distance += primary_specific_community_penalty
+        if authority == "primary_workflow" and is_default_workflow_query(query):
+            adjusted_distance -= primary_default_boost
+        raw_candidates.append((adjusted_distance, distance, str(document), metadata))
 
-    candidates.sort(key=lambda candidate: (candidate[0], candidate[1]))
+    raw_candidates.sort(key=lambda candidate: (candidate[0], candidate[1]))
+
+    preview_words = int(config.get("content_preview_dedupe_words", 32))
+    candidates: list[tuple[float, float, str, dict[str, Any]]] = []
+    seen_identity_keys: set[tuple[str, str, str, str]] = set()
+    seen_preview_keys: set[tuple[str, str, str, str]] = set()
+    seen_near_duplicates: list[dict[str, str]] = []
+    for adjusted_distance, distance, document, metadata in raw_candidates:
+        normalized_title = str(metadata.get("normalized_title") or normalize_key(str(metadata.get("title", ""))))
+        normalized_community = normalize_key(str(metadata.get("community", "")))
+        normalized_type = normalize_key(str(metadata.get("type", "")))
+        normalized_section = normalize_section_name(str(metadata.get("section", "")))
+        identity_key = (normalized_title, normalized_community, normalized_type, normalized_section)
+        preview_key = (
+            normalized_community,
+            normalized_type,
+            normalized_section,
+            normalized_preview_key(document, preview_words),
+        )
+        if identity_key in seen_identity_keys or preview_key in seen_preview_keys:
+            continue
+        if any(
+            existing["community"] == normalized_community
+            and existing["type"] == normalized_type
+            and existing["section"] == normalized_section
+            and jaccard_similarity(existing["document"], document) >= near_duplicate_threshold
+            for existing in seen_near_duplicates
+        ):
+            continue
+
+        seen_identity_keys.add(identity_key)
+        seen_preview_keys.add(preview_key)
+        seen_near_duplicates.append(
+            {
+                "community": normalized_community,
+                "type": normalized_type,
+                "section": normalized_section,
+                "document": document,
+            }
+        )
+        candidates.append((adjusted_distance, distance, document, metadata))
 
     chunks: list[dict[str, Any]] = []
     for source_id, (_adjusted, distance, document, metadata) in enumerate(candidates[:top_k], start=1):
@@ -250,6 +301,8 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 "distance": distance,
                 "title": str(metadata.get("title", "")),
                 "type": str(metadata.get("type", "")),
+                "authority_level": authority_level(metadata),
+                "scope": str(metadata.get("scope", "")),
                 "community": str(metadata.get("community", "")),
                 "section": str(metadata.get("section", "")),
                 "source_file": str(metadata.get("source_file", "")),
@@ -269,6 +322,8 @@ def build_context_packet(chunks: list[dict[str, Any]]) -> str:
                     f"[Source {chunk['source_id']}]",
                     f"Title: {chunk['title']}",
                     f"Type: {chunk['type']}",
+                    f"Authority Level: {chunk.get('authority_level', '')}",
+                    f"Scope: {chunk.get('scope', '')}",
                     f"Community: {chunk['community']}",
                     f"Section: {chunk['section']}",
                     f"Source File: {chunk['source_file']}",
@@ -289,7 +344,7 @@ def print_sources(chunks: list[dict[str, Any]], title: str = "Retrieved Sources"
         preview = shorten(" ".join(chunk["content"].split()), width=180, placeholder="...")
         print(
             f"[{chunk['source_id']}] distance={chunk['distance']} "
-            f"type={chunk['type']} community={chunk['community']} "
+            f"type={chunk['type']} authority={chunk.get('authority_level', '')} community={chunk['community']} "
             f"section={chunk['section']} source={chunk['source_file']}"
         )
         print(f"    {preview}")
@@ -319,6 +374,17 @@ def chunks_by_ids(chunks: list[dict[str, Any]], source_ids: list[int]) -> list[d
     return [lookup[source_id] for source_id in source_ids if source_id in lookup]
 
 
+def strip_sources_section(answer: str) -> str:
+    """Remove a model-generated trailing Sources block so callers render one citation list."""
+    cleaned = re.sub(
+        r"\n+\s*Sources:\s*\n(?:\s*\[\d+\][^\n]*(?:\n|$))+\s*$",
+        "\n",
+        str(answer or "").strip(),
+        flags=re.IGNORECASE,
+    ).strip()
+    return cleaned or str(answer or "").strip()
+
+
 def insufficient_context_answer(reason: str) -> str:
     return "\n".join(
         [
@@ -329,7 +395,16 @@ def insufficient_context_answer(reason: str) -> str:
     )
 
 
-def call_deepseek(api_key: str, question: str, context_packet: str, prompt: str) -> str:
+def call_deepseek(api_key: str, question: str, context_packet: str, prompt: str, retrieval_note: str = "") -> str:
+    user_parts = [f"Question:\n{question}"]
+    if retrieval_note:
+        user_parts.append(f"Retrieval note:\n{retrieval_note}")
+    user_parts.extend(
+        [
+            f"Retrieved context:\n{context_packet}",
+            "Return a concise grounded answer with Sources.",
+        ]
+    )
     payload = {
         "model": DEEPSEEK_MODEL,
         "temperature": 0.1,
@@ -337,13 +412,7 @@ def call_deepseek(api_key: str, question: str, context_packet: str, prompt: str)
             {"role": "system", "content": prompt},
             {
                 "role": "user",
-                "content": "\n\n".join(
-                    [
-                        f"Question:\n{question}",
-                        f"Retrieved context:\n{context_packet}",
-                        "Return a concise grounded answer with Sources.",
-                    ]
-                ),
+                "content": "\n\n".join(user_parts),
             },
         ],
     }
@@ -430,18 +499,19 @@ def main() -> int:
         return 1
 
     prompt = PROMPT_PATH.read_text(encoding="utf-8")
-    answer = call_deepseek(api_key, args.question, context_packet, prompt)
+    answer = call_deepseek(api_key, args.question, context_packet, prompt, str(assessment["reason"]))
+    source_ids = cited_source_ids(answer, chunks)
+    cited_chunks = chunks_by_ids(chunks, source_ids)
+    cleaned_answer = strip_sources_section(answer)
 
     print()
     print("Generated Answer:")
-    print(answer)
+    print(cleaned_answer)
     print()
-    source_ids = cited_source_ids(answer, chunks)
-    cited_chunks = chunks_by_ids(chunks, source_ids)
     if cited_chunks:
-        print_citations(cited_chunks, title="Answer Citations")
+        print_citations(cited_chunks, title="Sources")
     else:
-        print("Answer Citations:")
+        print("Sources:")
         print("- no explicit source IDs found in generated answer")
         print()
         print_sources(chunks, title="Retrieved Sources For Review")
