@@ -169,6 +169,23 @@ Primary workflow fallback can be treated as usable only when:
 
 Unknown community-specific questions still refuse when no indexed community source exists. Global primary workflow must not be converted into community-specific policy.
 
+### Phase 4C Batch Post Order Refresh
+
+```text
+post order batch input
+-> deterministic parser
+-> normalized atomic rules
+-> SHA-256 rule hashes
+-> duplicate/supersede/conflict/missing detection
+-> post order Markdown lifecycle updates
+-> refresh report
+-> ChromaDB rebuild
+```
+
+Phase 4C starts lifecycle handling with `post_order` only because post orders are highest authority. It does not use AI for diffing and never deletes old rules.
+
+Post order lifecycle metadata includes `rule_id`, `rule_hash`, `source_batch`, `batch_date`, `supersedes`, and `superseded_by`. Retrieval prefers `status: active` and penalizes `superseded`, `conflict`, `review`, and `inactive` documents if they are indexed.
+
 ## Phase 3A Retrieval Flow
 
 Markdown files in `vault/`
