@@ -1,0 +1,98 @@
+{
+  "red zone protocol": {
+    "expected_types": ["announcement"],
+    "intent_category": "temporary_protocol",
+    "preferred_sections": ["Announcement", "Operational Notes", "Summary", "Details"],
+    "is_global_allowed": true
+  },
+  "support room": {
+    "expected_types": ["announcement", "workflow"],
+    "intent_category": "reminder",
+    "preferred_sections": ["Announcement", "Operational Notes", "Summary"],
+    "is_global_allowed": true
+  },
+  "physical id": {
+    "expected_types": ["post_order", "qa_rule"],
+    "intent_category": "policy",
+    "preferred_sections": ["Rule", "Agent Action", "Summary", "Details"],
+    "is_global_allowed": false
+  },
+  "digital id": {
+    "expected_types": ["post_order", "qa_rule"],
+    "intent_category": "policy",
+    "preferred_sections": ["Rule", "Agent Action", "QA Notes", "Details"],
+    "is_global_allowed": false
+  },
+  "emergency code": {
+    "expected_types": ["post_order", "announcement"],
+    "intent_category": "emergency_code",
+    "preferred_sections": ["Rule", "Announcement", "Operational Notes"],
+    "is_global_allowed": false
+  },
+  "pickleball tournament": {
+    "expected_types": ["announcement"],
+    "intent_category": "event",
+    "preferred_sections": ["Announcement", "Operational Notes"],
+    "is_global_allowed": false
+  },
+  "gate issue": {
+    "expected_types": ["announcement"],
+    "intent_category": "gate_issue",
+    "preferred_sections": ["Announcement", "Operational Notes"],
+    "is_global_allowed": false
+  },
+  "nvr issue": {
+    "expected_types": ["announcement"],
+    "intent_category": "nvr_issue",
+    "preferred_sections": ["Announcement", "Operational Notes"],
+    "is_global_allowed": true
+  },
+  "id viewer": {
+    "expected_types": ["announcement"],
+    "intent_category": "nvr_issue",
+    "preferred_sections": ["Announcement", "Operational Notes"],
+    "is_global_allowed": false
+  },
+  "resident call": {
+    "expected_types": ["primary_workflow", "workflow", "post_order", "announcement"],
+    "intent_category": "default_workflow",
+    "preferred_sections": ["Summary", "Rule", "Announcement"],
+    "is_global_allowed": true
+  },
+  "voicemail": {
+    "expected_types": ["primary_workflow", "workflow", "post_order", "announcement"],
+    "intent_category": "default_workflow",
+    "preferred_sections": ["Summary", "Rule", "Announcement"],
+    "is_global_allowed": true
+  },
+  "community approved list": {
+    "expected_types": ["post_order", "announcement"],
+    "intent_category": "announcement",
+    "preferred_sections": ["Rule", "Announcement", "Operational Notes"],
+    "is_global_allowed": false
+  },
+  "marked vendor vehicles": {
+    "expected_types": ["post_order", "announcement"],
+    "intent_category": "policy",
+    "preferred_sections": ["Rule", "Announcement", "Operational Notes"],
+    "is_global_allowed": false
+  },
+  "3cp": {
+    "expected_types": ["post_order", "announcement"],
+    "intent_category": "traffic_handling",
+    "preferred_sections": ["Rule", "Announcement", "Operational Notes"],
+    "is_global_allowed": true
+  },
+  "pre-authorized": {
+    "expected_types": ["post_order", "announcement"],
+    "intent_category": "announcement",
+    "preferred_sections": ["Rule", "Announcement", "Operational Notes"],
+    "is_global_allowed": false
+  },
+  "preauthorized": {
+    "expected_types": ["post_order", "announcement"],
+    "intent_category": "announcement",
+    "preferred_sections": ["Rule", "Announcement", "Operational Notes"],
+    "is_global_allowed": false
+  }
+}
