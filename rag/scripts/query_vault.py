@@ -16,6 +16,7 @@ MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CHROMA_DIR = REPO_ROOT / "rag" / "chroma"
 CONFIG_PATH = REPO_ROOT / "rag" / "config" / "retrieval_config.json"
+ALIASES_PATH = REPO_ROOT / "rag" / "config" / "community_aliases.json"
 
 
 def load_retrieval_config() -> dict[str, Any]:
@@ -37,12 +38,40 @@ def load_retrieval_config() -> dict[str, Any]:
         return json.load(file)
 
 
+def load_community_aliases() -> dict[str, str]:
+    if not ALIASES_PATH.exists():
+        return {}
+    with ALIASES_PATH.open("r", encoding="utf-8") as file:
+        parsed = json.load(file)
+    return {str(key).upper(): str(value) for key, value in parsed.items()}
+
+
 def normalize_section_name(section: str) -> str:
     return re.sub(r"\s+", " ", str(section or "").strip()).lower()
 
 
 def normalize_key(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+
+
+def alias_tokens(query: str) -> list[str]:
+    tokens = re.findall(r"\b[A-Za-z]{2,6}\d*\b", query)
+    return [re.match(r"[A-Za-z]+", token).group(0).upper() for token in tokens if re.match(r"[A-Za-z]+", token)]
+
+
+def alias_community_hint(query: str) -> tuple[str, str]:
+    aliases = load_community_aliases()
+    for token in alias_tokens(query):
+        if token in aliases:
+            return aliases[token], token
+    return "", ""
+
+
+def expand_query_with_alias(query: str) -> tuple[str, str, str]:
+    community, alias = alias_community_hint(query)
+    if not community:
+        return query, "", ""
+    return f"{query} {community}", community, alias
 
 
 def normalize_preview(document: str) -> str:
@@ -97,14 +126,16 @@ def jaccard_similarity(left: str, right: str) -> float:
 
 def extract_query_hints(query: str, config: dict[str, Any], candidate_communities: set[str]) -> dict[str, Any]:
     normalized_query = normalize_key(query)
+    alias_community, alias = alias_community_hint(query)
     communities = {normalize_key(community): community for community in config.get("known_communities", [])}
     communities.update({normalize_key(community): community for community in candidate_communities if community})
-    community_hint = ""
+    community_hint = alias_community
     missing_community_hint = ""
-    for normalized_community, original in communities.items():
-        if normalized_community and normalized_community in normalized_query:
-            community_hint = original
-            break
+    if not community_hint:
+        for normalized_community, original in communities.items():
+            if normalized_community and normalized_community in normalized_query:
+                community_hint = original
+                break
     if not community_hint:
         proper_phrases = re.findall(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b", query)
         ignored = {"What", "Source Input", "Open Questions", "Change History", "Agent Action"}
@@ -114,7 +145,7 @@ def extract_query_hints(query: str, config: dict[str, Any], candidate_communitie
                 break
 
     expected_types: set[str] = set()
-    if any(term in normalized_query for term in ["post order", "rule", "policy"]):
+    if any(term in normalized_query for term in ["post order", "rule", "policy", "physical id", "digital id"]):
         expected_types.update({"post_order", "qa_rule"})
     if any(term in normalized_query for term in ["incident", "happened", "tailgating", "tailgate"]):
         expected_types.add("incident")
@@ -123,6 +154,7 @@ def extract_query_hints(query: str, config: dict[str, Any], candidate_communitie
 
     return {
         "community": community_hint,
+        "community_alias": alias,
         "missing_community": missing_community_hint,
         "expected_types": expected_types,
     }
@@ -165,8 +197,9 @@ def main() -> int:
     if not CHROMA_DIR.exists():
         raise SystemExit("Chroma index does not exist. Run: python rag/scripts/index_vault.py")
 
+    expanded_query, alias_community, alias = expand_query_with_alias(args.query)
     model = SentenceTransformer(MODEL_NAME)
-    query_embedding = model.encode([args.query], normalize_embeddings=True).tolist()[0]
+    query_embedding = model.encode([expanded_query], normalize_embeddings=True).tolist()[0]
 
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
     try:
@@ -174,7 +207,7 @@ def main() -> int:
     except Exception as error:
         raise SystemExit("Chroma collection is missing. Run: python rag/scripts/index_vault.py") from error
 
-    fetch_count = max(args.top_k * 4, 20)
+    fetch_count = max(args.top_k * 20, 100)
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=fetch_count,
@@ -206,6 +239,16 @@ def main() -> int:
     }
     status_boosts = {str(status): float(boost) for status, boost in config.get("status_boosts", {}).items()}
     status_penalties = {str(status): float(penalty) for status, penalty in config.get("status_penalties", {}).items()}
+    lifecycle_boosts = {
+        str(generation): float(boost)
+        for generation, boost in config.get("lifecycle_generation_boosts", {}).items()
+    }
+    lifecycle_penalties = {
+        str(generation): float(penalty)
+        for generation, penalty in config.get("lifecycle_generation_penalties", {}).items()
+    }
+    skip_legacy = bool(config.get("skip_legacy_lifecycle_by_default", True))
+    skip_archived = bool(config.get("skip_archived_by_default", True))
     primary_specific_community_penalty = float(config.get("primary_workflow_specific_community_penalty", 0.12))
     primary_default_boost = float(config.get("primary_workflow_default_query_boost", 0.1))
     weak_threshold = float(config.get("weak_context_distance_threshold", 0.95))
@@ -213,6 +256,30 @@ def main() -> int:
     near_duplicate_threshold = float(config.get("near_duplicate_similarity_threshold", 0.9))
     candidate_communities = {str(metadata.get("community", "")) for metadata in metadatas if metadata}
     hints = extract_query_hints(args.query, config, candidate_communities)
+    if hints["community"]:
+        try:
+            community_results = collection.get(
+                where={"community": hints["community"]},
+                include=["documents", "metadatas"],
+            )
+            seen = {
+                (str(metadata.get("source_file", "")), str(metadata.get("section", "")))
+                for metadata in metadatas
+                if metadata
+            }
+            for document, metadata in zip(
+                community_results.get("documents", []),
+                community_results.get("metadatas", []),
+            ):
+                key = (str(metadata.get("source_file", "")), str(metadata.get("section", "")))
+                if key in seen:
+                    continue
+                documents.append(document)
+                metadatas.append(metadata)
+                distances.append(1.25)
+                seen.add(key)
+        except Exception:
+            pass
 
     raw_candidates = []
     for index, document in enumerate(documents):
@@ -224,6 +291,12 @@ def main() -> int:
         if not args.include_low_value_sections and (
             truthy(metadata.get("is_low_value_section")) or normalized_section in low_value_sections
         ):
+            continue
+        status = str(metadata.get("status", ""))
+        lifecycle_generation = str(metadata.get("lifecycle_generation", ""))
+        if skip_archived and status == "archived":
+            continue
+        if skip_legacy and lifecycle_generation == "legacy":
             continue
 
         distance = distances[index] if index < len(distances) else 999.0
@@ -242,9 +315,10 @@ def main() -> int:
                 adjusted_distance += type_mismatch_penalty
         authority = authority_level(metadata)
         adjusted_distance -= authority_boosts.get(authority, 0.0)
-        status = str(metadata.get("status", ""))
         adjusted_distance -= status_boosts.get(status, 0.0)
         adjusted_distance += status_penalties.get(status, 0.0)
+        adjusted_distance -= lifecycle_boosts.get(lifecycle_generation, 0.0)
+        adjusted_distance += lifecycle_penalties.get(lifecycle_generation, 0.0)
         if authority == "primary_workflow" and hints["community"]:
             adjusted_distance += primary_specific_community_penalty
         if authority == "primary_workflow" and is_default_workflow_query(args.query):
@@ -252,6 +326,20 @@ def main() -> int:
         raw_candidates.append((adjusted_distance, float(distance), str(document), metadata))
 
     raw_candidates.sort(key=lambda candidate: (candidate[0], candidate[1]))
+    if hints["expected_types"]:
+        type_matched = [
+            candidate for candidate in raw_candidates if str(candidate[3].get("type", "")) in hints["expected_types"]
+        ]
+        if type_matched:
+            raw_candidates = type_matched
+    if hints["community"]:
+        community_matched = [
+            candidate
+            for candidate in raw_candidates
+            if normalize_key(str(candidate[3].get("community", ""))) == normalize_key(hints["community"])
+        ]
+        if community_matched:
+            raw_candidates = community_matched
 
     preview_words = int(config.get("content_preview_dedupe_words", 32))
     candidates = []
@@ -319,6 +407,8 @@ def main() -> int:
     print(f"Confidence Reason: {reason}")
     if hints["community"]:
         print(f"Community Hint: {hints['community']}")
+    if hints.get("community_alias"):
+        print(f"Community Alias: {hints['community_alias']} -> {hints['community']}")
     if hints["missing_community"]:
         print(f"Community Hint: {hints['missing_community']} (not found in indexed metadata)")
     if hints["expected_types"]:
@@ -334,6 +424,7 @@ def main() -> int:
         print(f"Type: {metadata.get('type', '')}")
         print(f"Authority: {authority_level(metadata)}")
         print(f"Status: {metadata.get('status', '')}")
+        print(f"Lifecycle Generation: {metadata.get('lifecycle_generation', '')}")
         print(f"Rule ID: {metadata.get('rule_id', '')}")
         print(f"Community: {metadata.get('community', '')}")
         print(f"Section: {metadata.get('section', '')}")
