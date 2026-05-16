@@ -32,6 +32,7 @@
   },
   "primary_workflow_specific_community_penalty": 0.12,
   "primary_workflow_default_query_boost": 0.1,
+  "primary_workflow_default_threshold": 1.1,
   "weak_context_distance_threshold": 0.95,
   "near_duplicate_similarity_threshold": 0.82,
   "content_preview_dedupe_words": 32,
