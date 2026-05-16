@@ -16,6 +16,8 @@ class Source(BaseModel):
     distance: float
     title: str
     type: str
+    authority_level: str = ""
+    scope: str = ""
     community: str
     section: str
     source_file: str
@@ -29,6 +31,8 @@ class AskResponse(BaseModel):
     answer: str
     retrieval_confidence: str
     confidence_reason: str
+    # All retrieved sources are returned separately from answer citations so UI
+    # clients can render one clean Sources section.
     sources: list[Source]
     answer_citations: list[Source]
     used_ai: bool
