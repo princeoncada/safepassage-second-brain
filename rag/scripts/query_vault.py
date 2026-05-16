@@ -3,9 +3,14 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from pathlib import Path
 from textwrap import shorten
 from typing import Any
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import chromadb
 from sentence_transformers import SentenceTransformer
@@ -15,7 +20,6 @@ from rag.query_intent import expand_query_with_intent, parse_query_intent
 
 COLLECTION_NAME = "safepassage_vault_chunks"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-REPO_ROOT = Path(__file__).resolve().parents[2]
 CHROMA_DIR = REPO_ROOT / "rag" / "chroma"
 CONFIG_PATH = REPO_ROOT / "rag" / "config" / "retrieval_config.json"
 ALIASES_PATH = REPO_ROOT / "rag" / "config" / "community_aliases.json"
