@@ -228,6 +228,28 @@ Phase 4C2 converts eligible older post-order notes into lifecycle-managed post-o
 
 Generated managed migration documents include `source_legacy_file`, `source_migration: legacy_post_order`, `migration_date`, `rule_id`, and `rule_hash`. These managed documents become the operational retrieval source of truth while the old files remain historical source material.
 
+### Phase 4C3 Announcement Lifecycle Ingestion
+
+```text
+clean pasted announcement text
+-> deterministic announcement parser
+-> managed announcement Markdown
+-> announcement refresh report
+-> ChromaDB rebuild
+```
+
+Announcements are the middle authority layer:
+
+```text
+post_order
+announcement
+primary_workflow
+```
+
+Announcements can provide reminders, temporary protocols, event notices, gate issues, NVR issues, approved vendor notes, and operational warnings. They do not override active post orders. Active announcements can answer relevant questions, pending announcements are advisory, and expired or archived announcements are penalized or skipped by normal retrieval.
+
+Phase 4C3 expects cleaned pasted text only. OCR and screenshot parsing are deferred to a later phase.
+
 ## Phase 3A Retrieval Flow
 
 Markdown files in `vault/`
