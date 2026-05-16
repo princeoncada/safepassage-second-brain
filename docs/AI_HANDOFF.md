@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 4C3 ANNOUNCEMENT / REMINDER LIFECYCLE INGESTION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, and Phase 4C2 managed post-order conversion are validated or mostly working.
+PHASE 4D OPERATIONAL QUERY PARSER / INTENT EXTRACTION. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, and Phase 4C3 announcement ingestion are validated or mostly working.
 
 ## What Exists
 
@@ -24,6 +24,7 @@ PHASE 4C3 ANNOUNCEMENT / REMINDER LIFECYCLE INGESTION. Phase 2 Minimal POW, Phas
 - Phase 4C1 lifecycle-aware retrieval and community aliases under `rag/scripts/` and `rag/config/community_aliases.json`.
 - Phase 4C2 legacy post-order migration under `automation/ingestion/migrate_legacy_post_orders.py`.
 - Phase 4C3 announcement refresh under `automation/ingestion/refresh_announcements.py`.
+- Phase 4D deterministic query parser in `rag/query_intent.py` with topic config in `rag/config/query_topics.json`.
 
 ## Current Stable Components
 
@@ -70,9 +71,11 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Finish Phase 4C3 validation.
+Finish Phase 4D manual validation.
 
-Focus on announcement lifecycle ingestion from cleaned pasted text: managed announcement docs, duplicate detection, community alias extraction, report generation, ChromaDB reindexing, and authority behavior. Announcements outrank primary workflow but never override post orders. OCR is deferred. Do not add autonomous agents, n8n rewrites, Open WebUI business logic, screenshot parsing, destructive cleanup, or AI-based parsing.
+Focus on deterministic query parsing before retrieval. The immediate failure being addressed is that `Red Zone Protocol` could be interpreted as a missing community even though it is a global operational announcement topic. The parser should identify known communities and aliases strictly, identify configured operational topics, and preserve Atlantis Bay-style unknown-community refusals.
+
+OCR is still deferred. Do not add autonomous agents, n8n rewrites, Open WebUI business logic, screenshot parsing, destructive cleanup, or AI-based parsing.
 
 ## Phase 3C Passed
 
@@ -260,7 +263,7 @@ Behavior:
 
 The user will manually validate, review, and commit. Do not run `git commit` or `git push`.
 
-## Phase 4C3 In Progress
+## Phase 4C3 Passed With Minor Retrieval Edge Case
 
 Phase 4C3 ingests daily reminder and announcement text as managed lifecycle documents.
 
@@ -282,7 +285,28 @@ Behavior:
 - expired and archived announcements are penalized or skipped by retrieval;
 - post orders must still win when they conflict with announcements.
 
-The user will manually validate, review, and commit. Do not run `git commit` or `git push`.
+Phase 4C3 is treated as passed with a minor retrieval edge case: `Red Zone Protocol` needed to be parsed as an operational topic instead of a missing community. Phase 4D addresses that parser issue. Do not run `git commit` or `git push`.
+
+## Phase 4D In Progress
+
+Phase 4D adds deterministic query intent extraction before retrieval.
+
+Key files:
+
+- `rag/query_intent.py`
+- `rag/config/query_topics.json`
+- `rag/scripts/query_vault.py`
+- `rag/scripts/answer_vault.py`
+
+Behavior:
+
+- community extraction only trusts configured aliases, known community names, and narrow unknown-community patterns;
+- operational proper nouns such as `Red Zone Protocol`, `Support Room`, `Community Approved List`, `Emergency Code`, and `Pickleball Tournament` are treated as topics, not communities;
+- expected document types are inferred deterministically from keywords and configured topics;
+- global announcement topics do not require a community hint;
+- unknown community-specific questions still refuse safely when no matching community source exists.
+
+The parser must not replace lifecycle scoring, authority hierarchy, primary workflow fallback, or grounded-answer refusal behavior. The user will manually validate, review, and commit. Do not run `git commit` or `git push`.
 
 ## Phase 3A Exit Criteria
 
