@@ -8,7 +8,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4C implementation:
+Working proof of work through Phase 4C1 validation, with Phase 4C2 legacy post-order migration in progress:
 
 - Phase 2 Minimal POW ingestion: passed
 - Phase 3A retrieval: passed
@@ -17,9 +17,11 @@ Working proof of work through Phase 4C implementation:
 - Phase 3D local FastAPI wrapper: passed
 - Phase 3E Open WebUI integration: passed
 - Phase 4A retrieval quality hardening: passed with minor tuning
-- Phase 4B primary workflow ingestion: mostly validated
+- Phase 4B primary workflow ingestion: passed
 - Phase 4B2 primary workflow fallback confidence fix: passed
-- Phase 4C batch post order refresh/diffing: in progress
+- Phase 4C batch post order refresh/diffing: passed
+- Phase 4C1 lifecycle retrieval hardening: passed with known limitation
+- Phase 4C2 legacy post order migration / managed source conversion: in progress
 
 Current architecture:
 
@@ -38,6 +40,12 @@ Phase 4A keeps this architecture and improves only retrieval ranking, dedupe, so
 Phase 4B adds the SafePassage primary kiosk workflow as global default guidance below post orders and announcements.
 
 Phase 4C adds deterministic batch post order refresh and diffing so incoming post-order batches can be compared against active vault rules before new Markdown is created.
+
+Phase 4C1 hardens retrieval over lifecycle-managed post orders. Active managed post orders are the operational retrieval source of truth. Pending rules are advisory only, superseded/archived rules are penalized or skipped, and legacy freeform post-order notes are skipped by default instead of deleted.
+
+Community aliases are resolved deterministically before retrieval. Letter prefixes such as `CBK`, `SR`, `MON`, and `OPB` map to their configured community names without using numeric client codes.
+
+Phase 4C2 converts eligible legacy freeform post orders into managed active post-order documents while preserving the original legacy files. This is used first for Sierra Ridge physical ID post orders so policy retrieval can come from managed `post_order` sources instead of weaker QA support notes.
 
 ## Post Order Batch Refresh
 
