@@ -33,6 +33,16 @@
   "primary_workflow_specific_community_penalty": 0.12,
   "primary_workflow_default_query_boost": 0.1,
   "primary_workflow_default_threshold": 1.1,
+  "status_boosts": {
+    "active": 0.12
+  },
+  "status_penalties": {
+    "needs_review": 0.04,
+    "review": 0.2,
+    "conflict": 0.5,
+    "superseded": 0.75,
+    "inactive": 0.75
+  },
   "weak_context_distance_threshold": 0.95,
   "near_duplicate_similarity_threshold": 0.82,
   "content_preview_dedupe_words": 32,
