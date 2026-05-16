@@ -13,6 +13,7 @@ from rag.scripts.answer_vault import (
     cited_source_ids,
     insufficient_context_answer,
     retrieve_chunks,
+    strip_sources_section,
 )
 
 
@@ -23,6 +24,8 @@ def chunk_to_source(chunk: dict[str, Any], show_context: bool) -> Source:
         distance=float(chunk.get("distance", 0.0)),
         title=str(chunk.get("title", "")),
         type=str(chunk.get("type", "")),
+        authority_level=str(chunk.get("authority_level", "")),
+        scope=str(chunk.get("scope", "")),
         community=str(chunk.get("community", "")),
         section=str(chunk.get("section", "")),
         source_file=str(chunk.get("source_file", "")),
@@ -88,7 +91,7 @@ def answer_question(request: AskRequest) -> AskResponse:
             request=request,
             answer="AI skipped because no_ai=true. Retrieved context returned in sources.",
             chunks=chunks,
-            cited_chunks=chunks,
+            cited_chunks=[],
             assessment=assessment,
             hints=hints,
             used_ai=False,
@@ -126,7 +129,7 @@ def answer_question(request: AskRequest) -> AskResponse:
 
     prompt = PROMPT_PATH.read_text(encoding="utf-8")
     try:
-        answer = call_deepseek(api_key, request.question, context_packet, prompt)
+        answer = call_deepseek(api_key, request.question, context_packet, prompt, str(assessment.get("reason", "")))
     except SystemExit as error:
         return build_response(
             status="error",
@@ -142,6 +145,7 @@ def answer_question(request: AskRequest) -> AskResponse:
 
     source_ids = cited_source_ids(answer, chunks)
     cited_chunks = chunks_by_ids(chunks, source_ids)
+    answer = strip_sources_section(answer)
     if not cited_chunks:
         warnings.append("generated answer did not include explicit source IDs")
 
