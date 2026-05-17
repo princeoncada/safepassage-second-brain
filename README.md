@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.10.0-alpha |
+| Current | 4.10.0-rc |
 | Last Stable | 4.9.0-stable (Phase 4.9.0) |
-| Status | alpha - manual validation pending |
+| Status | rc - pending commit |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.9.0 validation, with Phase 4.10.0-alpha in progress:
+Working proof of work through Phase 4.9.0 validation, with Phase 4.10.0-rc pending commit:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -40,7 +40,7 @@ Working proof of work through Phase 4.9.0 validation, with Phase 4.10.0-alpha in
 - Phase UX-1 [4.7.0-stable] - dashboard usability hardening: passed/validated
 - Phase 4I-lite [4.8.2-stable] - Text Ingestion via Open WebUI Slash Commands: passed/validated
 - Phase 4.9.0 [4.9.0-stable] - Scope-aware retrieval + source deduplication + alias hardening: passed/validated
-- Phase 4.10.0 [4.10.0-alpha] - Conversation context resolution: alpha
+- Phase 4.10.0 [4.10.0-rc] - Conversation context resolution: rc
 
 Current architecture:
 
@@ -90,7 +90,7 @@ Phase 4I-lite adds a guarded Open WebUI text-ingestion path through `/ask` slash
 
 Phase 4.9.0-stable improves scoped post-order listing retrieval, citation display, and alias hardening. Scoped kiosk or concierge post-order queries for a known community request the full matching rule set, keep K/C/KC scope ordering visible to the answer model, deduplicate answer citations by source file while leaving the full retrieved source list intact, resolve long partial-name aliases, and clarify ambiguous parent community aliases before retrieval.
 
-Phase 4.10.0-alpha adds request-local conversation context resolution. The `/ask` request can include optional prior user turns in `history`; the backend uses those turns only to resolve community context for ambiguous follow-up questions and does not send history to DeepSeek.
+Phase 4.10.0-rc adds request-local conversation context resolution. The `/ask` request can include optional prior user turns in `history`; the backend uses those turns only to resolve community context for ambiguous follow-up questions and does not send history to DeepSeek.
 
 Dashboard endpoints:
 
