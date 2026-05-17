@@ -142,3 +142,4 @@ When continuing this project, an AI agent MUST:
 Next version: 4.9.0-alpha
 Next phase: Community Onboarding + Scope-Aware Retrieval Improvements
 Goal: Ingest post orders for remaining unindexed communities and improve retrieval for "show me all" style queries across all communities.
+First task: Ingest post orders for remaining unindexed communities via `/post-orders [ALIAS] [text]` in Open WebUI, then validate `/announcements` YES confirmation flow.
