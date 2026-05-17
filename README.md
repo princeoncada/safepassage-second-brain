@@ -8,7 +8,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4G1 validation, with Phase 4J-lite implementation added for manual validation:
+Working proof of work through Phase UX-1 validation, with Phase 4I-lite implementation added for manual validation:
 
 - Phase 2 Minimal POW ingestion: passed
 - Phase 3A retrieval: passed
@@ -28,7 +28,9 @@ Working proof of work through Phase 4G1 validation, with Phase 4J-lite implement
 - Phase 4F OCR review + ingestion bridge: passed/validated
 - Phase 4G temporal expiry / activation engine: passed/validated
 - Phase 4G1 announcement retrieval precision hardening: passed/validated
-- Phase 4J-lite operational dashboard / shift briefing: implementation added, manual validation pending
+- Phase 4J-lite operational dashboard / shift briefing: passed/validated
+- Phase UX-1 User Workflow & OpenWebUI Usability Pass: passed/validated
+- Phase 4I-lite Text Ingestion via Open WebUI Slash Commands: implementation added, manual validation pending
 
 Current architecture:
 
@@ -50,7 +52,7 @@ Phase 4C adds deterministic batch post order refresh and diffing so incoming pos
 
 Phase 4C1 hardens retrieval over lifecycle-managed post orders. Active managed post orders are the operational retrieval source of truth. Pending rules are advisory only, superseded/archived rules are penalized or skipped, and legacy freeform post-order notes are skipped by default instead of deleted.
 
-Community aliases are resolved deterministically before retrieval. Letter prefixes such as `CBK`, `SR`, `MON`, and `OPB` map to their configured community names without using numeric client codes.
+Community aliases are resolved deterministically before retrieval. Letter prefixes such as `CBK`, `SR`, `MON`, and `OPB` map to their configured community names without using numeric client codes. `rag/config/community_aliases.json` now covers the full current virtual community alias list.
 
 Phase 4C2 converts eligible legacy freeform post orders into managed active post-order documents while preserving the original legacy files. This is used first for Sierra Ridge physical ID post orders so policy retrieval can come from managed `post_order` sources instead of weaker QA support notes.
 
@@ -72,6 +74,10 @@ Phase 4G1 hardens announcement retrieval precision after the temporal engine exp
 
 Phase 4J-lite adds a read-only operational dashboard and deterministic shift briefing layer over indexed memory. It aggregates active announcements, active post-order warnings, temporary protocols, gate/NVR/kiosk issues, events, compliance reminders, and expiring-soon notices while preserving source paths, authority, lifecycle status, and temporal state. It does not write to `vault/`, run ingestion, update ChromaDB, create autonomous workflows, or generate operational memory.
 
+Phase UX-1 hardens the dashboard briefing presentation and Open WebUI operator workflow. Dashboard aggregation now deduplicates repeated chunks by source file and title, excludes derived reports, visitor logs, incidents, and daily briefings from dashboard sections, expands the community alias table to the full current virtual community list, and adds a VA operator shift reference guide for Open WebUI.
+
+Phase 4I-lite adds a guarded Open WebUI text-ingestion path through `/ask` slash commands. `/post-orders` and `/announcements` create deterministic previews, require an explicit `YES` confirmation, then call the existing ingestion scripts and rebuild ChromaDB. It does not ingest on preview, use AI parsing, bypass human confirmation, add OCR upload, add new document types, or change authority rules.
+
 Dashboard endpoints:
 
 ```text
@@ -84,6 +90,23 @@ GET /dashboard/issues
 ```
 
 Optional community filtering is supported with `?community=CBK` or `?community=Sierra Ridge`.
+
+Use `/dashboard/briefing` for a plain Markdown shift briefing and `/dashboard/summary` for structured dashboard data. Add `?community=CBK`, `?community=SR`, or another configured alias to include that community plus global items.
+
+## Open WebUI
+
+Open WebUI remains a presentation layer over the local FastAPI RAG API. VA operators should use `openwebui/USAGE_GUIDE.md` as the practical shift reference for prompts, citations, dashboard briefing use, refusals, and operational boundaries.
+
+Open WebUI text ingestion commands are documented in `openwebui/INGEST_COMMANDS.md`.
+
+Supported guarded ingestion commands:
+
+```text
+/post-orders CBK 5/17/2026 Post Order (K): Only contact the resident twice.
+/announcements CBK CBK Pickleball Tournament May 13. Visitors should say the event name.
+```
+
+Both commands return a preview first. The user must reply `YES` to write through the deterministic ingestion scripts or `NO` to cancel.
 
 ## OCR Intake
 
