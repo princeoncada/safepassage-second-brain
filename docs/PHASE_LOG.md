@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.9.0-alpha | Phase 4.9.0 | alpha | 2026-05-17 | scope retrieval + source dedup |
 | 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
 | 4.8.1-stable | Phase 4I-lite | stable | 2026-05-17 | top_k fix + name match fix - VALIDATED |
 | 4.8.0-beta | Phase 4I-lite | beta | 2026-05-17 | slash commands, scope rerank partial |
@@ -28,9 +29,42 @@
 
 # Phase Log
 
+## Phase 4.9.0 Scope-Aware Retrieval + Source Deduplication
+
+Status: IN PROGRESS
+
+Version: 4.9.0-alpha
+
+Date started: 2026-05-17
+
+Purpose:
+
+Phase 4.9.0 fixes two operational usability bugs found after 4.8.2-stable:
+
+- Scope-filtered post-order listing queries could set `scope_hint` but still return only the default top 5 chunks, causing missing kiosk or concierge rules.
+- API `answer_citations` could show duplicate source filenames when DeepSeek cited multiple chunks from the same vault file.
+
+Implementation scope:
+
+- `rag/query_intent.py`: extend requested-all phrase detection for scoped post-order language and mark known community + scoped post-order queries as complete-list requests.
+- `rag/scripts/answer_vault.py`: filter scoped candidates after community/type filtering, sort K-only or C-only rules before KC rules, and uncap scoped community post-order listings to all matching candidates.
+- `rag/prompts/answer_from_context.md`: instruct the answer model to label scope and group full scoped listings by K/C-only first, then KC.
+- `api/service.py`: deduplicate `answer_citations` by `source_file` while leaving the full retrieved `sources` list unchanged.
+- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.9.0-alpha as the current in-progress implementation.
+
+Validation checklist:
+
+- [ ] User validates `what are the post orders for SR relevant to kiosk agents` returns all K and KC rules.
+- [ ] User validates kiosk scoped listings show K-only rules before KC rules.
+- [ ] User validates concierge scoped listings show C-only rules before KC rules.
+- [ ] User validates scoped listing retrieval does not leak rules from another community.
+- [ ] User validates normal non-scoped queries keep normal top_k behavior.
+- [ ] User validates `answer_citations` has no duplicate `source_file` entries.
+- [ ] User validates safe refusal remains unchanged when no relevant context exists.
+
 ## Current Phase
 
-PHASE 4I-lite [4.8.2-stable] TEXT INGESTION VIA OPEN WEBUI SLASH COMMANDS
+PHASE 4.9.0 [4.9.0-alpha] SCOPE-AWARE RETRIEVAL + SOURCE DEDUPLICATION
 
 ## Overall System Status
 
