@@ -78,17 +78,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.11.0-stable |
-| Phase | Phase 4.11.0 |
-| State | stable |
+| Version | 4.12.0-alpha |
+| Phase | Phase 4.12.0 |
+| State | alpha |
 | Date | 2026-05-17 |
-| Commit | master |
-| Summary | workflow simplification - remove rc state - VALIDATED |
+| Commit | pending |
+| Summary | scope filter fix - scope_key |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.12.0-alpha | Phase 4.12.0 | alpha | 2026-05-17 | scope filter fix - scope_key |
 | 4.11.0-stable | Phase 4.11.0 | stable | 2026-05-17 | workflow simplification - remove rc state - VALIDATED |
 | 4.10.0-stable | Phase 4.10.0 | stable | 2026-05-17 | conversation context resolution - VALIDATED |
 | 4.9.0-stable | Phase 4.9.0 | stable | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
@@ -139,9 +140,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current version: 4.11.0-stable
-Current phase: Workflow Simplification - Remove rc State
-Validation status: stable; committed to master on 2026-05-17.
-Next phase: Phase 4.12.0 - Community Onboarding. Goal: ingest post orders for remaining unindexed communities.
+Current working version: 4.12.0-alpha
+Current working phase: Scope Filter Fix - scope_key
+Validation status: alpha; manual validation pending.
+Next after stable: Phase 4.13.0 - Community Onboarding. Goal: ingest post orders for remaining unindexed communities.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-17-session-04.md` records the workflow documentation update clarifying when to use the 3-section prompt format. No version change was made for that documentation-only update.
