@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4E OCR INTAKE LAYER
+POST PHASE 4E DOCUMENTATION ALIGNMENT
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, and Phase 4D query intent parsing. Phase 4E adds OCR intake artifacts for human review before ingestion.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, and Phase 4E OCR intake using pytesseract fallback.
 
 ## Phase 2 Minimal POW
 
@@ -125,16 +125,17 @@ These are not blockers.
 
 ## Next Recommended Step
 
-Finish Phase 4E manual validation.
+Keep documentation aligned with the validated Phase 4E result.
 
 Scope:
 
-- confirm local OCR can create raw and review Markdown artifacts from screenshots;
-- confirm OCR output stays under `automation/ocr/output/`;
-- confirm OCR does not write to `vault/` or call ingestion scripts;
-- confirm human review remains required before any extracted text enters announcement or post-order ingestion.
+- validated OCR backend is pytesseract;
+- PaddleOCR is experimental and deferred due to Windows runtime compatibility failure;
+- OCR output stays under `automation/ocr/output/`;
+- OCR does not write to `vault/` or call ingestion scripts;
+- human review remains required before any extracted text enters announcement or post-order ingestion.
 
-After Phase 4E validation, consider a narrow reviewed-OCR handoff improvement if needed. Do not jump to agents, direct vault editing, automatic OCR ingestion, or Phase 5 without an explicit phase request.
+After Phase 4E, consider a narrow reviewed-OCR handoff improvement if needed. Do not jump to agents, direct vault editing, automatic OCR ingestion, or Phase 5 without an explicit phase request.
 
 ## Phase 3C RAG Quality Hardening
 
@@ -383,14 +384,14 @@ PASSED
 
 ## Phase 4E OCR Intake Layer
 
-IN PROGRESS
+PASSED USING PYTESSERACT FALLBACK
 
 - [x] Add local OCR extraction script
 - [x] Support single-image OCR input
 - [x] Support folder OCR input
 - [x] Support `png`, `jpg`, `jpeg`, and `webp`
-- [x] Prefer PaddleOCR when available
-- [x] Fall back to pytesseract when available
+- [x] Validate pytesseract fallback as the operational OCR backend
+- [x] Document PaddleOCR as experimental/deferred
 - [x] Add conservative preprocessing
 - [x] Write raw OCR text artifacts
 - [x] Write human-review Markdown artifacts
@@ -398,13 +399,19 @@ IN PROGRESS
 - [x] Preserve aliases during OCR cleanup without expanding them
 - [x] Document that OCR cannot write to `vault/`
 - [x] Document that OCR cannot trigger announcement or post-order refresh
-- [ ] User installs local OCR dependency manually
-- [ ] User runs single-image OCR manually
-- [ ] User runs folder OCR manually
-- [ ] User reviews generated OCR artifacts manually
-- [ ] User verifies reviewed OCR text can be copied into existing ingestion inputs
+- [x] User installs local OCR dependency manually
+- [x] User runs OCR manually using pytesseract
+- [x] User reviews generated OCR artifacts manually
+- [x] User verifies reviewed OCR text can be copied into existing ingestion inputs
 - [ ] User reviews changes manually
 - [ ] User commits changes manually
+
+Validation notes:
+
+- PaddleOCR installed partially and model downloads succeeded, but runtime execution failed on Windows/Paddle runtime compatibility.
+- PaddleOCR did not pass validation and is not the production OCR backend.
+- pytesseract fallback succeeded and generated OCR review artifacts.
+- The OCR architecture passed because it remains intake-only and requires human review before ingestion.
 
 ## Deferred
 
