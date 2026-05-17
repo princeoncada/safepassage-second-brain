@@ -73,6 +73,11 @@ Future AI work should:
 8. Keep `workflows/n8n/phase_2_minimal_pow_ingestion_workflow.json` as the stable ingestion base.
 9. Treat `vault/` Markdown as the source of truth.
 10. Treat `rag/chroma/` as disposable derived data.
+11. Read docs/WORKFLOW.md at the start of every session.
+12. Read docs/VERSIONING.md before touching any version-related documentation.
+13. Pull master before writing any Codex prompt.
+14. Write a post-validation documentation prompt after every successful validation.
+15. Write a session checkpoint prompt before closing a large chathead.
 
 ## Do Not Touch Without Explicit Request
 
@@ -80,6 +85,12 @@ Future AI work should:
 - Do not rewrite Phase 3A retrieval scripts from scratch.
 - Do not rewrite Phase 3B answering from scratch.
 - Do not revive the old complex Phase 2 workflow.
+- Do not rewrite docs/WORKFLOW.md without explicit user instruction.
+  This file defines the operational process and must remain stable.
+- Do not skip the post-validation documentation prompt after a successful validation pass.
+  It is a mandatory step in the phase cycle.
+- Do not write validation commands inside Codex prompts.
+  Validation commands are always given separately to the user.
 
 ## Do Not Do Yet
 
