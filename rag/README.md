@@ -9,6 +9,7 @@ Current status: WORKING PROOF OF WORK
 - Phase 4D adds deterministic query intent parsing before retrieval.
 - Phase 4E adds OCR intake artifacts before reviewed ingestion.
 - Phase 4F adds a reviewed OCR staging bridge before manual deterministic ingestion.
+- Phase 4G adds deterministic temporal expiry and activation metadata for lifecycle-aware retrieval.
 
 Phase 3A tests whether local semantic search can retrieve the right Markdown chunks from `vault/`.
 
@@ -31,6 +32,52 @@ The parser extracts:
 - default/global workflow intent.
 
 This prevents global operational topics from being treated as fake communities while keeping Atlantis Bay-style unknown-community refusal behavior conservative. The parser is deterministic and does not use an LLM.
+
+## Temporal Lifecycle Metadata
+
+Phase 4G evaluates temporal lifecycle metadata deterministically during indexing and retrieval.
+
+Supported frontmatter fields include:
+
+```text
+status
+lifecycle_status
+effective_date
+active_from
+start_date
+expires_at
+expiry_date
+active_until
+end_date
+expires_on
+superseded_by
+supersedes
+lifecycle_generation
+authority_level
+document_type
+type
+```
+
+Indexed chunks may include optional source metadata:
+
+```text
+temporal_state
+temporal_warning
+temporal_start_date
+temporal_start_field
+temporal_end_date
+temporal_end_field
+```
+
+Temporal states are `active`, `pending`, `not_yet_active`, `expired`, `superseded`, `archived`, `review`, and `unknown`. Retrieval prefers active temporal sources and downgrades non-current or uncertain sources without changing source Markdown. If only expired, pending, or not-yet-active sources are retrieved, answering is conservative and may refuse instead of presenting stale or future-dated material as current policy.
+
+Generate a read-only report:
+
+```powershell
+python automation/ingestion/report_temporal_lifecycle.py --expiring-soon-days 7
+```
+
+Reports are written under `vault/08_Reports/temporal-lifecycle/` and do not update ChromaDB or operational memory.
 
 ## Install
 
