@@ -11,6 +11,7 @@ Current status: WORKING PROOF OF WORK
 - Phase 4F adds a reviewed OCR staging bridge before manual deterministic ingestion.
 - Phase 4G adds deterministic temporal expiry and activation metadata for lifecycle-aware retrieval.
 - Phase 4G1 adds deterministic announcement retrieval precision hardening.
+- Phase 4J-lite adds read-only operational dashboard and shift briefing endpoints.
 
 Phase 3A tests whether local semantic search can retrieve the right Markdown chunks from `vault/`.
 
@@ -108,6 +109,48 @@ rerank_reasons
 ```
 
 These fields explain deterministic scoring and are not operational policy. Safe refusal behavior remains conservative when context is still weak.
+
+## Dashboard / Shift Briefing
+
+Phase 4J-lite adds a read-only dashboard layer over indexed memory.
+
+FastAPI routes:
+
+```text
+GET /dashboard/status
+GET /dashboard/summary
+GET /dashboard/briefing
+GET /dashboard/announcements
+GET /dashboard/post-orders
+GET /dashboard/issues
+```
+
+Optional community filtering:
+
+```text
+/dashboard/briefing?community=CBK
+/dashboard/briefing?community=Sierra Ridge
+```
+
+The dashboard groups operational memory into deterministic briefing sections:
+
+- Active Temporary Protocols
+- Gate / NVR / Kiosk Issues
+- Active Events
+- Important Operational Reminders
+- Expiring Soon
+- Community-Specific Alerts
+- QA / Compliance Warnings
+
+Each item preserves title, category, community, authority level, document type, lifecycle status, temporal state, effective/expiry dates, section, source file, and preview text.
+
+Preview from CLI without mutating memory:
+
+```powershell
+python automation/dashboard/preview_briefing.py --community CBK
+```
+
+The dashboard reads the existing ChromaDB index only. It does not write to `vault/`, run ingestion scripts, update ChromaDB, generate operational memory, or bypass source authority.
 
 ## Install
 
