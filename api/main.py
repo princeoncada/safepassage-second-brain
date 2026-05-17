@@ -32,6 +32,7 @@ app.add_middleware(
 )
 
 app.include_router(dashboard_router)
+# Open WebUI slash command ingestion is routed inside api.service.answer_question().
 
 
 @app.get("/health")
