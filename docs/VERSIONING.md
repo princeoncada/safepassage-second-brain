@@ -12,7 +12,7 @@ Components:
 - MAJOR: increments when a phase adds a new capability layer
 - MINOR: increments when a fix or improvement is applied within a phase
 - PATCH: increments for targeted bug fixes within a minor version
-- STATE: one of alpha, beta, rc, or stable
+- STATE: one of alpha, beta, or stable
 
 ## State Definitions
 
@@ -26,10 +26,10 @@ beta
   Use with caution during testing only.
   At least one validation pass completed but failures or gaps exist.
 
-rc (release candidate)
-  All known bugs fixed. All validation commands passed.
-  Awaiting user commit to master.
-  Safe to test operationally but not yet committed.
+rc (retired)
+  Previously used as a release candidate state between beta and stable.
+  No longer used in the active phase cycle as of Phase 4.11.0.
+  Existing rc entries in the version history table are preserved for reference.
 
 stable
   Committed to master. Production ready.
@@ -42,15 +42,10 @@ alpha -> beta
   Action: update STATE from alpha to beta in all four versioning locations
   Note: document which tests passed and which failed
 
-beta -> rc
-  Trigger: all known bugs fixed AND all validation commands pass
-  Action: update STATE from beta to rc, increment PATCH if bugs were fixed
-  Note: document the patch notes and which fixes were applied
-
-rc -> stable
-  Trigger: user manually commits to master
-  Action: update STATE from rc to stable in all four versioning locations
-  Note: add validation record with date and summary
+alpha -> stable (or beta -> stable)
+  Trigger: all known bugs fixed AND all validation commands pass AND user commits to master
+  Action: update STATE from alpha (or beta) to stable in all four versioning locations
+  Note: document the validation record and which checks passed
 
 stable -> patch (regression)
   Trigger: new bug found in a stable phase
@@ -83,18 +78,19 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.10.0-rc |
-| Phase | Phase 4.10.0 |
-| State | rc |
+| Version | 4.11.0-alpha |
+| Phase | Phase 4.11.0 |
+| State | alpha |
 | Date | 2026-05-17 |
 | Commit | pending |
-| Summary | conversation context resolution - VALIDATED |
+| Summary | workflow simplification - remove rc state |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.10.0-rc | Phase 4.10.0 | rc | 2026-05-17 | conversation context resolution - VALIDATED |
+| 4.11.0-alpha | Phase 4.11.0 | alpha | 2026-05-17 | workflow simplification - remove rc state |
+| 4.10.0-stable | Phase 4.10.0 | stable | 2026-05-17 | conversation context resolution - VALIDATED |
 | 4.9.0-stable | Phase 4.9.0 | stable | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
 | 4.9.0-alpha | Phase 4.9.0 | alpha | 2026-05-17 | scope retrieval + source dedup |
 | 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
@@ -135,18 +131,17 @@ When continuing this project, an AI agent MUST:
 2. Read docs/AI_HANDOFF.md to understand the current phase and what exists.
 3. Read docs/PHASE_LOG.md to understand the full history and what was validated.
 4. Never assign a version state higher than what is actually true:
-   - Do not mark alpha as rc without a validation pass.
-   - Do not mark rc as stable without a user commit.
+   - Do not mark alpha as stable without all validation checks passing and user commit.
 5. Apply every version change to all four versioning locations simultaneously. Partial updates break consistency for the next agent.
 6. When in doubt about the current version, trust docs/VERSIONING.md over any other file - it is the single source of truth.
 7. Include a patch note block for every MINOR or PATCH version change.
-8. Include a validation record block for every rc -> stable promotion.
+8. Include a validation record block for every stable promotion.
 
 ## Next Phase
 
-Current working version: 4.10.0-rc
-Current working phase: Conversation Context Resolution
-Validation status: rc; all checks passed on 2026-05-17, awaiting user commit to master.
-Next after stable: Phase 4.11.0 - Community Onboarding. Goal: ingest post orders for remaining unindexed communities.
+Current working version: 4.11.0-alpha
+Current working phase: Workflow Simplification - Remove rc State
+Validation status: alpha; manual validation pending.
+Next after stable: Phase 4.12.0 - Community Onboarding. Goal: ingest post orders for remaining unindexed communities.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-17-session-04.md` records the workflow documentation update clarifying when to use the 3-section prompt format. No version change was made for that documentation-only update.
