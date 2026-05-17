@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.8.1-rc |
-| Last Stable | 4.7.0-stable (Phase UX-1) |
-| Status | rc - pending validation |
+| Current | 4.8.1-stable |
+| Last Stable | 4.8.1-stable (Phase 4I-lite) |
+| Status | stable - committed |
 
 ## Source Of Truth
 
@@ -38,7 +38,7 @@ Working proof of work through Phase UX-1 validation, with Phase 4I-lite implemen
 - Phase 4G1 [4.5.1-stable] - announcement retrieval precision hardening: passed/validated
 - Phase 4J-lite [4.6.0-stable] - operational dashboard / shift briefing: passed/validated
 - Phase UX-1 [4.7.0-stable] - dashboard usability hardening: passed/validated
-- Phase 4I-lite [4.8.1-rc] - Text Ingestion via Open WebUI Slash Commands: implementation added, manual validation pending
+- Phase 4I-lite [4.8.1-stable] - Text Ingestion via Open WebUI Slash Commands: passed/validated
 
 Current architecture:
 
