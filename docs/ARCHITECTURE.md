@@ -306,6 +306,30 @@ Temporal scoring is layered on top of existing community, topic, authority, life
 
 The temporal report utility writes review reports under `vault/08_Reports/temporal-lifecycle/`. These reports are derived review artifacts only. They do not update ChromaDB, run ingestion scripts, rewrite source Markdown, or create operational truth.
 
+### Phase 4G1 Announcement Retrieval Precision Hardening
+
+```text
+query
+-> deterministic parser
+-> community/topic extraction
+-> vector retrieval
+-> deterministic reranking
+   -> authority
+   -> lifecycle
+   -> temporal state
+   -> title/topic/category overlap
+   -> section weighting
+-> grounded answer or safe refusal
+```
+
+Phase 4G1 adds a deterministic precision layer for operational announcements. It was added after the Red Zone Protocol reminder query showed that correct parser intent and safe refusal were not enough when nearby reminders shared dense operational language.
+
+The reranking layer supplements embeddings; it does not replace them. It uses exact topic phrase matches, normalized title overlap, keyword overlap, category match, direct answer section weighting, existing authority hierarchy, lifecycle status, and temporal state. `Announcement` sections are preferred for announcement questions. Metadata-heavy sections such as `Operational Notes`, `Source`, and migration notes are penalized for direct operational questions but remain available for traceability/debugging.
+
+Announcement chunks preserve title, category, and normalized announcement topic text in indexed metadata so exact operational topics such as `Red Zone Protocol`, `Pickleball Tournament`, `NVR`, and `Support Room` can be ranked deterministically without LLM reranking or semantic rewriting.
+
+Phase 4G1 does not lower refusal thresholds globally, create fallback answers, rewrite vault documents, update ChromaDB automatically, or allow announcements to override post orders.
+
 ### Phase 4E OCR Intake Layer
 
 ```text
