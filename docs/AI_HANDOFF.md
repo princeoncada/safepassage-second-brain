@@ -1,16 +1,16 @@
 # AI Handoff
 
-## Current Version: 4.8.2-stable
+## Current Version: 4.9.0-rc
 
 ## Current Phase
 
 PHASE 4I-lite [4.8.2-stable] - Text Ingestion via Open WebUI Slash Commands. Fully validated and stable. Patch 4.8.2 fixes the DATE_PATTERN word boundary issue in slash command post-order parsing. Current checkpoint documentation is uncommitted until the user commits it. Phase 2 [2.0.0-stable] Minimal POW, Phase 3A [3.0.0-stable] Retrieval POW, Phase 3B [3.1.0-stable] Grounded Answering POW, Phase 3C [3.2.0-stable] RAG Quality Hardening, Phase 3D [3.3.0-stable] Local API Wrapper, Phase 3E [3.4.0-stable] Open WebUI Integration, Phase 4A [4.0.0-stable] Retrieval Quality Hardening, Phase 4B [4.1.0-stable] Primary Workflow Ingestion, Phase 4B2 [4.1.1-stable] fallback confidence, Phase 4C [4.2.0-stable] post order refresh, Phase 4C1 [4.2.1-stable] lifecycle retrieval hardening, Phase 4C2 [4.2.2-stable] managed post-order conversion, Phase 4C3 [4.2.3-stable] announcement ingestion, Phase 4D [4.3.0-stable] query parsing, Phase 4E [4.4.0-stable] OCR intake using pytesseract, Phase 4F [4.4.1-stable] OCR review + ingestion bridge, Phase 4G [4.5.0-stable] temporal expiry / activation, Phase 4G1 [4.5.1-stable] announcement retrieval precision hardening, Phase 4J-lite [4.6.0-stable] operational dashboard / shift briefing, and Phase UX-1 [4.7.0-stable] dashboard/OpenWebUI usability hardening are validated or stable unless their phase sections say otherwise.
 
-## Phase 4.9.0 In Progress
+## Phase 4.9.0 [4.9.0-rc] - Scope-Aware Retrieval + Source Dedup + Alias Hardening
 
 Phase 4.9.0-alpha addresses two operational retrieval issues. First, scoped post-order listing queries such as "post orders for SR relevant to kiosk agents" now request complete scoped retrieval, filter candidates by K/C/KC scope metadata after community and type filtering, sort K-only or C-only rules before KC rules, and uncap scoped community post-order listings to all matching candidates. Second, API answer citations are deduplicated by `source_file` so multiple cited chunks from the same vault file do not render as duplicate source filenames.
 
-Files changed for 4.9.0-alpha: `rag/query_intent.py`, `rag/scripts/answer_vault.py`, `rag/prompts/answer_from_context.md`, `api/service.py`, `docs/VERSIONING.md`, `docs/PHASE_LOG.md`, `docs/AI_HANDOFF.md`, and `README.md`. Manual validation is pending.
+Files changed for 4.9.0-alpha: `rag/query_intent.py`, `rag/scripts/answer_vault.py`, `rag/prompts/answer_from_context.md`, `api/service.py`, `docs/VERSIONING.md`, `docs/PHASE_LOG.md`, `docs/AI_HANDOFF.md`, and `README.md`. VALIDATED - all checks passed 2026-05-17. Awaiting user commit to master.
 
 Patch applied: community_aliases.json extended with partial-name aliases (SIERRA, MONTEREY, CLEARBROOK, etc.) to prevent cross-community bleed on scoped queries where the operator types a partial community name instead of the formal alias or full name.
 
@@ -116,7 +116,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Current working version: 4.9.0-alpha. Validate scope-aware complete listing retrieval and source-file citation deduplication. First manual check: ask `what are the post orders for SR relevant to kiosk agents` and confirm all K and KC rules are returned with K-only rules before KC rules and no duplicate `answer_citations.source_file` entries.
+Commit 4.9.0-rc to master to promote to stable. After commit, next phase is 4.10.0 - Conversation Context: resolve community/topic hints from prior turns in the same session (context resolution only, not full history to DeepSeek).
 
 ## Phase 4I-lite Implementation Added
 
