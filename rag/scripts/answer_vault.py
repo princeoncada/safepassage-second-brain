@@ -473,8 +473,12 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         )
         candidates.append((adjusted_distance, distance, document, metadata))
 
+    effective_top_k = top_k
+    if hints.get("requested_all"):
+        effective_top_k = 25
+
     chunks: list[dict[str, Any]] = []
-    for source_id, (_adjusted, distance, document, metadata) in enumerate(candidates[:top_k], start=1):
+    for source_id, (_adjusted, distance, document, metadata) in enumerate(candidates[:effective_top_k], start=1):
         chunks.append(
             {
                 "source_id": source_id,
