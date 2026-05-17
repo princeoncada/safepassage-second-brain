@@ -20,6 +20,7 @@ Before doing anything else:
    - docs/SESSION_LOG/ (latest session log only)
 3. Report back:
    - Current version and state
+   - Valid active states are alpha, beta, and stable
    - Current phase
    - What is in progress or pending
    - Any uncommitted work
