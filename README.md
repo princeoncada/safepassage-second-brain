@@ -2,6 +2,14 @@
 
 A local-first AI-powered operational knowledge system for workflows, SOPs, post orders, QA protection, incidents, scripts, automations, and searchable work intelligence.
 
+## Version Status
+
+| Field | Value |
+| --- | --- |
+| Current | 4.8.1-rc |
+| Last Stable | 4.7.0-stable (Phase UX-1) |
+| Status | rc - pending validation |
+
 ## Source Of Truth
 
 Markdown files in `vault/`.
@@ -10,27 +18,27 @@ Markdown files in `vault/`.
 
 Working proof of work through Phase UX-1 validation, with Phase 4I-lite implementation added for manual validation:
 
-- Phase 2 Minimal POW ingestion: passed
-- Phase 3A retrieval: passed
-- Phase 3B grounded answering: passed
-- Phase 3C RAG quality hardening: passed
-- Phase 3D local FastAPI wrapper: passed
-- Phase 3E Open WebUI integration: passed
-- Phase 4A retrieval quality hardening: passed with minor tuning
-- Phase 4B primary workflow ingestion: passed
-- Phase 4B2 primary workflow fallback confidence fix: passed
-- Phase 4C batch post order refresh/diffing: passed
-- Phase 4C1 lifecycle retrieval hardening: passed with known limitation
-- Phase 4C2 legacy post order migration / managed source conversion: passed
-- Phase 4C3 announcement / reminder lifecycle ingestion: passed with minor retrieval edge case
-- Phase 4D operational query parser / intent extraction: passed
-- Phase 4E OCR intake layer: passed using pytesseract fallback
-- Phase 4F OCR review + ingestion bridge: passed/validated
-- Phase 4G temporal expiry / activation engine: passed/validated
-- Phase 4G1 announcement retrieval precision hardening: passed/validated
-- Phase 4J-lite operational dashboard / shift briefing: passed/validated
-- Phase UX-1 User Workflow & OpenWebUI Usability Pass: passed/validated
-- Phase 4I-lite Text Ingestion via Open WebUI Slash Commands: implementation added, manual validation pending
+- Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
+- Phase 3A [3.0.0-stable] - retrieval: passed
+- Phase 3B [3.1.0-stable] - grounded answering: passed
+- Phase 3C [3.2.0-stable] - RAG quality hardening: passed
+- Phase 3D [3.3.0-stable] - local FastAPI wrapper: passed
+- Phase 3E [3.4.0-stable] - Open WebUI integration: passed
+- Phase 4A [4.0.0-stable] - retrieval quality hardening: passed with minor tuning
+- Phase 4B [4.1.0-stable] - primary workflow ingestion: passed
+- Phase 4B2 [4.1.1-stable] - primary workflow fallback confidence fix: passed
+- Phase 4C [4.2.0-stable] - batch post order refresh/diffing: passed
+- Phase 4C1 [4.2.1-stable] - lifecycle retrieval hardening: passed with known limitation
+- Phase 4C2 [4.2.2-stable] - legacy post order migration / managed source conversion: passed
+- Phase 4C3 [4.2.3-stable] - announcement / reminder lifecycle ingestion: passed with minor retrieval edge case
+- Phase 4D [4.3.0-stable] - operational query parser / intent extraction: passed
+- Phase 4E [4.4.0-stable] - OCR intake layer: passed using pytesseract fallback
+- Phase 4F [4.4.1-stable] - OCR review + ingestion bridge: passed/validated
+- Phase 4G [4.5.0-stable] - temporal expiry / activation engine: passed/validated
+- Phase 4G1 [4.5.1-stable] - announcement retrieval precision hardening: passed/validated
+- Phase 4J-lite [4.6.0-stable] - operational dashboard / shift briefing: passed/validated
+- Phase UX-1 [4.7.0-stable] - dashboard usability hardening: passed/validated
+- Phase 4I-lite [4.8.1-rc] - Text Ingestion via Open WebUI Slash Commands: implementation added, manual validation pending
 
 Current architecture:
 
