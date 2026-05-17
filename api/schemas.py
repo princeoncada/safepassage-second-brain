@@ -9,6 +9,7 @@ class AskRequest(BaseModel):
     show_context: bool = False
     no_ai: bool = False
     include_low_value_sections: bool = False
+    history: list[str] = Field(default_factory=list)
 
 
 class Source(BaseModel):
