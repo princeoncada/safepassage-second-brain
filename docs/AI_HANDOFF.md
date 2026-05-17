@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 4E OCR INTAKE LAYER. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, and Phase 4D query parsing are validated or mostly working.
+POST PHASE 4E DOCUMENTATION ALIGNMENT. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, Phase 4D query parsing, and Phase 4E OCR intake using pytesseract are validated or mostly working.
 
 ## What Exists
 
@@ -72,9 +72,9 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Finish Phase 4E manual validation.
+Keep Phase 4E documentation aligned with validation.
 
-Focus on local OCR intake only. OCR should turn screenshots into raw and reviewable text artifacts for a human to edit before using the existing announcement or post-order ingestion scripts.
+OCR is operational using pytesseract. PaddleOCR did not pass Windows runtime validation and should be treated as experimental/deferred unless a future phase pins a compatible version or moves OCR to Linux/Docker.
 
 OCR must not directly modify operational memory. Do not add automatic OCR-to-vault ingestion, autonomous agents, n8n rewrites, Open WebUI business logic, destructive cleanup, or AI-based parsing.
 
@@ -309,9 +309,9 @@ Behavior:
 
 The parser must not replace lifecycle scoring, authority hierarchy, primary workflow fallback, or grounded-answer refusal behavior. Do not run `git commit` or `git push`.
 
-## Phase 4E In Progress
+## Phase 4E Passed Using Pytesseract
 
-Phase 4E adds local OCR intake only.
+Phase 4E adds local OCR intake only. The validated backend is pytesseract.
 
 Key files:
 
@@ -325,7 +325,8 @@ Behavior:
 
 - accepts `png`, `jpg`, `jpeg`, and `webp`;
 - supports one image or an input directory;
-- prefers PaddleOCR and falls back to pytesseract when available;
+- uses pytesseract as the current validated OCR backend;
+- treats PaddleOCR as experimental/deferred after Windows runtime validation failure;
 - writes raw text and review Markdown artifacts;
 - includes OCR engine and confidence when available;
 - performs conservative whitespace cleanup only;
