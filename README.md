@@ -8,7 +8,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4G validation, with Phase 4G1 implementation added for manual validation:
+Working proof of work through Phase 4G1 validation, with Phase 4J-lite implementation added for manual validation:
 
 - Phase 2 Minimal POW ingestion: passed
 - Phase 3A retrieval: passed
@@ -27,7 +27,8 @@ Working proof of work through Phase 4G validation, with Phase 4G1 implementation
 - Phase 4E OCR intake layer: passed using pytesseract fallback
 - Phase 4F OCR review + ingestion bridge: passed/validated
 - Phase 4G temporal expiry / activation engine: passed/validated
-- Phase 4G1 announcement retrieval precision hardening: implementation added, manual validation pending
+- Phase 4G1 announcement retrieval precision hardening: passed/validated
+- Phase 4J-lite operational dashboard / shift briefing: implementation added, manual validation pending
 
 Current architecture:
 
@@ -68,6 +69,21 @@ Phase 4G adds a deterministic temporal expiry / activation engine. Vault Markdow
 Temporal reports can be generated under `vault/08_Reports/temporal-lifecycle/`. These reports are review artifacts only. They do not mutate operational memory, run ingestion scripts, update ChromaDB, or bypass human review.
 
 Phase 4G1 hardens announcement retrieval precision after the temporal engine exposed a Red Zone Protocol retrieval specificity regression. It keeps the same safety boundaries and adds deterministic section-aware reranking: exact topic/title/body matches, title overlap, category matches, and the `Announcement` section are boosted, while `Operational Notes`, `Source`, migration notes, and other metadata-heavy sections are penalized for direct operational questions. It does not lower refusal thresholds globally, use LLM reranking, rewrite vault files, or let announcements override post orders.
+
+Phase 4J-lite adds a read-only operational dashboard and deterministic shift briefing layer over indexed memory. It aggregates active announcements, active post-order warnings, temporary protocols, gate/NVR/kiosk issues, events, compliance reminders, and expiring-soon notices while preserving source paths, authority, lifecycle status, and temporal state. It does not write to `vault/`, run ingestion, update ChromaDB, create autonomous workflows, or generate operational memory.
+
+Dashboard endpoints:
+
+```text
+GET /dashboard/status
+GET /dashboard/summary
+GET /dashboard/briefing
+GET /dashboard/announcements
+GET /dashboard/post-orders
+GET /dashboard/issues
+```
+
+Optional community filtering is supported with `?community=CBK` or `?community=Sierra Ridge`.
 
 ## OCR Intake
 
