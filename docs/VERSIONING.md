@@ -83,17 +83,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.8.2-stable |
-| Phase | Phase 4I-lite |
-| State | stable |
+| Version | 4.9.0-alpha |
+| Phase | Phase 4.9.0 |
+| State | alpha |
 | Date | 2026-05-17 |
-| Commit | master |
-| Summary | DATE_PATTERN word boundary fix - VALIDATED |
+| Commit | pending |
+| Summary | scope retrieval + source dedup |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.9.0-alpha | Phase 4.9.0 | alpha | 2026-05-17 | scope retrieval + source dedup |
 | 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
 | 4.8.1-stable | Phase 4I-lite | stable | 2026-05-17 | top_k fix + name match - VALIDATED |
 | 4.8.1-rc | Phase 4I-lite | rc | 2026-05-17 | top_k fix + name match fix |
@@ -141,9 +142,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Next version: 4.9.0-alpha
-Next phase: Community Onboarding + Scope-Aware Retrieval Improvements
-Goal: Ingest post orders for remaining unindexed communities and improve retrieval for "show me all" style queries across all communities.
-First task: Ingest post orders for remaining unindexed communities via `/post-orders [ALIAS] [text]` in Open WebUI, then validate `/announcements` YES confirmation flow.
+Current working version: 4.9.0-alpha
+Current working phase: Scope-Aware Retrieval + Source Deduplication
+Goal: Improve scoped post-order listing retrieval so kiosk/concierge queries return the full matching K/C/KC rule set, and deduplicate displayed answer citations by source file.
+Validation status: manual validation pending.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-17-session-04.md` records the workflow documentation update clarifying when to use the 3-section prompt format. No version change was made for that documentation-only update.
