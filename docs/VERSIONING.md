@@ -83,16 +83,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.8.1-stable |
+| Version | 4.8.2-stable |
 | Phase | Phase 4I-lite |
 | State | stable |
 | Date | 2026-05-17 |
 | Commit | master |
+| Summary | DATE_PATTERN word boundary fix - VALIDATED |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
 | 4.8.1-stable | Phase 4I-lite | stable | 2026-05-17 | top_k fix + name match - VALIDATED |
 | 4.8.1-rc | Phase 4I-lite | rc | 2026-05-17 | top_k fix + name match fix |
 | 4.8.0-beta | Phase 4I-lite | beta | 2026-05-17 | slash commands, scope rerank partial |
