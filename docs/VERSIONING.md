@@ -83,18 +83,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.10.0-alpha |
+| Version | 4.10.0-rc |
 | Phase | Phase 4.10.0 |
-| State | alpha |
+| State | rc |
 | Date | 2026-05-17 |
 | Commit | pending |
-| Summary | conversation context resolution |
+| Summary | conversation context resolution - VALIDATED |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.10.0-alpha | Phase 4.10.0 | alpha | 2026-05-17 | conversation context resolution |
+| 4.10.0-rc | Phase 4.10.0 | rc | 2026-05-17 | conversation context resolution - VALIDATED |
 | 4.9.0-stable | Phase 4.9.0 | stable | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
 | 4.9.0-alpha | Phase 4.9.0 | alpha | 2026-05-17 | scope retrieval + source dedup |
 | 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
@@ -144,9 +144,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.10.0-alpha
+Current working version: 4.10.0-rc
 Current working phase: Conversation Context Resolution
-Validation status: alpha; manual validation pending.
-Goal: resolve community/topic hints from prior user turns in request-local history without sending history to DeepSeek.
+Validation status: rc; all checks passed on 2026-05-17, awaiting user commit to master.
+Next after stable: Phase 4.11.0 - Community Onboarding. Goal: ingest post orders for remaining unindexed communities.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-17-session-04.md` records the workflow documentation update clarifying when to use the 3-section prompt format. No version change was made for that documentation-only update.
