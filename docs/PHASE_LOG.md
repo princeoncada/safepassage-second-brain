@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.11.0-alpha | Phase 4.11.0 | alpha | 2026-05-17 | workflow simplification - remove rc state |
+| 4.11.0-stable | Phase 4.11.0 | stable | 2026-05-17 | workflow simplification - remove rc state - VALIDATED |
 | 4.10.0-stable | Phase 4.10.0 | stable | 2026-05-17 | conversation context resolution - VALIDATED |
 | 4.9.0-stable | Phase 4.9.0 | stable | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
 | 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
@@ -33,9 +33,9 @@
 
 ## Phase 4.11.0 Workflow Simplification - Remove rc State
 
-Status: IN PROGRESS
+Status: PASSED - stable
 
-Version: 4.11.0-alpha
+Version: 4.11.0-stable
 
 Date started: 2026-05-17
 
@@ -55,12 +55,20 @@ Files changed:
 
 Validation checklist:
 
-- [ ] docs/VERSIONING.md: rc removed from active promotion rules
-- [ ] docs/WORKFLOW.md: DOCUMENT step updated, rc references removed
-- [ ] docs/AI_HANDOFF.md: updated to reflect simplified cycle
-- [ ] docs/PHASE_LOG.md: updated
-- [ ] Session checkpoint and opener prompts updated in session log
-- [ ] All existing phase entries preserved unchanged
+- [x] docs/VERSIONING.md: rc removed from active promotion rules
+- [x] docs/WORKFLOW.md: DOCUMENT step updated, rc references removed
+- [x] docs/AI_HANDOFF.md: updated to reflect simplified cycle
+- [x] docs/PHASE_LOG.md: updated
+- [x] Session checkpoint and opener prompts updated in session log
+- [x] All existing phase entries preserved unchanged
+
+### Validation Record - 4.11.0-stable
+Date: 2026-05-17
+All checks passed. Committed to master.
+- [x] rc retired from active cycle in VERSIONING.md and WORKFLOW.md
+- [x] 4.10.0 promoted to stable in all four locations
+- [x] No code files touched
+- [x] All existing phase history preserved
 
 ## Phase 4.10.0 Conversation Context Resolution
 
@@ -168,13 +176,13 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.11.0 [4.11.0-alpha] WORKFLOW SIMPLIFICATION
+PHASE 4.11.0 [4.11.0-stable] WORKFLOW SIMPLIFICATION
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, Phase 4G1 announcement retrieval precision hardening, Phase 4J-lite operational dashboard / shift briefing, Phase UX-1 dashboard/OpenWebUI usability hardening, Phase 4I-lite slash command ingestion plus scope retrieval fixes, Phase 4.9.0 scope retrieval/source deduplication/alias hardening, and Phase 4.10.0 conversation context resolution. Phase 4.10.0 is stable. Phase 4.11.0 is documentation-only workflow simplification in progress.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, Phase 4G1 announcement retrieval precision hardening, Phase 4J-lite operational dashboard / shift briefing, Phase UX-1 dashboard/OpenWebUI usability hardening, Phase 4I-lite slash command ingestion plus scope retrieval fixes, Phase 4.9.0 scope retrieval/source deduplication/alias hardening, Phase 4.10.0 conversation context resolution, and Phase 4.11.0 workflow simplification. Phase 4.11.0 is stable.
 
 ## Phase 2 Minimal POW
 
