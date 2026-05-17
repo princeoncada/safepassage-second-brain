@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.12.0-alpha | Phase 4.12.0 | alpha | 2026-05-17 | scope filter fix - scope_key |
 | 4.11.0-stable | Phase 4.11.0 | stable | 2026-05-17 | workflow simplification - remove rc state - VALIDATED |
 | 4.10.0-stable | Phase 4.10.0 | stable | 2026-05-17 | conversation context resolution - VALIDATED |
 | 4.9.0-stable | Phase 4.9.0 | stable | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
@@ -30,6 +31,30 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.12.0 Scope Filter Fix - scope_key
+
+Status: IN PROGRESS
+
+Version: 4.12.0-alpha
+
+Date started: 2026-05-17
+
+Purpose:
+
+Phase 4.12.0 fixes the scoped post-order candidate filter introduced in Phase 4.9.0. The filter now uses indexed `scope_key` metadata instead of searching for letters in the normalized `scope` string.
+
+Implementation scope:
+
+- `rag/scripts/answer_vault.py`: kiosk scope filtering keeps candidates with `scope_key` `k` or `kc`; concierge scope filtering keeps candidates with `scope_key` `c` or `kc`.
+- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.12.0-alpha as the current in-progress implementation.
+
+Validation checklist:
+
+- [ ] User validates kiosk scoped listing returns K and KC rules using `scope_key`.
+- [ ] User validates concierge scoped listing returns C and KC rules using `scope_key`.
+- [ ] User validates fallback to unfiltered candidates remains intact when scoped filtering returns no matches.
+- [ ] User validates no unrelated retrieval, reranking, query intent, indexing, ingestion, config, vault, or API behavior changed.
 
 ## Phase 4.11.0 Workflow Simplification - Remove rc State
 
@@ -176,7 +201,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.11.0 [4.11.0-stable] WORKFLOW SIMPLIFICATION
+PHASE 4.12.0 [4.12.0-alpha] SCOPE FILTER FIX
 
 ## Overall System Status
 
