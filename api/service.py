@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import os
+from pathlib import Path
 from textwrap import shorten
 from typing import Any
 
@@ -11,6 +13,7 @@ from api.ingest import (
     handle_post_orders_command,
 )
 from api.schemas import AskRequest, AskResponse, Source
+from rag.query_intent import parse_query_intent
 from rag.scripts.answer_vault import (
     PROMPT_PATH,
     build_context_packet,
@@ -22,6 +25,9 @@ from rag.scripts.answer_vault import (
     retrieve_chunks,
     strip_sources_section,
 )
+
+
+AMBIGUOUS_ALIASES_PATH = Path(__file__).resolve().parents[1] / "rag" / "config" / "ambiguous_community_aliases.json"
 
 
 def chunk_to_source(chunk: dict[str, Any], show_context: bool) -> Source:
@@ -87,6 +93,14 @@ def build_response(
     used_ai: bool,
     warnings: list[str],
 ) -> AskResponse:
+    answer_citations = [chunk_to_source(chunk, False) for chunk in cited_chunks]
+    seen_files: set[str] = set()
+    deduped_citations: list[Source] = []
+    for source in answer_citations:
+        if source.source_file not in seen_files:
+            seen_files.add(source.source_file)
+            deduped_citations.append(source)
+
     return AskResponse(
         status=status,
         question=request.question,
@@ -94,7 +108,7 @@ def build_response(
         retrieval_confidence=str(assessment.get("confidence", "")),
         confidence_reason=str(assessment.get("reason", "")),
         sources=[chunk_to_source(chunk, request.show_context) for chunk in chunks],
-        answer_citations=[chunk_to_source(chunk, False) for chunk in cited_chunks],
+        answer_citations=deduped_citations,
         used_ai=used_ai,
         warnings=warnings,
     )
@@ -112,6 +126,25 @@ def _ingest_response(request: AskRequest, answer_text: str) -> AskResponse:
         used_ai=False,
         warnings=[],
     )
+
+
+def load_ambiguous_aliases() -> dict:
+    if not AMBIGUOUS_ALIASES_PATH.exists():
+        return {}
+    with AMBIGUOUS_ALIASES_PATH.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def check_ambiguous_community(community: str) -> str:
+    """Return a clarification message if community is a known ambiguous parent,
+    else return empty string."""
+    if not community:
+        return ""
+    ambiguous = load_ambiguous_aliases()
+    for parent_community, config in ambiguous.items():
+        if community == parent_community:
+            return str(config.get("clarification_message", ""))
+    return ""
 
 
 def answer_question(request: AskRequest) -> AskResponse:
@@ -133,6 +166,12 @@ def answer_question(request: AskRequest) -> AskResponse:
     if question_upper == "NO":
         answer_text = handle_confirm_no()
         return _ingest_response(request, answer_text)
+
+    # Check for ambiguous parent community before retrieval.
+    _intent_check = parse_query_intent(question_stripped)
+    _clarification = check_ambiguous_community(_intent_check.community)
+    if _clarification:
+        return _ingest_response(request, _clarification)
 
     warnings: list[str] = []
     try:
