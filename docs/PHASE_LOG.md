@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.9.0-alpha | Phase 4.9.0 | alpha | 2026-05-17 | scope retrieval + source dedup |
+| 4.9.0-rc | Phase 4.9.0 | rc | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
 | 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
 | 4.8.1-stable | Phase 4I-lite | stable | 2026-05-17 | top_k fix + name match fix - VALIDATED |
 | 4.8.0-beta | Phase 4I-lite | beta | 2026-05-17 | slash commands, scope rerank partial |
@@ -31,9 +31,9 @@
 
 ## Phase 4.9.0 Scope-Aware Retrieval + Source Deduplication
 
-Status: IN PROGRESS
+Status: VALIDATED - rc
 
-Version: 4.9.0-alpha
+Version: 4.9.0-rc
 
 Date started: 2026-05-17
 
@@ -54,17 +54,40 @@ Implementation scope:
 
 Validation checklist:
 
-- [ ] User validates `what are the post orders for SR relevant to kiosk agents` returns all K and KC rules.
-- [ ] User validates kiosk scoped listings show K-only rules before KC rules.
-- [ ] User validates concierge scoped listings show C-only rules before KC rules.
-- [ ] User validates scoped listing retrieval does not leak rules from another community.
-- [ ] User validates normal non-scoped queries keep normal top_k behavior.
-- [ ] User validates `answer_citations` has no duplicate `source_file` entries.
-- [ ] User validates safe refusal remains unchanged when no relevant context exists.
+- [x] User validates `what are the post orders for SR relevant to kiosk agents` returns all K and KC rules.
+- [x] User validates kiosk scoped listings show K-only rules before KC rules.
+- [x] User validates concierge scoped listings show C-only rules before KC rules.
+- [x] User validates scoped listing retrieval does not leak rules from another community.
+- [x] User validates normal non-scoped queries keep normal top_k behavior.
+- [x] User validates `answer_citations` has no duplicate `source_file` entries.
+- [x] User validates safe refusal remains unchanged when no relevant context exists.
+
+### Validation Record - 4.9.0-rc
+Date: 2026-05-17
+All checks passed.
+
+Passed:
+- [x] requested_all triggers on scoped listing phrases
+- [x] scope_hint=kiosk and scope_hint=concierge detected correctly
+- [x] Scoped listing returns all matching rules uncapped
+- [x] No cross-community bleed on scoped queries
+- [x] K-only / K&C grouping in AI answer
+- [x] Concierge scope symmetric
+- [x] answer_citations deduplicated by source_file
+- [x] SIERRA and all partial-name aliases resolve correctly
+- [x] Long aliases (>6 chars) resolve after regex fix
+- [x] HP/PLM/PALMS/HERITAGE return clarification message
+- [x] Sub-community aliases (HPS, HPD, HPN, PLMIM) not intercepted
+- [x] Existing aliases unbroken
+- [x] Normal RAG unaffected
+
+Non-blocking:
+- SIERRA may show as alias label instead of SR when both in alias table
+- Some scoped answers cite Scope section chunk instead of Rule section chunk for same file - content correct, cosmetic only
 
 ## Current Phase
 
-PHASE 4.9.0 [4.9.0-alpha] SCOPE-AWARE RETRIEVAL + SOURCE DEDUPLICATION
+PHASE 4.9.0 [4.9.0-rc] SCOPE-AWARE RETRIEVAL + SOURCE DEDUPLICATION + ALIAS HARDENING
 
 ## Overall System Status
 
