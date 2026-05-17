@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.9.0-alpha |
+| Current | 4.9.0-rc |
 | Last Stable | 4.8.2-stable (Phase 4I-lite) |
-| Status | alpha - manual validation pending |
+| Status | rc - awaiting commit |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4I-lite validation, with Phase 4.9.0-alpha implementation in progress:
+Working proof of work through Phase 4I-lite validation, with Phase 4.9.0-rc validation complete and pending commit:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -39,7 +39,7 @@ Working proof of work through Phase 4I-lite validation, with Phase 4.9.0-alpha i
 - Phase 4J-lite [4.6.0-stable] - operational dashboard / shift briefing: passed/validated
 - Phase UX-1 [4.7.0-stable] - dashboard usability hardening: passed/validated
 - Phase 4I-lite [4.8.2-stable] - Text Ingestion via Open WebUI Slash Commands: passed/validated
-- Phase 4.9.0 [4.9.0-alpha] - Scope-aware retrieval + source deduplication: alpha
+- Phase 4.9.0 [4.9.0-rc] - Scope-aware retrieval + source deduplication + alias hardening: rc
 
 Current architecture:
 
@@ -87,7 +87,7 @@ Phase UX-1 hardens the dashboard briefing presentation and Open WebUI operator w
 
 Phase 4I-lite adds a guarded Open WebUI text-ingestion path through `/ask` slash commands. `/post-orders` and `/announcements` create deterministic previews, require an explicit `YES` confirmation, then call the existing ingestion scripts and rebuild ChromaDB. It does not ingest on preview, use AI parsing, bypass human confirmation, add OCR upload, add new document types, or change authority rules.
 
-Phase 4.9.0-alpha improves scoped post-order listing retrieval and citation display. Scoped kiosk or concierge post-order queries for a known community request the full matching rule set, keep K/C/KC scope ordering visible to the answer model, and deduplicate answer citations by source file while leaving the full retrieved source list intact.
+Phase 4.9.0-rc improves scoped post-order listing retrieval, citation display, and alias hardening. Scoped kiosk or concierge post-order queries for a known community request the full matching rule set, keep K/C/KC scope ordering visible to the answer model, deduplicate answer citations by source file while leaving the full retrieved source list intact, resolve long partial-name aliases, and clarify ambiguous parent community aliases before retrieval.
 
 Dashboard endpoints:
 
