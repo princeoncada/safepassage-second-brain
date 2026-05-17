@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.10.0-alpha | Phase 4.10.0 | alpha | 2026-05-17 | conversation context resolution |
 | 4.9.0-stable | Phase 4.9.0 | stable | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
 | 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
 | 4.8.1-stable | Phase 4I-lite | stable | 2026-05-17 | top_k fix + name match fix - VALIDATED |
@@ -28,6 +29,35 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.10.0 Conversation Context Resolution
+
+Status: IN PROGRESS
+
+Version: 4.10.0-alpha
+
+Date started: 2026-05-17
+
+Purpose:
+
+Phase 4.10.0 adds lightweight conversation context resolution to `/ask`. The API can accept up to 5 prior user turns in a request-local `history` field and use them only to resolve community context when the current question is ambiguous. History is not stored server-side and is not sent to DeepSeek.
+
+Implementation scope:
+
+- `api/schemas.py`: add optional `history` list to `AskRequest`.
+- `api/service.py`: add `resolve_community_from_history()` and patch the retrieval question with a history-derived community only when the current question has no community.
+- `openwebui/examples/openwebui_connection_example.md`: document the optional `history` field and Open WebUI Pipe history extraction.
+- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.10.0-alpha as the current in-progress implementation.
+
+Validation checklist:
+
+- [ ] User validates callers without `history` continue to work unchanged.
+- [ ] User validates history is capped to the last 5 user turns.
+- [ ] User validates current-query community takes priority over history.
+- [ ] User validates an ambiguous follow-up can resolve community from prior user turns.
+- [ ] User validates history is not sent to DeepSeek.
+- [ ] User validates `request.question` in the API response remains the original unpatched question.
+- [ ] User validates safe refusal remains unchanged when neither current question nor history resolves a community.
 
 ## Phase 4.9.0 Scope-Aware Retrieval + Source Deduplication
 
@@ -88,7 +118,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.9.0 [4.9.0-stable] SCOPE-AWARE RETRIEVAL + SOURCE DEDUPLICATION + ALIAS HARDENING
+PHASE 4.10.0 [4.10.0-alpha] CONVERSATION CONTEXT RESOLUTION
 
 ## Overall System Status
 
