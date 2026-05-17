@@ -187,6 +187,7 @@ Session Checkpoint process:
     - Creates docs/SESSION_LOG/YYYY-MM-DD-HH.md with session summary
       containing: what was done, what is in progress, what is next,
       any open decisions, and any known issues
+    - References docs/NEW_CHATHEAD_OPENER.md for the new chathead opener
 
   Step 2: User runs the checkpoint prompt through Codex and commits
 
@@ -203,6 +204,12 @@ Session log format (docs/SESSION_LOG/YYYY-MM-DD-HH.md):
   ## Open Decisions
   ## Known Issues
   ## Next Recommended Action
+  ## New Chathead Opener
+  See docs/NEW_CHATHEAD_OPENER.md for the current opener text.
+
+The session log must reference docs/NEW_CHATHEAD_OPENER.md for the
+opener text. It must NOT embed the opener inline. The canonical opener
+is always stored in docs/NEW_CHATHEAD_OPENER.md and updated there only.
 
 ## Repo Awareness Rules
 
