@@ -455,10 +455,10 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         scope_hint = str(hints.get("scope_hint", ""))
         scope_matched = []
         for candidate in raw_candidates:
-            scope_val = str(candidate[3].get("scope", "")).upper()
-            if scope_hint == "kiosk" and "K" in scope_val:
+            scope_key = str(candidate[3].get("scope_key", "")).lower()
+            if scope_hint == "kiosk" and scope_key in ("k", "kc"):
                 scope_matched.append(candidate)
-            elif scope_hint == "concierge" and "C" in scope_val:
+            elif scope_hint == "concierge" and scope_key in ("c", "kc"):
                 scope_matched.append(candidate)
         if scope_matched:
             raw_candidates = scope_matched
