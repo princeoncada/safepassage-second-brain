@@ -8,7 +8,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4E validation, with Phase 4F implementation added for manual validation:
+Working proof of work through Phase 4F validation, with Phase 4G implementation added for manual validation:
 
 - Phase 2 Minimal POW ingestion: passed
 - Phase 3A retrieval: passed
@@ -25,7 +25,8 @@ Working proof of work through Phase 4E validation, with Phase 4F implementation 
 - Phase 4C3 announcement / reminder lifecycle ingestion: passed with minor retrieval edge case
 - Phase 4D operational query parser / intent extraction: passed
 - Phase 4E OCR intake layer: passed using pytesseract fallback
-- Phase 4F OCR review + ingestion bridge: implementation added, manual validation pending
+- Phase 4F OCR review + ingestion bridge: passed/validated
+- Phase 4G temporal expiry / activation engine: implementation added, manual validation pending
 
 Current architecture:
 
@@ -60,6 +61,10 @@ Phase 4E adds a local OCR intake layer for screenshots and images. OCR creates r
 The current validated OCR backend is `pytesseract`. PaddleOCR did not pass Windows runtime validation and is deferred as an experimental future Linux, Docker, or pinned-version candidate.
 
 Phase 4F adds an explicit OCR review queue and a deterministic review bridge. The bridge only copies human-approved reviewed OCR text into staging files under `automation/ingestion/reviewed_ocr_inputs/`; it does not write to `vault/`, trigger ingestion scripts, or update ChromaDB.
+
+Phase 4G adds a deterministic temporal expiry / activation engine. Vault Markdown remains the source of truth, but indexed chunks can now carry temporal lifecycle metadata such as `temporal_state`, `temporal_warning`, active/effective dates, and expiry/end dates. Retrieval still preserves the authority hierarchy `post_order > announcement > primary_workflow`, but now prefers currently active temporal sources, downgrades pending, not-yet-active, expired, superseded, archived, review, and unknown-temporal sources, and exposes warnings when context is stale or uncertain.
+
+Temporal reports can be generated under `vault/08_Reports/temporal-lifecycle/`. These reports are review artifacts only. They do not mutate operational memory, run ingestion scripts, update ChromaDB, or bypass human review.
 
 ## OCR Intake
 
