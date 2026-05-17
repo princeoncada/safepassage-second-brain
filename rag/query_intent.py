@@ -74,6 +74,22 @@ CONCIERGE_SCOPE_PHRASES = {
     "concierge rules",
 }
 
+REQUESTED_ALL_PHRASES = {
+    "complete list",
+    "all post orders",
+    "all kiosk",
+    "all concierge",
+    "full list",
+    "every post order",
+    "list all",
+    "all rules",
+    "all the post orders",
+    "give me all",
+    "show me all",
+    "all active",
+    "full post order",
+}
+
 
 @dataclass
 class QueryIntent:
@@ -86,6 +102,7 @@ class QueryIntent:
     intent_category: str = "unknown"
     topic_terms: list[str] = field(default_factory=list)
     scope_hint: str = ""
+    requested_all: bool = False
     is_default_workflow_query: bool = False
     is_global_query: bool = False
     warnings: list[str] = field(default_factory=list)
@@ -99,6 +116,7 @@ class QueryIntent:
             "intent_category": self.intent_category,
             "topic_terms": self.topic_terms,
             "scope_hint": self.scope_hint,
+            "requested_all": self.requested_all,
             "is_default_workflow_query": self.is_default_workflow_query,
             "is_global_query": self.is_global_query,
             "warnings": self.warnings,
@@ -205,6 +223,11 @@ def detect_scope(intent: QueryIntent) -> None:
         intent.scope_hint = "concierge"
 
 
+def detect_requested_all(intent: QueryIntent) -> None:
+    if any(phrase in intent.normalized_query for phrase in REQUESTED_ALL_PHRASES):
+        intent.requested_all = True
+
+
 def phrase_is_operational_topic(phrase: str) -> bool:
     normalized = normalize_key(phrase)
     if normalized in NON_COMMUNITY_TOPICS:
@@ -238,6 +261,19 @@ def parse_query_intent(query: str, known_communities: set[str] | None = None) ->
             intent.community_alias = token
             break
 
+    if not intent.community:
+        sorted_names = sorted(
+            aliases.items(),
+            key=lambda item: len(item[1]),
+            reverse=True,
+        )
+        for alias_key, community_name in sorted_names:
+            normalized_name = normalize_key(community_name)
+            if normalized_name and normalized_name in intent.normalized_query:
+                intent.community = community_name
+                intent.community_alias = alias_key
+                break
+
     communities = known_community_map(known_communities)
     if not intent.community:
         for normalized_community, original in communities.items():
@@ -247,6 +283,7 @@ def parse_query_intent(query: str, known_communities: set[str] | None = None) ->
 
     detect_topic(intent)
     detect_keyword_intent(intent)
+    detect_requested_all(intent)
     detect_scope(intent)
 
     if not intent.community:
