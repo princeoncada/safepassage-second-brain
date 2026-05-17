@@ -46,6 +46,18 @@
     "expired": 1.2,
     "archived": 1.5
   },
+  "temporal_state_boosts": {
+    "active": 0.22
+  },
+  "temporal_state_penalties": {
+    "pending": 0.35,
+    "not_yet_active": 0.5,
+    "expired": 0.9,
+    "review": 0.65,
+    "unknown": 0.25,
+    "superseded": 1.2,
+    "archived": 1.5
+  },
   "lifecycle_generation_boosts": {
     "managed": 0.28
   },
