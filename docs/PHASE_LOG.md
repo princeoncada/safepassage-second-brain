@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.9.0-rc | Phase 4.9.0 | rc | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
+| 4.9.0-stable | Phase 4.9.0 | stable | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
 | 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
 | 4.8.1-stable | Phase 4I-lite | stable | 2026-05-17 | top_k fix + name match fix - VALIDATED |
 | 4.8.0-beta | Phase 4I-lite | beta | 2026-05-17 | slash commands, scope rerank partial |
@@ -31,9 +31,9 @@
 
 ## Phase 4.9.0 Scope-Aware Retrieval + Source Deduplication
 
-Status: VALIDATED - rc
+Status: PASSED - stable
 
-Version: 4.9.0-rc
+Version: 4.9.0-stable
 
 Date started: 2026-05-17
 
@@ -65,6 +65,7 @@ Validation checklist:
 ### Validation Record - 4.9.0-rc
 Date: 2026-05-17
 All checks passed.
+Committed to master: 2026-05-17
 
 Passed:
 - [x] requested_all triggers on scoped listing phrases
@@ -87,7 +88,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.9.0 [4.9.0-rc] SCOPE-AWARE RETRIEVAL + SOURCE DEDUPLICATION + ALIAS HARDENING
+PHASE 4.9.0 [4.9.0-stable] SCOPE-AWARE RETRIEVAL + SOURCE DEDUPLICATION + ALIAS HARDENING
 
 ## Overall System Status
 
