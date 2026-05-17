@@ -34,15 +34,17 @@ It supports one image or a folder of images.
 
 ## Engines
 
-Preferred engine:
-
-- PaddleOCR
-
-Fallback engine:
+Current validated engine:
 
 - pytesseract
 
-Both options are local/offline capable. The OCR layer does not use cloud OCR, OpenAI OCR, or external APIs.
+Deferred experimental engine:
+
+- PaddleOCR
+
+pytesseract is the current validated OCR backend for this project. PaddleOCR installed partially and downloaded models, but did not pass Windows/Paddle runtime validation. Treat PaddleOCR as experimental and deferred for a future Linux, Docker, or pinned-version phase.
+
+The OCR layer does not use cloud OCR, OpenAI OCR, or external APIs.
 
 ## Output Artifacts
 
@@ -110,6 +112,6 @@ Then run the existing deterministic ingestion script for that document type and 
 - OCR accuracy depends on screenshot quality.
 - Table-like layouts may lose structure.
 - Bullets and indentation may need manual cleanup.
-- PaddleOCR and pytesseract return confidence differently.
 - Tesseract requires a local binary in addition to the Python package.
+- PaddleOCR is not production validated in this repo and should not be documented as the active OCR backend.
 - OCR output is not operational memory until reviewed and ingested.
