@@ -102,7 +102,7 @@ The secret scan should return no real secrets. Placeholder values in `.env.examp
 
 ## Current Checkpoint Status
 
-Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C post-order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, and Phase 4D query intent parsing have passed or mostly passed local validation. Phase 4E OCR intake is the current manual-validation phase. The system is a working proof of work, not a finished final product.
+Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C post-order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, Phase 4D query intent parsing, and Phase 4E OCR intake using pytesseract have passed or mostly passed local validation. The system is a working proof of work, not a finished final product.
 
 ## Phase 2 Minimal POW Validated Tests
 
@@ -775,21 +775,23 @@ Expected:
 
 ## Phase 4E OCR Intake Validation
 
-The user runs this validation manually after installing a local OCR engine.
+Phase 4E passed using pytesseract fallback.
 
-Optional OCR dependencies:
-
-```powershell
-pip install paddleocr paddlepaddle pillow
-```
-
-Fallback option:
+Validated OCR dependency path:
 
 ```powershell
 pip install pytesseract pillow
 ```
 
-Tesseract fallback also requires the local Tesseract binary installed on Windows.
+Tesseract also requires the local Windows Tesseract binary.
+
+Deferred experimental option:
+
+```powershell
+pip install paddleocr paddlepaddle pillow
+```
+
+PaddleOCR did not pass validation. It installed partially, model downloads succeeded, and initialization partially succeeded, but runtime execution failed on Windows/Paddle runtime compatibility. Treat PaddleOCR as a future Linux, Docker, or pinned-version candidate only.
 
 Single-image OCR:
 
@@ -812,3 +814,9 @@ Expected:
 - OCR does not write to `vault/`;
 - OCR does not call announcement or post-order ingestion scripts;
 - human review is required before copied OCR text enters an ingestion input.
+
+Validated outcome:
+
+- pytesseract generated OCR review artifacts successfully;
+- PaddleOCR did not pass runtime validation;
+- OCR architecture passed independently because it remains intake-only.
