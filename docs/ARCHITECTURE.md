@@ -330,6 +330,47 @@ Announcement chunks preserve title, category, and normalized announcement topic 
 
 Phase 4G1 does not lower refusal thresholds globally, create fallback answers, rewrite vault documents, update ChromaDB automatically, or allow announcements to override post orders.
 
+### Phase 4J-lite Operational Dashboard / Shift Briefing
+
+```text
+vault Markdown
+-> ChromaDB indexed memory
+-> retrieval metadata + lifecycle + temporal state
+-> deterministic dashboard aggregation
+-> compact shift briefing
+```
+
+Phase 4J-lite adds a read-only operational visibility layer to the local FastAPI app. It is intended for usability testing and faster kiosk situational awareness, not automation.
+
+Dashboard routes:
+
+```text
+/dashboard/status
+/dashboard/summary
+/dashboard/briefing
+/dashboard/announcements
+/dashboard/post-orders
+/dashboard/issues
+```
+
+The dashboard reads indexed ChromaDB metadata derived from `vault/` and groups active operational memory into:
+
+```text
+Active Temporary Protocols
+Gate / NVR / Kiosk Issues
+Active Events
+Important Operational Reminders
+Expiring Soon
+Community-Specific Alerts
+QA / Compliance Warnings
+```
+
+Each dashboard item preserves title, category, community, authority level, type, lifecycle status, temporal state, effective/expiry dates when available, section, source file, and preview text.
+
+Prioritization is deterministic. Signals include authority level, temporal activity, expiring-soon dates, temporary protocols, gate/NVR/kiosk issue categories, compliance warnings, emergency-related text, and community-specific relevance.
+
+Phase 4J-lite does not write to `vault/`, run ingestion scripts, update ChromaDB, bypass human review, generate operational memory, create agents, or let dashboard summaries override source authority.
+
 ### Phase 4E OCR Intake Layer
 
 ```text
