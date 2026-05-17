@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4J-lite OPERATIONAL DASHBOARD / SHIFT BRIEFING
+PHASE 4I-lite TEXT INGESTION VIA OPEN WEBUI SLASH COMMANDS
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, and Phase 4G1 announcement retrieval precision hardening. Phase 4J-lite implementation adds a read-only operational dashboard / shift briefing layer and is awaiting manual validation.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, Phase 4G1 announcement retrieval precision hardening, Phase 4J-lite operational dashboard / shift briefing, and Phase UX-1 dashboard/Open WebUI usability hardening. Phase 4I-lite implementation adds guarded text ingestion via Open WebUI slash commands and is awaiting manual validation.
 
 ## Phase 2 Minimal POW
 
@@ -125,16 +125,17 @@ These are not blockers.
 
 ## Next Recommended Step
 
-Manually validate Phase 4J-lite Operational Dashboard / Shift Briefing.
+Manually validate Phase 4I-lite Text Ingestion via Open WebUI Slash Commands.
 
 Scope:
 
-- validate `/dashboard/status`;
-- validate `/dashboard/briefing`;
-- validate `/dashboard/briefing?community=CBK`;
-- validate `/dashboard/announcements`, `/dashboard/post-orders`, and `/dashboard/issues`;
-- confirm dashboard items preserve source file, authority, lifecycle status, and temporal state;
-- confirm dashboard output is read-only and does not mutate `vault/` or ChromaDB.
+- validate `/post-orders` preview for a known community alias;
+- validate `/announcements` preview for a known community alias;
+- validate unrecognized-community errors list valid aliases;
+- validate `YES` confirmation calls the deterministic ingestion script and then `rag/scripts/index_vault.py`;
+- validate `NO` confirmation clears pending state and writes nothing;
+- validate expired or missing confirmation state returns a clear message;
+- confirm normal `/ask` RAG behavior still works for non-slash questions.
 
 Do not jump to agents, direct vault editing, automatic OCR ingestion, or Phase 5 without an explicit phase request.
 
@@ -529,7 +530,7 @@ Phase 4G1 does not add LLM reranking, AI semantic rewriting, autonomous retrieva
 
 ## Phase 4J-lite Operational Dashboard / Shift Briefing
 
-IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+PASSED / VALIDATED
 
 - [x] Add read-only FastAPI dashboard routes under `/dashboard`
 - [x] Add `/dashboard/status`
@@ -544,14 +545,75 @@ IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
 - [x] Preserve source file, authority, type, lifecycle status, temporal state, effective date, and expiry date per dashboard item
 - [x] Add optional read-only CLI briefing preview
 - [x] Preserve dashboard as visibility only, not operational memory
-- [ ] User manually validates dashboard API routes
-- [ ] User manually validates community filtering
-- [ ] User manually validates briefing grouping and ordering
-- [ ] User manually validates dashboard does not mutate vault or ChromaDB
+- [x] User manually validates dashboard API routes
+- [x] User manually validates community filtering
+- [x] User manually validates briefing grouping and ordering
+- [x] User manually validates dashboard does not mutate vault or ChromaDB
 - [ ] User reviews changes manually
 - [ ] User commits changes manually
 
 Phase 4J-lite does not auto-ingest OCR, update vault memory, bypass human review, weaken safe refusal, hallucinate operational guidance, override authority hierarchy, create autonomous workflows, add background mutation tasks, add browser automation agents, or generate operational memory.
+
+## Phase UX-1 User Workflow & OpenWebUI Usability Pass
+
+PASSED / VALIDATED
+
+- [x] Change dashboard deduplication from `(source_file, section)` to `(source_file, title)`
+- [x] Exclude dashboard items from `vault/08_Reports/`
+- [x] Exclude dashboard items from `vault/07_Visitor_Logs/`
+- [x] Exclude dashboard items from `vault/06_Incidents/`
+- [x] Exclude dashboard items from `vault/01_Daily_Briefings/`
+- [x] Preserve dashboard scoring, grouping, filtering, source metadata, authority metadata, lifecycle status, and temporal state behavior
+- [x] Expand `rag/config/community_aliases.json` to the full current virtual community alias table
+- [x] Correct aliases such as `CBKN`, `PBM`, and `PLM` to match the authoritative letter-only alias list
+- [x] Add `openwebui/USAGE_GUIDE.md` as a practical VA operator shift reference
+- [x] Document Open WebUI prompt patterns, citations, safe refusals, low-confidence warnings, shift-start workflow, dashboard briefing usage, and operator boundaries
+- [x] Update `README.md` with the current validated state, dashboard endpoint guidance, Open WebUI usage guide reference, and full alias-table note
+- [x] Update `docs/AI_HANDOFF.md` with UX-1 implementation status and next-step guidance
+- [x] User manually validates dashboard deduplication
+- [x] User manually validates dashboard source-prefix exclusions
+- [x] User manually validates expanded alias behavior
+- [x] User reviews Open WebUI guide manually
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+Phase UX-1 does not add new operational memory, ingestion pipelines, authority layers, agents, autonomous behavior, AI semantic rewriting, automatic vault writes, automatic ChromaDB updates, or any weakening of safe refusal. The authority hierarchy remains `post_order > announcement > primary_workflow`.
+
+## Phase 4I-lite Text Ingestion via Open WebUI Slash Commands
+
+IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+
+- [x] Add `api/ingest.py` for guarded slash command ingestion state and handlers
+- [x] Add `/post-orders` command detection through `/ask`
+- [x] Add `/announcements` command detection through `/ask`
+- [x] Resolve community aliases and configured full community names deterministically
+- [x] Return plain-text usage errors for missing community or missing pasted text
+- [x] Return plain-text unrecognized-community errors with valid alias examples
+- [x] Parse post order text deterministically from dated `Post Order (K/C/K&C)` entries
+- [x] Normalize post order type markers to `K`, `C`, or `KC`
+- [x] Generate post order preview before any vault write
+- [x] Parse announcement text deterministically from blocks or numbered items
+- [x] Infer announcement category from fixed keyword rules
+- [x] Generate announcement preview before any vault write
+- [x] Store one pending ingestion state in memory with a 5-minute expiry
+- [x] Route `YES` confirmation before normal RAG answering
+- [x] Route `NO` cancellation before normal RAG answering
+- [x] Call `refresh_post_orders.py` only after `YES` for post order pending state
+- [x] Call `refresh_announcements.py` only after `YES` for announcement pending state
+- [x] Call `rag/scripts/index_vault.py` after successful ingestion
+- [x] Avoid calling `reset_chroma.py`
+- [x] Delete temporary batch file after successful ingestion and rebuild
+- [x] Add `openwebui/INGEST_COMMANDS.md` operator guide with supported aliases and worked examples
+- [x] Update README and AI handoff for 4I-lite status
+- [ ] User manually validates `/post-orders` preview flow
+- [ ] User manually validates `/announcements` preview flow
+- [ ] User manually validates `YES` ingestion flow
+- [ ] User manually validates `NO` cancellation flow
+- [ ] User manually validates normal RAG `/ask` behavior remains unchanged
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+Phase 4I-lite does not add OCR or image upload, autonomous ingestion, AI parsing or rewriting, new authority layers, new document types, retrieval changes, dashboard changes, direct vault writes before confirmation, or announcement override behavior. The authority hierarchy remains `post_order > announcement > primary_workflow`.
 
 ## Deferred
 
@@ -559,7 +621,7 @@ Phase 4J-lite does not auto-ingest OCR, update vault memory, bypass human review
 - n8n RAG integration
 - autonomous agents
 - Git auto-commit
-- dashboards
+- additional dashboard features beyond the validated read-only dashboard
 - voice/UI
 - Phase 4B chat modes
 - Phase 4C continuous ingestion
