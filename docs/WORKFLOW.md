@@ -90,6 +90,9 @@ DOCUMENT
     - Updates AI_HANDOFF.md recommended next step
   This step is mandatory after every successful validation.
   It is never optional or deferred.
+  Note: The post-validation documentation prompt is given as a plain
+  Codex prompt block only. The 3-section wrapper is not used here.
+  Only implementation work uses the 3-section format.
 
 COMMIT
   User manually commits all changes to master.
@@ -129,6 +132,28 @@ Documentation requirement (mandatory for every phase prompt):
   - docs/PHASE_LOG.md (phase entry with version tag and checklist)
   - docs/AI_HANDOFF.md (current phase, what exists, recommended next step)
   - docs/VERSIONING.md (version history table)
+
+## When To Use The 3-Section Format
+
+The 3-section format (SECTION 1: Codex Master Prompt / SECTION 2: What
+You Need From Me / SECTION 3: PowerShell Validation Commands) is only
+used for implementation work.
+
+USE 3-section format for:
+- Starting a new phase
+- Fixing a bug or regression
+- Any task where Codex will write or modify code
+
+DO NOT USE 3-section format for:
+- Post-validation documentation prompts
+  (version promotion, recording validation results, patch notes)
+- Session checkpoint prompts before closing a chathead
+- Any documentation-only Codex task
+
+For post-validation documentation and session checkpoints:
+- Give the Codex prompt directly as a single plain txt code block
+- No Section 2 or Section 3 needed
+- These prompts touch only docs/ files, never code
 
 ## Post-Validation Documentation Prompt
 
