@@ -145,3 +145,5 @@ Next version: 4.9.0-alpha
 Next phase: Community Onboarding + Scope-Aware Retrieval Improvements
 Goal: Ingest post orders for remaining unindexed communities and improve retrieval for "show me all" style queries across all communities.
 First task: Ingest post orders for remaining unindexed communities via `/post-orders [ALIAS] [text]` in Open WebUI, then validate `/announcements` YES confirmation flow.
+
+Latest checkpoint: `docs/SESSION_LOG/2026-05-17-session-04.md` records the workflow documentation update clarifying when to use the 3-section prompt format. No version change was made for that documentation-only update.
