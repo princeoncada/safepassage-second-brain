@@ -20,6 +20,7 @@ from sentence_transformers import SentenceTransformer
 
 from rag.lifecycle import temporal_lifecycle
 from rag.query_intent import expand_query_with_intent, parse_query_intent
+from rag.retrieval_rerank import rerank_adjustment
 
 
 COLLECTION_NAME = "safepassage_vault_chunks"
@@ -219,7 +220,7 @@ def retrieval_assessment(
             "refuse": True,
             "reason": f"only non-current temporal lifecycle sources were retrieved: {', '.join(states)}",
         }
-    best_distance = min(float(chunk["distance"]) for chunk in chunks)
+    best_distance = min(float(chunk.get("rerank_score") or chunk["distance"]) for chunk in chunks)
     has_primary_workflow = has_global_primary_workflow(chunks)
     if hints["missing_community"]:
         return {
@@ -253,7 +254,7 @@ def retrieval_assessment(
         return {
             "confidence": "weak",
             "refuse": True,
-            "reason": f"best distance {best_distance:.4f} is above threshold {threshold}",
+            "reason": f"best rerank score {best_distance:.4f} is above threshold {threshold}",
         }
     if hints["expected_types"] and not any(chunk["type"] in hints["expected_types"] for chunk in chunks):
         return {
@@ -264,7 +265,7 @@ def retrieval_assessment(
     return {
         "confidence": "strong",
         "refuse": False,
-        "reason": f"best distance {best_distance:.4f} is within threshold {threshold}",
+        "reason": f"best rerank score {best_distance:.4f} is within threshold {threshold}",
     }
 
 
@@ -402,6 +403,18 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
             adjusted_distance += primary_specific_community_penalty
         if authority == "primary_workflow" and hints.get("is_default_workflow_query"):
             adjusted_distance -= primary_default_boost
+        rerank_delta, rerank_reasons = rerank_adjustment(
+            query=query,
+            document=str(document),
+            metadata=metadata,
+            hints=hints,
+            config=config,
+        )
+        adjusted_distance += rerank_delta
+        metadata = dict(metadata)
+        metadata["rerank_score"] = f"{adjusted_distance:.4f}"
+        metadata["rerank_delta"] = f"{rerank_delta:.4f}"
+        metadata["rerank_reasons"] = "; ".join(rerank_reasons)
         raw_candidates.append((adjusted_distance, distance, str(document), metadata))
 
     raw_candidates.sort(key=lambda candidate: (candidate[0], candidate[1]))
@@ -482,6 +495,10 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 "announcement_id": str(metadata.get("announcement_id", "")),
                 "announcement_hash": str(metadata.get("announcement_hash", "")),
                 "category": str(metadata.get("category", "")),
+                "normalized_announcement": str(metadata.get("normalized_announcement", "")),
+                "rerank_score": str(metadata.get("rerank_score", "")),
+                "rerank_delta": str(metadata.get("rerank_delta", "")),
+                "rerank_reasons": str(metadata.get("rerank_reasons", "")),
                 "rule_id": str(metadata.get("rule_id", "")),
                 "rule_hash": str(metadata.get("rule_hash", "")),
                 "source_batch": str(metadata.get("source_batch", "")),
@@ -534,6 +551,8 @@ def build_context_packet(chunks: list[dict[str, Any]]) -> str:
                     f"Temporal Start: {chunk.get('temporal_start_date', '')} ({chunk.get('temporal_start_field', '')})",
                     f"Temporal End: {chunk.get('temporal_end_date', '')} ({chunk.get('temporal_end_field', '')})",
                     f"Category: {chunk.get('category', '')}",
+                    f"Rerank Score: {chunk.get('rerank_score', '')}",
+                    f"Rerank Reasons: {chunk.get('rerank_reasons', '')}",
                     f"Announcement ID: {chunk.get('announcement_id', '')}",
                     f"Rule ID: {chunk.get('rule_id', '')}",
                     f"Community: {chunk['community']}",
@@ -561,6 +580,7 @@ def print_sources(chunks: list[dict[str, Any]], title: str = "Retrieved Sources"
             f"lifecycle={chunk.get('lifecycle_generation', '')} "
             f"temporal={chunk.get('temporal_state', '')} "
             f"category={chunk.get('category', '')} "
+            f"rerank={chunk.get('rerank_score', '')} "
             f"section={chunk['section']} source={chunk['source_file']}"
         )
         print(f"    {preview}")
