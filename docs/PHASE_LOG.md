@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4G TEMPORAL EXPIRY / ACTIVATION ENGINE
+PHASE 4G1 ANNOUNCEMENT RETRIEVAL PRECISION HARDENING
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, and Phase 4F OCR review + ingestion bridge. Phase 4G implementation adds deterministic temporal expiry and activation awareness and is awaiting manual validation.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, and Phase 4G temporal expiry / activation. Phase 4G1 implementation hardens announcement retrieval precision and is awaiting manual validation.
 
 ## Phase 2 Minimal POW
 
@@ -125,16 +125,15 @@ These are not blockers.
 
 ## Next Recommended Step
 
-Manually validate Phase 4G Temporal Expiry / Activation Engine.
+Manually validate Phase 4G1 Announcement Retrieval Precision Hardening.
 
 Scope:
 
-- rebuild ChromaDB manually so indexed chunks include temporal metadata;
+- rebuild ChromaDB manually so indexed chunks include announcement topic metadata;
+- validate `What is the Red Zone Protocol reminder?` retrieves the actual Red Zone Protocol announcement first;
+- validate nearby support room, NVR, traffic, compliance, gate, vendor, and event reminders no longer outrank exact announcement topic matches;
 - validate active post orders still outrank announcements and primary workflow;
-- validate expired, pending, not-yet-active, superseded, archived, review, and unknown-temporal records are downgraded or warned;
-- validate unknown-community refusal still works;
-- generate the temporal lifecycle report manually and inspect it under `vault/08_Reports/temporal-lifecycle/`;
-- confirm the report is review output only and does not update ChromaDB or operational source documents.
+- validate unknown-community refusal and weak-context refusal still work.
 
 Do not jump to agents, direct vault editing, automatic OCR ingestion, or Phase 5 without an explicit phase request.
 
@@ -463,7 +462,7 @@ No automatic OCR-to-vault ingestion, autonomous agents, AI semantic rewriting, a
 
 ## Phase 4G Temporal Expiry / Activation Engine
 
-IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+PASSED / VALIDATED
 
 - [x] Add deterministic temporal lifecycle utility
 - [x] Support status, lifecycle status, effective/start/active date fields, expiry/end date fields, supersede metadata, document type, and authority fields
@@ -476,13 +475,13 @@ IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
 - [x] Add conservative answer warnings/refusal when only non-current temporal sources are retrieved
 - [x] Add read-only temporal lifecycle report script under `automation/ingestion/`
 - [x] Document temporal lifecycle behavior and safety boundaries
-- [ ] User manually rebuilds ChromaDB
-- [ ] User manually validates active post orders still outrank announcements and primary workflow
-- [ ] User manually validates expired-source warning or refusal behavior
-- [ ] User manually validates pending/not-yet-active warning or refusal behavior
-- [ ] User manually validates active source with missing temporal metadata exposes a low-priority source warning
-- [ ] User manually validates unknown-community refusal still works
-- [ ] User manually runs temporal lifecycle report and reviews grouped output
+- [x] User manually rebuilds ChromaDB
+- [x] User manually validates active post orders still outrank announcements and primary workflow
+- [x] User manually validates expired-source warning or refusal behavior
+- [x] User manually validates pending/not-yet-active warning or refusal behavior
+- [x] User manually validates active source with missing temporal metadata exposes a low-priority source warning
+- [x] User manually validates unknown-community refusal still works
+- [x] User manually runs temporal lifecycle report and reviews grouped output
 - [ ] User reviews changes manually
 - [ ] User commits changes manually
 
@@ -497,6 +496,35 @@ python automation/ingestion/report_temporal_lifecycle.py --expiring-soon-days 7
 ```
 
 Phase 4G does not delete historical lifecycle records, rewrite source vault documents, auto-ingest OCR or staging files, bypass human review, weaken authority hierarchy, weaken unknown-community refusal, use AI semantic rewriting, introduce agents, or update ChromaDB automatically.
+
+## Phase 4G1 Announcement Retrieval Precision Hardening
+
+IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+
+Known regression:
+
+- `What is the Red Zone Protocol reminder?` had correct parser classification and safe refusal behavior, but vector retrieval could return nearby operational reminder chunks instead of the exact Red Zone Protocol announcement.
+- Root cause was retrieval specificity, not intent parsing: reminder announcements share dense operational language, and metadata/title/category/section signals were not weighted strongly enough.
+
+Implemented:
+
+- [x] Preserve announcement title/topic locality in indexed chunk text
+- [x] Preserve `normalized_announcement` metadata for deterministic reranking
+- [x] Add deterministic reranking using exact topic phrase matches, title overlap, keyword overlap, category matches, section weighting, authority, lifecycle, and temporal state
+- [x] Boost direct `Announcement` body sections for announcement questions
+- [x] Penalize metadata-heavy sections such as `Operational Notes`, `Source`, and `Migration Notes` without fully excluding them
+- [x] Surface optional rerank diagnostics in CLI/API source output
+- [x] Preserve safe refusal thresholds and unknown-community refusal behavior
+- [x] Preserve `post_order > announcement > primary_workflow`
+- [ ] User manually rebuilds ChromaDB
+- [ ] User manually validates Red Zone Protocol announcement precision
+- [ ] User manually validates Pickleball Tournament, NVR reminder, and Support Room reminder precision
+- [ ] User manually validates post orders still outrank announcements
+- [ ] User manually validates Atlantis Bay refusal still works
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+Phase 4G1 does not add LLM reranking, AI semantic rewriting, autonomous retrieval agents, vault rewrites, automatic ingestion, automatic ChromaDB updates, global threshold weakening, or announcement override behavior.
 
 ## Deferred
 
