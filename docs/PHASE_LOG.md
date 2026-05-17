@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
 | 4.8.1-stable | Phase 4I-lite | stable | 2026-05-17 | top_k fix + name match fix - VALIDATED |
 | 4.8.0-beta | Phase 4I-lite | beta | 2026-05-17 | slash commands, scope rerank partial |
 | 4.7.0-stable | Phase UX-1 | stable | 2026-05-17 | dashboard + alias expansion |
@@ -29,13 +30,13 @@
 
 ## Current Phase
 
-PHASE 4I-lite [4.8.1-stable] TEXT INGESTION VIA OPEN WEBUI SLASH COMMANDS
+PHASE 4I-lite [4.8.2-stable] TEXT INGESTION VIA OPEN WEBUI SLASH COMMANDS
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, Phase 4G1 announcement retrieval precision hardening, Phase 4J-lite operational dashboard / shift briefing, Phase UX-1 dashboard/Open WebUI usability hardening, and Phase 4I-lite slash command ingestion plus scope retrieval fixes. Phase 4I-lite is validated and promoted to 4.8.1-stable.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, Phase 4G1 announcement retrieval precision hardening, Phase 4J-lite operational dashboard / shift briefing, Phase UX-1 dashboard/OpenWebUI usability hardening, and Phase 4I-lite slash command ingestion plus scope retrieval fixes. Phase 4I-lite is validated and promoted to 4.8.2-stable.
 
 ## Phase 2 Minimal POW
 
@@ -152,7 +153,7 @@ These are not blockers.
 
 ## Next Recommended Step
 
-Start Phase 4.9.0-alpha Community Onboarding + Scope-Aware Retrieval Improvements after the 4.8.1-stable commit is in place.
+Start Phase 4.9.0-alpha Community Onboarding + Scope-Aware Retrieval Improvements after the 4.8.2-stable commit is in place.
 
 Scope:
 
@@ -604,7 +605,7 @@ PASSED / VALIDATED
 
 Phase UX-1 does not add new operational memory, ingestion pipelines, authority layers, agents, autonomous behavior, AI semantic rewriting, automatic vault writes, automatic ChromaDB updates, or any weakening of safe refusal. The authority hierarchy remains `post_order > announcement > primary_workflow`.
 
-## Phase 4I-lite Text Ingestion via Open WebUI Slash Commands [4.8.1-stable]
+## Phase 4I-lite Text Ingestion via Open WebUI Slash Commands [4.8.2-stable]
 
 PASSED / VALIDATED
 
@@ -636,6 +637,35 @@ Validation summary:
 Known remaining items (non-blocking, future improvement):
 - /announcements command not yet validated end-to-end with confirmed YES
 - Res Confirmation alert rule flagged as review-status in CBK vault (not a bug - correct lifecycle behavior)
+
+## Patch 4.8.2 — DATE_PATTERN Word Boundary Fix
+
+Version: 4.8.2-stable
+Date: 2026-05-17
+Phase: Phase 4I-lite
+
+### Root Cause
+DATE_PATTERN used \b word boundary anchors. The \b assertion fails when a
+date string is immediately followed by a capital letter with no whitespace
+(e.g. "5/17/2026Post Order"). Python treats digit-to-letter as \w-to-\w,
+so no word boundary fires. Result: zero date matches, zero rules parsed,
+and the "No post order rules were parsed" error was returned to the operator
+even on valid input.
+
+### Fix Applied
+- api/ingest.py DATE_PATTERN: replaced \b anchors with negative digit
+  lookbehind (?<!\d) and lookahead (?!\d) to prevent matching inside longer
+  number strings while correctly matching dates that run into letters.
+- api/ingest.py POST_ORDER_LABEL_PATTERN: added \s* inside the type
+  parentheses to handle all spacing variants: (K & C), (K&C), (KC), (K), (C).
+
+### Validation Record
+- [x] DATE_PATTERN regex updated correctly in api/ingest.py
+- [x] /post-orders SR [no-space input] returns preview (not error)
+- [x] 2 rules parsed from 2-rule compact input
+- [x] Rule text extracted correctly for K and C types
+- [x] NO cancels cleanly, nothing written to vault
+Validated: 2026-05-17
 
 - [x] Add `api/ingest.py` for guarded slash command ingestion state and handlers
 - [x] Add `/post-orders` command detection through `/ask`
