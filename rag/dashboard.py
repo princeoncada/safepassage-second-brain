@@ -22,6 +22,12 @@ LOW_VALUE_SECTIONS = {"source", "migration notes", "operational notes", "change 
 PREFERRED_SECTIONS = {"announcement", "rule", "agent action", "summary", "details", "policy"}
 NON_CURRENT_STATES = {"expired", "superseded", "archived", "review"}
 ISSUE_TERMS = {"gate", "nvr", "kiosk", "audio", "barrier", "id viewer", "traffic", "emergency"}
+DASHBOARD_SOURCE_EXCLUDE_PREFIXES = (
+    "vault/08_Reports/",
+    "vault/07_Visitor_Logs/",
+    "vault/06_Incidents/",
+    "vault/01_Daily_Briefings/",
+)
 
 
 @dataclass(frozen=True)
@@ -157,6 +163,9 @@ def score_item(metadata: dict[str, Any], expiry_date: str, expiring_soon_days: i
 
 
 def include_item(metadata: dict[str, Any], community: str) -> bool:
+    source_file = str(metadata.get("source_file", ""))
+    if source_file.startswith(DASHBOARD_SOURCE_EXCLUDE_PREFIXES):
+        return False
     section = normalize_key(metadata.get("section", ""))
     if section in LOW_VALUE_SECTIONS:
         return False
@@ -181,7 +190,7 @@ def build_items(community: str = "", expiring_soon_days: int = 7, limit: int = 5
     for metadata, document in zip(metadatas, documents):
         if not include_item(metadata, resolved_community):
             continue
-        source_key = (str(metadata.get("source_file", "")), str(metadata.get("section", "")))
+        source_key = (str(metadata.get("source_file", "")), str(metadata.get("title", "")))
         if source_key in seen_sources:
             continue
         seen_sources.add(source_key)
