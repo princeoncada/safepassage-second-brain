@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,11 @@ from sentence_transformers import SentenceTransformer
 COLLECTION_NAME = "safepassage_vault_chunks"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from rag.lifecycle import temporal_lifecycle
+
 VAULT_DIR = REPO_ROOT / "vault"
 CHROMA_DIR = REPO_ROOT / "rag" / "chroma"
 CONFIG_PATH = REPO_ROOT / "rag" / "config" / "retrieval_config.json"
@@ -172,6 +178,7 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
         priority = normalize_metadata_value(frontmatter.get("priority"))
         tags = normalize_metadata_value(frontmatter.get("tags"))
         status = normalize_metadata_value(frontmatter.get("status"))
+        lifecycle_status = normalize_metadata_value(frontmatter.get("lifecycle_status"))
         authority_level = normalize_metadata_value(frontmatter.get("authority_level"))
         if not authority_level:
             authority_level = DEFAULT_AUTHORITY_BY_TYPE.get(normalize_key(doc_type).replace(" ", "_"), "")
@@ -187,6 +194,12 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
         source_name = normalize_metadata_value(frontmatter.get("source_name"))
         batch_date = normalize_metadata_value(frontmatter.get("batch_date"))
         effective_date = normalize_metadata_value(frontmatter.get("effective_date"))
+        active_from = normalize_metadata_value(frontmatter.get("active_from"))
+        start_date = normalize_metadata_value(frontmatter.get("start_date"))
+        active_until = normalize_metadata_value(frontmatter.get("active_until"))
+        expires_at = normalize_metadata_value(frontmatter.get("expires_at"))
+        expiry_date = normalize_metadata_value(frontmatter.get("expiry_date"))
+        end_date = normalize_metadata_value(frontmatter.get("end_date"))
         expires_on = normalize_metadata_value(frontmatter.get("expires_on"))
         event_dates = normalize_metadata_value(frontmatter.get("event_dates"))
         update_type = normalize_metadata_value(frontmatter.get("update_type"))
@@ -200,6 +213,8 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
         lifecycle_generation = normalize_metadata_value(frontmatter.get("lifecycle_generation"))
         if not lifecycle_generation and normalize_key(doc_type).replace(" ", "_") == "post_order":
             lifecycle_generation = "managed" if rule_id or rule_hash or source_batch else "legacy"
+        temporal = temporal_lifecycle(frontmatter)
+        temporal_metadata = temporal.as_metadata()
 
         for section, content in split_sections(body):
             normalized_section = normalize_section_name(section)
@@ -272,6 +287,19 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
                     "lifecycle_generation": lifecycle_generation,
                     "tags": tags,
                     "status": status,
+                    "lifecycle_status": lifecycle_status,
+                    "active_from": active_from,
+                    "start_date": start_date,
+                    "active_until": active_until,
+                    "expires_at": expires_at,
+                    "expiry_date": expiry_date,
+                    "end_date": end_date,
+                    "temporal_state": temporal_metadata["temporal_state"],
+                    "temporal_warning": temporal_metadata["temporal_warning"],
+                    "temporal_start_date": temporal_metadata["temporal_start_date"],
+                    "temporal_start_field": temporal_metadata["temporal_start_field"],
+                    "temporal_end_date": temporal_metadata["temporal_end_date"],
+                    "temporal_end_field": temporal_metadata["temporal_end_field"],
                     "is_low_value_section": str(is_low_value).lower(),
                     "is_preferred_section": str(normalized_section in preferred_sections).lower(),
                     "content_fingerprint": fingerprint,
