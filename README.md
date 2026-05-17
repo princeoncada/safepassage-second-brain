@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.11.0-stable |
+| Current | 4.12.0-alpha |
 | Last Stable | 4.11.0-stable (Phase 4.11.0) |
-| Status | stable - committed |
+| Status | alpha - manual validation pending |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.11.0 validation:
+Working proof of work through Phase 4.11.0 validation, with Phase 4.12.0-alpha in progress:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -42,6 +42,7 @@ Working proof of work through Phase 4.11.0 validation:
 - Phase 4.9.0 [4.9.0-stable] - Scope-aware retrieval + source deduplication + alias hardening: passed/validated
 - Phase 4.10.0 [4.10.0-stable] - Conversation context resolution: passed/validated
 - Phase 4.11.0 [4.11.0-stable] - Workflow simplification / remove rc state: passed/validated
+- Phase 4.12.0 [4.12.0-alpha] - Scope filter fix using scope_key: alpha
 
 Current architecture:
 
@@ -94,6 +95,8 @@ Phase 4.9.0-stable improves scoped post-order listing retrieval, citation displa
 Phase 4.10.0-stable adds request-local conversation context resolution. The `/ask` request can include optional prior user turns in `history`; the backend uses those turns only to resolve community context for ambiguous follow-up questions and does not send history to DeepSeek.
 
 Phase 4.11.0-stable simplifies the documentation workflow by retiring rc as an active phase state. Future phases promote directly from alpha, or beta after partial validation, to stable when validation passes and the user commits.
+
+Phase 4.12.0-alpha fixes scoped post-order filtering by using indexed `scope_key` metadata (`k`, `c`, `kc`) instead of searching for letters in the normalized `scope` string.
 
 Dashboard endpoints:
 
