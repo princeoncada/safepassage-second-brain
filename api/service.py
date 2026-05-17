@@ -4,6 +4,12 @@ import os
 from textwrap import shorten
 from typing import Any
 
+from api.ingest import (
+    handle_announcements_command,
+    handle_confirm_no,
+    handle_confirm_yes,
+    handle_post_orders_command,
+)
 from api.schemas import AskRequest, AskResponse, Source
 from rag.scripts.answer_vault import (
     PROMPT_PATH,
@@ -94,7 +100,40 @@ def build_response(
     )
 
 
+def _ingest_response(request: AskRequest, answer_text: str) -> AskResponse:
+    return AskResponse(
+        status="ok",
+        question=request.question,
+        answer=answer_text,
+        retrieval_confidence="1.0",
+        confidence_reason="Open WebUI slash command handled by deterministic ingestion flow.",
+        sources=[],
+        answer_citations=[],
+        used_ai=False,
+        warnings=[],
+    )
+
+
 def answer_question(request: AskRequest) -> AskResponse:
+    question_stripped = request.question.strip()
+    question_upper = question_stripped.upper()
+
+    if question_stripped.lower().startswith("/post-orders"):
+        answer_text = handle_post_orders_command(question_stripped)
+        return _ingest_response(request, answer_text)
+
+    if question_stripped.lower().startswith("/announcements"):
+        answer_text = handle_announcements_command(question_stripped)
+        return _ingest_response(request, answer_text)
+
+    if question_upper == "YES":
+        answer_text = handle_confirm_yes()
+        return _ingest_response(request, answer_text)
+
+    if question_upper == "NO":
+        answer_text = handle_confirm_no()
+        return _ingest_response(request, answer_text)
+
     warnings: list[str] = []
     try:
         chunks, hints, assessment = retrieve_chunks(
