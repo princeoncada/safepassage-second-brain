@@ -8,7 +8,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4D validation, with Phase 4E OCR intake in progress:
+Working proof of work through Phase 4E validation:
 
 - Phase 2 Minimal POW ingestion: passed
 - Phase 3A retrieval: passed
@@ -24,7 +24,7 @@ Working proof of work through Phase 4D validation, with Phase 4E OCR intake in p
 - Phase 4C2 legacy post order migration / managed source conversion: passed
 - Phase 4C3 announcement / reminder lifecycle ingestion: passed with minor retrieval edge case
 - Phase 4D operational query parser / intent extraction: passed
-- Phase 4E OCR intake layer: in progress
+- Phase 4E OCR intake layer: passed using pytesseract fallback
 
 Current architecture:
 
@@ -50,11 +50,13 @@ Community aliases are resolved deterministically before retrieval. Letter prefix
 
 Phase 4C2 converts eligible legacy freeform post orders into managed active post-order documents while preserving the original legacy files. This is used first for Sierra Ridge physical ID post orders so policy retrieval can come from managed `post_order` sources instead of weaker QA support notes.
 
-Phase 4C3 adds deterministic announcement and reminder ingestion from cleaned pasted text. Announcements are managed lifecycle documents under `vault/05_Announcements` and sit between post orders and primary workflow in authority: `post_order > announcement > primary_workflow`. OCR is deferred.
+Phase 4C3 adds deterministic announcement and reminder ingestion from cleaned pasted text. Announcements are managed lifecycle documents under `vault/05_Announcements` and sit between post orders and primary workflow in authority: `post_order > announcement > primary_workflow`.
 
 Phase 4D adds deterministic query intent parsing before retrieval. It extracts known community aliases, operational topics, expected document types, scope hints, and default/global intent so phrases like `Red Zone Protocol` are treated as announcement topics instead of missing communities.
 
 Phase 4E adds a local OCR intake layer for screenshots and images. OCR creates raw and reviewable text artifacts only; it does not write to `vault/`, trigger ingestion scripts, update ChromaDB, or bypass human review.
+
+The current validated OCR backend is `pytesseract`. PaddleOCR did not pass Windows runtime validation and is deferred as an experimental future Linux, Docker, or pinned-version candidate.
 
 ## OCR Intake
 
@@ -64,6 +66,8 @@ python automation/ocr/ocr_extract.py --input-dir path/to/screenshots
 ```
 
 Review the generated Markdown under `automation/ocr/output/` before copying corrected text into announcement or post-order ingestion inputs.
+
+OCR remains intake-only. Human review is mandatory before any OCR text is used for operational ingestion.
 
 ## Post Order Batch Refresh
 
