@@ -268,6 +268,44 @@ Community extraction is intentionally strict. A phrase is treated as a community
 
 The query parser is deterministic and does not use an LLM. It does not replace authority scoring, lifecycle scoring, primary workflow fallback, or insufficient-context refusal checks.
 
+### Phase 4G Temporal Expiry / Activation Engine
+
+```text
+vault Markdown
+-> frontmatter lifecycle/date parsing
+-> deterministic temporal state
+-> ChromaDB metadata
+-> authority + lifecycle + temporal reranking
+-> grounded answer warnings/refusal
+```
+
+Phase 4G adds deterministic temporal interpretation without mutating source memory. It reads lifecycle and date metadata such as `status`, `lifecycle_status`, `effective_date`, `active_from`, `start_date`, `expires_at`, `expiry_date`, `active_until`, `end_date`, `expires_on`, `superseded_by`, and authority/document type fields.
+
+Temporal states are:
+
+```text
+active
+pending
+not_yet_active
+expired
+superseded
+archived
+review
+unknown
+```
+
+Retrieval still follows the authority hierarchy:
+
+```text
+post_order
+announcement
+primary_workflow
+```
+
+Temporal scoring is layered on top of existing community, topic, authority, lifecycle generation, and static status scoring. It strongly prefers currently active records, downgrades pending and not-yet-active records, downgrades expired records, and keeps superseded, archived, review, and unknown-temporal records below active operational memory. If only non-current temporal sources are retrieved, the answer path is conservative and may refuse.
+
+The temporal report utility writes review reports under `vault/08_Reports/temporal-lifecycle/`. These reports are derived review artifacts only. They do not update ChromaDB, run ingestion scripts, rewrite source Markdown, or create operational truth.
+
 ### Phase 4E OCR Intake Layer
 
 ```text
