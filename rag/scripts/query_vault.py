@@ -281,6 +281,7 @@ def main() -> int:
     known_communities = set(config.get("known_communities", [])) | candidate_communities
     intent = parse_query_intent(args.query, known_communities)
     hints = intent.as_hints()
+    hints["scope_hint"] = intent.scope_hint
     if hints["community"]:
         try:
             community_results = collection.get(
