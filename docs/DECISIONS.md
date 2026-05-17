@@ -86,3 +86,35 @@ Phase 2 does not implement ChromaDB, RAG, Open WebUI, or advanced automations.
 ### Reason
 
 The system needs reliable structured ingestion before retrieval, chat, and automation layers are added.
+
+---
+
+## ADR-008: Semantic Phase Versioning
+
+### Decision
+
+All phases use semantic version tags in the format PHASE-[MAJOR].[MINOR].[PATCH]-[STATE] where STATE is one of alpha, beta, rc, or stable.
+
+### Reason
+
+As the project grows in complexity with multiple Codex agents, human operators, and live validation passes happening in parallel, an explicit versioning system prevents ambiguity about whether a phase is safe to rely on operationally. It also gives future AI agents a clear signal about what is production-ready vs in-progress.
+
+### Promotion Rules
+
+alpha -> beta: first partial validation pass completed
+beta -> rc: all known bugs fixed, all validation commands pass
+rc -> stable: user manually commits to master
+stable -> patch: new bug found, fix applied, patch version incremented
+
+### State Meanings
+
+alpha: Implemented but not yet tested. Do not rely on operationally.
+beta: Partially working. Known issues remain. Use with caution.
+rc: All tests pass. Awaiting commit. Safe to test operationally.
+stable: Committed to master. Production ready.
+
+### Rejected Alternatives
+
+- Date-only versioning: does not communicate stability state
+- Semantic versioning without state suffix: hides validation status
+- No versioning: causes confusion for AI agents continuing the project
