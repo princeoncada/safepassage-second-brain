@@ -24,7 +24,7 @@ Step 2: Read these files in order
 Step 3: Report state before acting
   After reading, the AI agent must state:
   - Current version (from VERSIONING.md)
-  - Current phase and its state (alpha/beta/rc/stable)
+  - Current phase and its state (alpha/beta/stable)
   - What is in progress or pending
   - Recommended next action
   The user confirms or redirects before any work begins.
@@ -84,8 +84,8 @@ FIX (if needed)
 DOCUMENT
   After all checks pass, AI writes a post-validation Codex prompt.
   This prompt always:
-    - Promotes the version from rc to stable
-    - Records the validation results in PHASE_LOG.md
+    - Records all validation checks as PASSED or FAILED in PHASE_LOG.md
+    - Promotes the version directly from alpha (or beta) to stable
     - Updates all four versioning locations
     - Updates AI_HANDOFF.md recommended next step
   This step is mandatory after every successful validation.
@@ -97,7 +97,8 @@ DOCUMENT
 COMMIT
   User manually commits all changes to master.
   AI never commits, pushes, or creates branches.
-  After commit: version state becomes stable in the next session.
+  After commit: version state is stable. The post-validation doc prompt
+  already recorded stable - no further promotion step is needed.
 
 ## Codex Prompt Standards
 
@@ -161,7 +162,7 @@ After every successful validation, AI writes a separate Codex prompt that record
 
 1. Lists every validation check with PASSED or FAILED
 2. Records known remaining items (non-blocking)
-3. Promotes version in all four locations (rc -> stable)
+3. Promotes version in all four locations (alpha/beta -> stable)
 4. Adds a Validation Record section to PHASE_LOG.md
 5. Updates AI_HANDOFF.md recommended next step
 6. Updates docs/VERSIONING.md current version table
@@ -240,9 +241,8 @@ Version state during the phase cycle:
   PLAN and PROMPT stages:     previous stable version still current
   BUILD stage:                new alpha version assigned
   TEST stage:                 alpha or beta depending on first results
-  after all checks pass:      rc version assigned
-  after DOCUMENT prompt runs: rc version recorded
-  after user commits:         stable version in next session
+  after all checks pass AND user commits: stable version assigned
+  after DOCUMENT prompt runs:              stable version recorded
 
 Every Codex prompt header must include the current version:
   PROJECT: SafePassage Second Brain
