@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.10.0-alpha | Phase 4.10.0 | alpha | 2026-05-17 | conversation context resolution |
+| 4.10.0-rc | Phase 4.10.0 | rc | 2026-05-17 | conversation context resolution - VALIDATED |
 | 4.9.0-stable | Phase 4.9.0 | stable | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
 | 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
 | 4.8.1-stable | Phase 4I-lite | stable | 2026-05-17 | top_k fix + name match fix - VALIDATED |
@@ -32,9 +32,9 @@
 
 ## Phase 4.10.0 Conversation Context Resolution
 
-Status: IN PROGRESS
+Status: VALIDATED - rc
 
-Version: 4.10.0-alpha
+Version: 4.10.0-rc
 
 Date started: 2026-05-17
 
@@ -47,17 +47,35 @@ Implementation scope:
 - `api/schemas.py`: add optional `history` list to `AskRequest`.
 - `api/service.py`: add `resolve_community_from_history()` and patch the retrieval question with a history-derived community only when the current question has no community.
 - `openwebui/examples/openwebui_connection_example.md`: document the optional `history` field and Open WebUI Pipe history extraction.
-- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.10.0-alpha as the current in-progress implementation.
+- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.10.0-rc validation status.
 
 Validation checklist:
 
-- [ ] User validates callers without `history` continue to work unchanged.
-- [ ] User validates history is capped to the last 5 user turns.
-- [ ] User validates current-query community takes priority over history.
-- [ ] User validates an ambiguous follow-up can resolve community from prior user turns.
-- [ ] User validates history is not sent to DeepSeek.
-- [ ] User validates `request.question` in the API response remains the original unpatched question.
-- [ ] User validates safe refusal remains unchanged when neither current question nor history resolves a community.
+- [x] User validates callers without `history` continue to work unchanged.
+- [x] User validates history is capped to the last 5 user turns.
+- [x] User validates current-query community takes priority over history.
+- [x] User validates an ambiguous follow-up can resolve community from prior user turns.
+- [x] User validates history is not sent to DeepSeek.
+- [x] User validates `request.question` in the API response remains the original unpatched question.
+- [x] User validates safe refusal remains unchanged when neither current question nor history resolves a community.
+
+### Validation Record - 4.10.0-rc
+Date: 2026-05-17
+All checks passed.
+
+Passed:
+- [x] AskRequest history field added, defaults to empty list
+- [x] Existing callers unaffected
+- [x] Ambiguous follow-up resolves community from history
+- [x] Original question preserved in response
+- [x] Explicit community in current question ignores history
+- [x] Most-recent-first resolution correct
+- [x] Empty history stateless fallback clean
+- [x] Normal RAG unaffected
+
+Non-blocking:
+- History patches retrieval query only, not DeepSeek prompt - by design
+- Pipe update required to activate feature in Open WebUI
 
 ## Phase 4.9.0 Scope-Aware Retrieval + Source Deduplication
 
@@ -118,7 +136,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.10.0 [4.10.0-alpha] CONVERSATION CONTEXT RESOLUTION
+PHASE 4.10.0 [4.10.0-rc] CONVERSATION CONTEXT RESOLUTION
 
 ## Overall System Status
 
