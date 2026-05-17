@@ -285,7 +285,7 @@ Phase 4E is intake-only. It helps convert reminder screenshots, Discord screensh
 
 OCR output is not operational memory. It must not write directly to `vault/`, call post-order or announcement refresh scripts, update lifecycle state, or rebuild ChromaDB. Human review is required before any extracted text enters the existing ingestion pipeline.
 
-The OCR layer prefers local PaddleOCR when available and can fall back to local pytesseract. It does not use cloud OCR, OpenAI OCR, or LLM cleanup.
+The validated OCR backend is local pytesseract. PaddleOCR is deferred as experimental because it did not pass Windows/Paddle runtime validation. The OCR layer does not use cloud OCR, OpenAI OCR, or LLM cleanup.
 
 ## Phase 3A Retrieval Flow
 
