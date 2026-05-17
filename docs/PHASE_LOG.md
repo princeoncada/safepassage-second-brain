@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4G1 ANNOUNCEMENT RETRIEVAL PRECISION HARDENING
+PHASE 4J-lite OPERATIONAL DASHBOARD / SHIFT BRIEFING
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, and Phase 4G temporal expiry / activation. Phase 4G1 implementation hardens announcement retrieval precision and is awaiting manual validation.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, and Phase 4G1 announcement retrieval precision hardening. Phase 4J-lite implementation adds a read-only operational dashboard / shift briefing layer and is awaiting manual validation.
 
 ## Phase 2 Minimal POW
 
@@ -125,15 +125,16 @@ These are not blockers.
 
 ## Next Recommended Step
 
-Manually validate Phase 4G1 Announcement Retrieval Precision Hardening.
+Manually validate Phase 4J-lite Operational Dashboard / Shift Briefing.
 
 Scope:
 
-- rebuild ChromaDB manually so indexed chunks include announcement topic metadata;
-- validate `What is the Red Zone Protocol reminder?` retrieves the actual Red Zone Protocol announcement first;
-- validate nearby support room, NVR, traffic, compliance, gate, vendor, and event reminders no longer outrank exact announcement topic matches;
-- validate active post orders still outrank announcements and primary workflow;
-- validate unknown-community refusal and weak-context refusal still work.
+- validate `/dashboard/status`;
+- validate `/dashboard/briefing`;
+- validate `/dashboard/briefing?community=CBK`;
+- validate `/dashboard/announcements`, `/dashboard/post-orders`, and `/dashboard/issues`;
+- confirm dashboard items preserve source file, authority, lifecycle status, and temporal state;
+- confirm dashboard output is read-only and does not mutate `vault/` or ChromaDB.
 
 Do not jump to agents, direct vault editing, automatic OCR ingestion, or Phase 5 without an explicit phase request.
 
@@ -499,7 +500,7 @@ Phase 4G does not delete historical lifecycle records, rewrite source vault docu
 
 ## Phase 4G1 Announcement Retrieval Precision Hardening
 
-IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+PASSED / VALIDATED
 
 Known regression:
 
@@ -516,15 +517,41 @@ Implemented:
 - [x] Surface optional rerank diagnostics in CLI/API source output
 - [x] Preserve safe refusal thresholds and unknown-community refusal behavior
 - [x] Preserve `post_order > announcement > primary_workflow`
-- [ ] User manually rebuilds ChromaDB
-- [ ] User manually validates Red Zone Protocol announcement precision
-- [ ] User manually validates Pickleball Tournament, NVR reminder, and Support Room reminder precision
-- [ ] User manually validates post orders still outrank announcements
-- [ ] User manually validates Atlantis Bay refusal still works
+- [x] User manually rebuilds ChromaDB
+- [x] User manually validates Red Zone Protocol announcement precision
+- [x] User manually validates Pickleball Tournament, NVR reminder, and Support Room reminder precision
+- [x] User manually validates post orders still outrank announcements
+- [x] User manually validates Atlantis Bay refusal still works
 - [ ] User reviews changes manually
 - [ ] User commits changes manually
 
 Phase 4G1 does not add LLM reranking, AI semantic rewriting, autonomous retrieval agents, vault rewrites, automatic ingestion, automatic ChromaDB updates, global threshold weakening, or announcement override behavior.
+
+## Phase 4J-lite Operational Dashboard / Shift Briefing
+
+IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+
+- [x] Add read-only FastAPI dashboard routes under `/dashboard`
+- [x] Add `/dashboard/status`
+- [x] Add `/dashboard/summary`
+- [x] Add `/dashboard/briefing`
+- [x] Add `/dashboard/announcements`
+- [x] Add `/dashboard/post-orders`
+- [x] Add `/dashboard/issues`
+- [x] Add deterministic briefing sections for temporary protocols, gate/NVR/kiosk issues, active events, operational reminders, expiring-soon notices, community alerts, and QA/compliance warnings
+- [x] Add deterministic priority scoring from authority, temporal state, expiring-soon dates, category, issue keywords, and community specificity
+- [x] Add optional community filtering using existing alias logic
+- [x] Preserve source file, authority, type, lifecycle status, temporal state, effective date, and expiry date per dashboard item
+- [x] Add optional read-only CLI briefing preview
+- [x] Preserve dashboard as visibility only, not operational memory
+- [ ] User manually validates dashboard API routes
+- [ ] User manually validates community filtering
+- [ ] User manually validates briefing grouping and ordering
+- [ ] User manually validates dashboard does not mutate vault or ChromaDB
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+Phase 4J-lite does not auto-ingest OCR, update vault memory, bypass human review, weaken safe refusal, hallucinate operational guidance, override authority hierarchy, create autonomous workflows, add background mutation tasks, add browser automation agents, or generate operational memory.
 
 ## Deferred
 
