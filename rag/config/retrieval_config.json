@@ -21,6 +21,29 @@
     "QA Notes": 0.06
   },
   "low_value_section_penalty": 0.35,
+  "section_penalties": {
+    "Source": 0.45,
+    "Migration Notes": 0.4,
+    "Operational Notes": 0.22,
+    "Change History": 0.35,
+    "Open Questions": 0.35,
+    "Source Input": 0.35
+  },
+  "direct_answer_section_boosts": {
+    "Announcement": 0.22,
+    "Agent Action": 0.18,
+    "Rule": 0.16,
+    "Policy": 0.14,
+    "Summary": 0.12,
+    "Details": 0.1
+  },
+  "title_overlap_boost": 0.28,
+  "keyword_overlap_boost": 0.18,
+  "exact_topic_title_boost": 0.55,
+  "exact_topic_body_boost": 0.42,
+  "exact_topic_chunk_boost": 0.28,
+  "category_match_boost": 0.2,
+  "announcement_body_section_boost": 0.14,
   "community_match_boost": 0.18,
   "community_mismatch_penalty": 0.45,
   "type_match_boost": 0.1,
