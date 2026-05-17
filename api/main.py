@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.dashboard import router as dashboard_router
 from api.schemas import AskRequest, AskResponse
 from api.service import answer_question
 
@@ -29,6 +30,8 @@ app.add_middleware(
     allow_methods=["POST", "GET"],
     allow_headers=["*"],
 )
+
+app.include_router(dashboard_router)
 
 
 @app.get("/health")
