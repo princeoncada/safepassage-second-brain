@@ -83,17 +83,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.9.0-alpha |
+| Version | 4.9.0-rc |
 | Phase | Phase 4.9.0 |
-| State | alpha |
+| State | rc |
 | Date | 2026-05-17 |
 | Commit | pending |
-| Summary | scope retrieval + source dedup |
+| Summary | scope retrieval + source dedup + alias hardening - VALIDATED |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.9.0-rc | Phase 4.9.0 | rc | 2026-05-17 | scope retrieval + source dedup + alias hardening - VALIDATED |
 | 4.9.0-alpha | Phase 4.9.0 | alpha | 2026-05-17 | scope retrieval + source dedup |
 | 4.8.2-stable | Phase 4I-lite | stable | 2026-05-17 | DATE_PATTERN word boundary fix - VALIDATED |
 | 4.8.1-stable | Phase 4I-lite | stable | 2026-05-17 | top_k fix + name match - VALIDATED |
@@ -142,9 +143,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.9.0-alpha
-Current working phase: Scope-Aware Retrieval + Source Deduplication
-Goal: Improve scoped post-order listing retrieval so kiosk/concierge queries return the full matching K/C/KC rule set, and deduplicate displayed answer citations by source file.
-Validation status: manual validation pending.
+Current working version: 4.9.0-rc
+Current working phase: Scope-Aware Retrieval + Source Deduplication + Alias Hardening
+Validation status: all checks passed on 2026-05-17; awaiting user commit to master.
+Next after stable: Phase 4.10.0 - Conversation Context. Goal: resolve community/topic hints from prior turns in the same session without sending full conversation history to DeepSeek.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-17-session-04.md` records the workflow documentation update clarifying when to use the 3-section prompt format. No version change was made for that documentation-only update.
