@@ -1,0 +1,21 @@
+{
+  "Heritage Palms": {
+    "aliases": ["HP", "PALMS", "HERITAGE"],
+    "sub_communities": {
+      "HPD": "Heritage Palms Dunbar",
+      "HPM": "Heritage Palms Miles",
+      "HPN": "Heritage Palms North",
+      "HPS": "Heritage Palms South",
+      "HPW": "Heritage Palms Wal"
+    },
+    "clarification_message": "Which Heritage Palms community do you mean? Please use one of these specific aliases:\n- HPD = Heritage Palms Dunbar\n- HPM = Heritage Palms Miles\n- HPN = Heritage Palms North\n- HPS = Heritage Palms South\n- HPW = Heritage Palms Wal"
+  },
+  "Palm Isles": {
+    "aliases": ["PLM"],
+    "sub_communities": {
+      "PLMIM": "Palm Isles Main",
+      "PLMIC": "Palm Isles Condo 3"
+    },
+    "clarification_message": "Which Palm Isles community do you mean? Please use one of these specific aliases:\n- PLMIM = Palm Isles Main\n- PLMIC = Palm Isles Condo 3"
+  }
+}
