@@ -18,6 +18,7 @@ if str(REPO_ROOT) not in sys.path:
 import chromadb
 from sentence_transformers import SentenceTransformer
 
+from rag.lifecycle import temporal_lifecycle
 from rag.query_intent import expand_query_with_intent, parse_query_intent
 
 
@@ -111,6 +112,20 @@ def authority_level(metadata: dict[str, Any]) -> str:
     return ""
 
 
+def temporal_state(metadata: dict[str, Any]) -> str:
+    explicit = str(metadata.get("temporal_state", "")).strip()
+    if explicit:
+        return explicit
+    return temporal_lifecycle(metadata).temporal_state
+
+
+def temporal_warning(metadata: dict[str, Any]) -> str:
+    explicit = str(metadata.get("temporal_warning", "")).strip()
+    if explicit:
+        return explicit
+    return temporal_lifecycle(metadata).temporal_warning
+
+
 def is_default_workflow_query(query: str) -> bool:
     normalized = normalize_key(query)
     return any(term in normalized for term in ["default", "base workflow", "primary workflow", "by default"])
@@ -195,6 +210,15 @@ def retrieval_assessment(
 ) -> dict[str, Any]:
     if not chunks:
         return {"confidence": "none", "refuse": True, "reason": "no chunks returned"}
+    active_temporal = [chunk for chunk in chunks if chunk.get("temporal_state") == "active"]
+    noncurrent_temporal = [chunk for chunk in chunks if chunk.get("temporal_state") in {"expired", "pending", "not_yet_active"}]
+    if noncurrent_temporal and not active_temporal:
+        states = sorted({str(chunk.get("temporal_state")) for chunk in noncurrent_temporal})
+        return {
+            "confidence": "weak",
+            "refuse": True,
+            "reason": f"only non-current temporal lifecycle sources were retrieved: {', '.join(states)}",
+        }
     best_distance = min(float(chunk["distance"]) for chunk in chunks)
     has_primary_workflow = has_global_primary_workflow(chunks)
     if hints["missing_community"]:
@@ -287,6 +311,8 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     }
     status_boosts = {str(status): float(boost) for status, boost in config.get("status_boosts", {}).items()}
     status_penalties = {str(status): float(penalty) for status, penalty in config.get("status_penalties", {}).items()}
+    temporal_boosts = {str(state): float(boost) for state, boost in config.get("temporal_state_boosts", {}).items()}
+    temporal_penalties = {str(state): float(penalty) for state, penalty in config.get("temporal_state_penalties", {}).items()}
     lifecycle_boosts = {
         str(generation): float(boost)
         for generation, boost in config.get("lifecycle_generation_boosts", {}).items()
@@ -348,6 +374,7 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
             continue
         if skip_legacy and lifecycle_generation == "legacy":
             continue
+        temporal = temporal_state(metadata)
 
         distance = float(distances[index]) if index < len(distances) else 999.0
         adjusted_distance = distance - section_boosts.get(normalized_section, 0.0)
@@ -367,6 +394,8 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         adjusted_distance -= authority_boosts.get(authority, 0.0)
         adjusted_distance -= status_boosts.get(status, 0.0)
         adjusted_distance += status_penalties.get(status, 0.0)
+        adjusted_distance -= temporal_boosts.get(temporal, 0.0)
+        adjusted_distance += temporal_penalties.get(temporal, 0.0)
         adjusted_distance -= lifecycle_boosts.get(lifecycle_generation, 0.0)
         adjusted_distance += lifecycle_penalties.get(lifecycle_generation, 0.0)
         if authority == "primary_workflow" and hints["community"]:
@@ -442,7 +471,14 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 "authority_level": authority_level(metadata),
                 "scope": str(metadata.get("scope", "")),
                 "status": str(metadata.get("status", "")),
+                "lifecycle_status": str(metadata.get("lifecycle_status", "")),
                 "lifecycle_generation": str(metadata.get("lifecycle_generation", "")),
+                "temporal_state": temporal_state(metadata),
+                "temporal_warning": temporal_warning(metadata),
+                "temporal_start_date": str(metadata.get("temporal_start_date", "")),
+                "temporal_start_field": str(metadata.get("temporal_start_field", "")),
+                "temporal_end_date": str(metadata.get("temporal_end_date", "")),
+                "temporal_end_field": str(metadata.get("temporal_end_field", "")),
                 "announcement_id": str(metadata.get("announcement_id", "")),
                 "announcement_hash": str(metadata.get("announcement_hash", "")),
                 "category": str(metadata.get("category", "")),
@@ -451,6 +487,12 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 "source_batch": str(metadata.get("source_batch", "")),
                 "source_name": str(metadata.get("source_name", "")),
                 "effective_date": str(metadata.get("effective_date", "")),
+                "active_from": str(metadata.get("active_from", "")),
+                "start_date": str(metadata.get("start_date", "")),
+                "active_until": str(metadata.get("active_until", "")),
+                "expires_at": str(metadata.get("expires_at", "")),
+                "expiry_date": str(metadata.get("expiry_date", "")),
+                "end_date": str(metadata.get("end_date", "")),
                 "expires_on": str(metadata.get("expires_on", "")),
                 "event_dates": str(metadata.get("event_dates", "")),
                 "source_legacy_file": str(metadata.get("source_legacy_file", "")),
@@ -487,6 +529,10 @@ def build_context_packet(chunks: list[dict[str, Any]]) -> str:
                     f"Scope: {chunk.get('scope', '')}",
                     f"Status: {chunk.get('status', '')}",
                     f"Lifecycle Generation: {chunk.get('lifecycle_generation', '')}",
+                    f"Temporal State: {chunk.get('temporal_state', '')}",
+                    f"Temporal Warning: {chunk.get('temporal_warning', '')}",
+                    f"Temporal Start: {chunk.get('temporal_start_date', '')} ({chunk.get('temporal_start_field', '')})",
+                    f"Temporal End: {chunk.get('temporal_end_date', '')} ({chunk.get('temporal_end_field', '')})",
                     f"Category: {chunk.get('category', '')}",
                     f"Announcement ID: {chunk.get('announcement_id', '')}",
                     f"Rule ID: {chunk.get('rule_id', '')}",
@@ -513,6 +559,7 @@ def print_sources(chunks: list[dict[str, Any]], title: str = "Retrieved Sources"
             f"type={chunk['type']} authority={chunk.get('authority_level', '')} "
             f"status={chunk.get('status', '')} community={chunk['community']} "
             f"lifecycle={chunk.get('lifecycle_generation', '')} "
+            f"temporal={chunk.get('temporal_state', '')} "
             f"category={chunk.get('category', '')} "
             f"section={chunk['section']} source={chunk['source_file']}"
         )
@@ -565,15 +612,36 @@ def insufficient_context_answer(reason: str) -> str:
 
 
 def lifecycle_advisory_note(chunks: list[dict[str, Any]]) -> str:
-    pending = [chunk for chunk in chunks if str(chunk.get("status", "")) == "pending"]
-    if not pending:
+    pending = [
+        chunk
+        for chunk in chunks
+        if str(chunk.get("status", "")) == "pending" or str(chunk.get("temporal_state", "")) in {"pending", "not_yet_active"}
+    ]
+    expired = [chunk for chunk in chunks if str(chunk.get("temporal_state", "")) == "expired"]
+    unknown = [chunk for chunk in chunks if str(chunk.get("temporal_state", "")) == "unknown"]
+    if not pending and not expired and not unknown:
         return ""
-    active = [chunk for chunk in chunks if str(chunk.get("status", "")) == "active"]
+    active = [chunk for chunk in chunks if str(chunk.get("temporal_state", "")) == "active"]
     if not active:
-        return ""
+        lines = ["Temporal advisory: retrieved sources are not confirmed active by temporal metadata."]
+        for chunk in pending + expired + unknown:
+            lines.append(
+                f"- Source {chunk['source_id']}: temporal_state={chunk.get('temporal_state', '')} "
+                f"{chunk['title']} ({chunk['source_file']} - {chunk['section']})"
+            )
+        return "\n".join(lines)
     pending_lines = [
-        f"- Pending Source {chunk['source_id']}: {chunk['title']} ({chunk['source_file']} - {chunk['section']})"
+        f"- Non-current Source {chunk['source_id']}: temporal_state={chunk.get('temporal_state', '')} "
+        f"{chunk['title']} ({chunk['source_file']} - {chunk['section']})"
         for chunk in pending
+    ]
+    expired_lines = [
+        f"- Expired Source {chunk['source_id']}: {chunk['title']} ({chunk['source_file']} - {chunk['section']})"
+        for chunk in expired
+    ]
+    unknown_lines = [
+        f"- Unknown Temporal Source {chunk['source_id']}: {chunk['title']} ({chunk['source_file']} - {chunk['section']})"
+        for chunk in unknown
     ]
     active_lines = [
         f"- Active Source {chunk['source_id']}: {chunk['title']} ({chunk['source_file']} - {chunk['section']})"
@@ -582,11 +650,13 @@ def lifecycle_advisory_note(chunks: list[dict[str, Any]]) -> str:
     return "\n".join(
         [
             "Lifecycle advisory: active rules outrank pending rules.",
-            "If a pending rule is operationally relevant, mention it as a pending update warning and do not treat it as active.",
+            "If a pending, not-yet-active, expired, or unknown-temporal source is operationally relevant, warn and do not treat it as active.",
             "Active context:",
             *active_lines,
-            "Pending context:",
+            "Non-current or uncertain context:",
             *pending_lines,
+            *expired_lines,
+            *unknown_lines,
         ]
     )
 
@@ -676,7 +746,17 @@ def main() -> int:
     advisory_note = lifecycle_advisory_note(chunks)
     if advisory_note:
         print()
-        print("Warning: pending lifecycle context is present.")
+        print("Warning: non-current or uncertain temporal lifecycle context is present.")
+    temporal_warnings = [
+        f"Source {chunk['source_id']}: {chunk.get('temporal_warning')}"
+        for chunk in chunks
+        if chunk.get("temporal_warning")
+    ]
+    if temporal_warnings:
+        print()
+        print("Temporal Metadata Warnings:")
+        for warning in temporal_warnings:
+            print(f"- {warning}")
 
     if args.show_context:
         print()
