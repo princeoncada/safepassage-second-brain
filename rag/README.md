@@ -8,6 +8,7 @@ Current status: WORKING PROOF OF WORK
 - Phase 3E documents Open WebUI as a presentation-only UI over FastAPI.
 - Phase 4D adds deterministic query intent parsing before retrieval.
 - Phase 4E adds OCR intake artifacts before reviewed ingestion.
+- Phase 4F adds a reviewed OCR staging bridge before manual deterministic ingestion.
 
 Phase 3A tests whether local semantic search can retrieve the right Markdown chunks from `vault/`.
 
@@ -15,7 +16,7 @@ Phase 3B adds minimal grounded answer generation using only retrieved vault chun
 
 This does not add Open WebUI-hosted retrieval, n8n integration, agents, automatic memory editing, Git automation, dashboards, or Phase 4 automations.
 
-Phase 4E OCR output is not indexed directly. OCR artifacts must be reviewed and then copied into the existing deterministic ingestion inputs before Markdown enters `vault/` and ChromaDB is rebuilt.
+Phase 4E OCR output is not indexed directly. Phase 4F can stage human-approved reviewed OCR text under `automation/ingestion/reviewed_ocr_inputs/`, but this is not ingestion. The user must still run the existing deterministic ingestion scripts manually before Markdown enters `vault/` and ChromaDB is rebuilt.
 
 ## Query Intent Parsing
 
