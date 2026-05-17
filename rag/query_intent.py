@@ -56,6 +56,24 @@ IGNORED_PROPER_PHRASES = {
     "emergency code",
 }
 
+KIOSK_SCOPE_PHRASES = {
+    "for kiosk",
+    "kiosk only",
+    "kiosk agent",
+    "kiosk post orders",
+    "kiosk specifically",
+    "kiosk rules",
+}
+
+CONCIERGE_SCOPE_PHRASES = {
+    "for concierge",
+    "concierge only",
+    "concierge agent",
+    "concierge post orders",
+    "concierge specifically",
+    "concierge rules",
+}
+
 
 @dataclass
 class QueryIntent:
@@ -175,6 +193,12 @@ def detect_keyword_intent(intent: QueryIntent) -> None:
 
 def detect_scope(intent: QueryIntent) -> None:
     query = intent.normalized_query
+    if any(phrase in query for phrase in KIOSK_SCOPE_PHRASES):
+        intent.scope_hint = "kiosk"
+        return
+    if any(phrase in query for phrase in CONCIERGE_SCOPE_PHRASES):
+        intent.scope_hint = "concierge"
+        return
     if any(term in query for term in ["kiosk", "gate", "visitor", "vendor", "access"]):
         intent.scope_hint = "kiosk"
     if any(term in query for term in ["concierge", "caller", "call resident"]):
