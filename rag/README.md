@@ -10,6 +10,7 @@ Current status: WORKING PROOF OF WORK
 - Phase 4E adds OCR intake artifacts before reviewed ingestion.
 - Phase 4F adds a reviewed OCR staging bridge before manual deterministic ingestion.
 - Phase 4G adds deterministic temporal expiry and activation metadata for lifecycle-aware retrieval.
+- Phase 4G1 adds deterministic announcement retrieval precision hardening.
 
 Phase 3A tests whether local semantic search can retrieve the right Markdown chunks from `vault/`.
 
@@ -78,6 +79,35 @@ python automation/ingestion/report_temporal_lifecycle.py --expiring-soon-days 7
 ```
 
 Reports are written under `vault/08_Reports/temporal-lifecycle/` and do not update ChromaDB or operational memory.
+
+## Retrieval Reranking
+
+Phase 4G1 adds deterministic reranking after vector retrieval.
+
+The final retrieval order is influenced by:
+
+- vector distance from ChromaDB;
+- deterministic query intent, including community and topic terms;
+- authority hierarchy: `post_order > announcement > primary_workflow`;
+- lifecycle and temporal state;
+- exact topic phrase matches in title, normalized announcement text, or chunk body;
+- title and keyword overlap;
+- category match;
+- section weighting.
+
+Announcement chunks include title, category, and normalized announcement topic text in the embedded chunk and metadata. This reduces mixed-reminder retrieval pollution for questions such as `What is the Red Zone Protocol reminder?`.
+
+For direct operational questions, `Announcement`, `Rule`, `Agent Action`, `Policy`, `Summary`, and `Details` sections are preferred. Metadata-heavy sections such as `Operational Notes`, `Source`, `Migration Notes`, `Change History`, `Open Questions`, and `Source Input` are penalized but not fully excluded when available.
+
+Optional source diagnostics may include:
+
+```text
+rerank_score
+rerank_delta
+rerank_reasons
+```
+
+These fields explain deterministic scoring and are not operational policy. Safe refusal behavior remains conservative when context is still weak.
 
 ## Install
 
