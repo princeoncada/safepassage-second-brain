@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-PHASE 4F OCR REVIEW + INGESTION BRIDGE
+PHASE 4G TEMPORAL EXPIRY / ACTIVATION ENGINE
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, and Phase 4E OCR intake using pytesseract fallback. Phase 4F implementation adds a reviewed OCR staging bridge and is awaiting manual validation.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, and Phase 4F OCR review + ingestion bridge. Phase 4G implementation adds deterministic temporal expiry and activation awareness and is awaiting manual validation.
 
 ## Phase 2 Minimal POW
 
@@ -125,17 +125,16 @@ These are not blockers.
 
 ## Next Recommended Step
 
-Manually validate Phase 4F OCR Review + Ingestion Bridge.
+Manually validate Phase 4G Temporal Expiry / Activation Engine.
 
 Scope:
 
-- validated OCR backend remains pytesseract;
-- PaddleOCR remains experimental and deferred due to Windows runtime compatibility failure;
-- OCR output stays under `automation/ocr/output/`;
-- reviewed OCR files may be organized under `automation/ocr/review_queue/`;
-- approved reviewed OCR text may be staged under `automation/ingestion/reviewed_ocr_inputs/`;
-- OCR and the review bridge do not write to `vault/`, call ingestion scripts, or update ChromaDB;
-- human review remains required before any extracted text enters announcement or post-order ingestion.
+- rebuild ChromaDB manually so indexed chunks include temporal metadata;
+- validate active post orders still outrank announcements and primary workflow;
+- validate expired, pending, not-yet-active, superseded, archived, review, and unknown-temporal records are downgraded or warned;
+- validate unknown-community refusal still works;
+- generate the temporal lifecycle report manually and inspect it under `vault/08_Reports/temporal-lifecycle/`;
+- confirm the report is review output only and does not update ChromaDB or operational source documents.
 
 Do not jump to agents, direct vault editing, automatic OCR ingestion, or Phase 5 without an explicit phase request.
 
@@ -417,7 +416,7 @@ Validation notes:
 
 ## Phase 4F OCR Review + Ingestion Bridge
 
-IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+PASSED / VALIDATED
 
 - [x] Add OCR review queue folders for pending, approved, and rejected review artifacts
 - [x] Add `.gitkeep` files for empty review queue folders
@@ -436,10 +435,10 @@ IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
 - [x] Avoid calling announcement or post-order ingestion scripts
 - [x] Avoid ChromaDB indexing
 - [x] Preserve reviewed text without summarizing or rewriting it
-- [ ] User manually validates refusal for pending review files
-- [ ] User manually validates refusal for unapproved files
-- [ ] User manually validates announcement staging output
-- [ ] User manually validates post-order staging output
+- [x] User manually validates refusal for missing review file
+- [x] User manually validates refusal for pending or unapproved review files
+- [x] User manually validates announcement staging output
+- [x] User manually validates post-order staging output
 - [ ] User manually runs the appropriate deterministic ingestion script if staging output is acceptable
 - [ ] User manually rebuilds ChromaDB after ingestion
 - [ ] User reviews changes manually
@@ -461,6 +460,43 @@ image
 ```
 
 No automatic OCR-to-vault ingestion, autonomous agents, AI semantic rewriting, alias expansion during OCR cleanup, ingestion-script calls, direct vault writes, artifact deletion, or ChromaDB updates were added.
+
+## Phase 4G Temporal Expiry / Activation Engine
+
+IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+
+- [x] Add deterministic temporal lifecycle utility
+- [x] Support status, lifecycle status, effective/start/active date fields, expiry/end date fields, supersede metadata, document type, and authority fields
+- [x] Tolerate ISO dates and ISO datetimes
+- [x] Treat invalid date formats as unknown/missing with warnings instead of crashing lifecycle evaluation
+- [x] Add temporal metadata to indexed ChromaDB chunks
+- [x] Preserve existing authority hierarchy and lifecycle generation behavior
+- [x] Add temporal scoring so active sources are preferred and pending, not-yet-active, expired, review, unknown, superseded, and archived sources are downgraded
+- [x] Expose temporal source fields through CLI/API source metadata
+- [x] Add conservative answer warnings/refusal when only non-current temporal sources are retrieved
+- [x] Add read-only temporal lifecycle report script under `automation/ingestion/`
+- [x] Document temporal lifecycle behavior and safety boundaries
+- [ ] User manually rebuilds ChromaDB
+- [ ] User manually validates active post orders still outrank announcements and primary workflow
+- [ ] User manually validates expired-source warning or refusal behavior
+- [ ] User manually validates pending/not-yet-active warning or refusal behavior
+- [ ] User manually validates active source with missing temporal metadata exposes a low-priority source warning
+- [ ] User manually validates unknown-community refusal still works
+- [ ] User manually runs temporal lifecycle report and reviews grouped output
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+Expected validation examples:
+
+```powershell
+python rag/scripts/reset_chroma.py --yes
+python rag/scripts/index_vault.py
+python rag/scripts/answer_vault.py "What is the CBK rule for physical ID?" --top-k 5
+python rag/scripts/answer_vault.py "What is the vehicle policy for Atlantis Bay?" --top-k 5
+python automation/ingestion/report_temporal_lifecycle.py --expiring-soon-days 7
+```
+
+Phase 4G does not delete historical lifecycle records, rewrite source vault documents, auto-ingest OCR or staging files, bypass human review, weaken authority hierarchy, weaken unknown-community refusal, use AI semantic rewriting, introduce agents, or update ChromaDB automatically.
 
 ## Deferred
 
