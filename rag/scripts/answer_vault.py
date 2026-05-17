@@ -69,7 +69,7 @@ def normalize_key(value: str) -> str:
 
 
 def alias_tokens(query: str) -> list[str]:
-    tokens = re.findall(r"\b[A-Za-z]{2,6}\d*\b", query)
+    tokens = re.findall(r"\b[A-Za-z]{2,20}\d*\b", query)
     return [re.match(r"[A-Za-z]+", token).group(0).upper() for token in tokens if re.match(r"[A-Za-z]+", token)]
 
 
@@ -142,6 +142,25 @@ def jaccard_similarity(left: str, right: str) -> float:
     if not left_tokens or not right_tokens:
         return 0.0
     return len(left_tokens & right_tokens) / len(left_tokens | right_tokens)
+
+
+def scope_sort_group(scope_hint: str, metadata: dict[str, Any]) -> int:
+    scope_val = str(metadata.get("scope", "")).upper()
+    has_k = "K" in scope_val
+    has_c = "C" in scope_val
+    if scope_hint == "kiosk":
+        if has_k and not has_c:
+            return 0
+        if has_k and has_c:
+            return 1
+        return 2
+    if scope_hint == "concierge":
+        if has_c and not has_k:
+            return 0
+        if has_k and has_c:
+            return 1
+        return 2
+    return 0
 
 
 def extract_query_hints(query: str, config: dict[str, Any], candidate_communities: set[str]) -> dict[str, Any]:
@@ -432,6 +451,17 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         ]
         if community_matched:
             raw_candidates = community_matched
+    if hints.get("scope_hint"):
+        scope_hint = str(hints.get("scope_hint", ""))
+        scope_matched = []
+        for candidate in raw_candidates:
+            scope_val = str(candidate[3].get("scope", "")).upper()
+            if scope_hint == "kiosk" and "K" in scope_val:
+                scope_matched.append(candidate)
+            elif scope_hint == "concierge" and "C" in scope_val:
+                scope_matched.append(candidate)
+        if scope_matched:
+            raw_candidates = scope_matched
 
     preview_words = int(config.get("content_preview_dedupe_words", 32))
     candidates: list[tuple[float, float, str, dict[str, Any]]] = []
@@ -473,8 +503,18 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         )
         candidates.append((adjusted_distance, distance, document, metadata))
 
+    if hints.get("scope_hint"):
+        scope_hint = str(hints.get("scope_hint", ""))
+        candidates.sort(key=lambda candidate: scope_sort_group(scope_hint, candidate[3]))
+
     effective_top_k = top_k
-    if hints.get("requested_all"):
+    if (
+        hints.get("scope_hint")
+        and hints.get("community")
+        and "post_order" in hints.get("expected_types", set())
+    ):
+        effective_top_k = len(candidates)
+    elif hints.get("requested_all"):
         effective_top_k = 25
 
     chunks: list[dict[str, Any]] = []
