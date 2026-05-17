@@ -18,9 +18,9 @@ PENDING_TTL_MINUTES = 5
 
 pending_state: dict[str, dict[str, Any]] = {}
 
-DATE_PATTERN = re.compile(r"\b\d{1,2}/\d{1,2}/\d{4}\b")
+DATE_PATTERN = re.compile(r"(?<!\d)\d{1,2}/\d{1,2}/\d{4}(?!\d)")
 POST_ORDER_LABEL_PATTERN = re.compile(
-    r"POST\s+ORDERS?\s*\((K\s*(?:&|AND)\s*C|K&C|KC|K|C)\)\s*:\s*(.*)",
+    r"POST\s+ORDERS?\s*\(\s*(K\s*(?:&|AND)\s*C|K\s*&\s*C|KC|K|C)\s*\)\s*:\s*(.*)",
     re.IGNORECASE | re.DOTALL,
 )
 NUMBERED_ITEM_PATTERN = re.compile(r"(?:^|\n)\s*\d+[\.)]\s+")
