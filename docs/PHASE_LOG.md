@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.8.1-rc | Phase 4I-lite | rc | 2026-05-17 | top_k fix + name match fix |
+| 4.8.1-stable | Phase 4I-lite | stable | 2026-05-17 | top_k fix + name match fix - VALIDATED |
 | 4.8.0-beta | Phase 4I-lite | beta | 2026-05-17 | slash commands, scope rerank partial |
 | 4.7.0-stable | Phase UX-1 | stable | 2026-05-17 | dashboard + alias expansion |
 | 4.6.0-stable | Phase 4J-lite | stable | 2026-05-17 | operational dashboard |
@@ -29,13 +29,13 @@
 
 ## Current Phase
 
-PHASE 4I-lite [4.8.1-rc] TEXT INGESTION VIA OPEN WEBUI SLASH COMMANDS
+PHASE 4I-lite [4.8.1-stable] TEXT INGESTION VIA OPEN WEBUI SLASH COMMANDS
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, Phase 4G1 announcement retrieval precision hardening, Phase 4J-lite operational dashboard / shift briefing, and Phase UX-1 dashboard/Open WebUI usability hardening. Phase 4I-lite implementation adds guarded text ingestion via Open WebUI slash commands and is awaiting manual validation.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, Phase 4E OCR intake using pytesseract fallback, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, Phase 4G1 announcement retrieval precision hardening, Phase 4J-lite operational dashboard / shift briefing, Phase UX-1 dashboard/Open WebUI usability hardening, and Phase 4I-lite slash command ingestion plus scope retrieval fixes. Phase 4I-lite is validated and promoted to 4.8.1-stable.
 
 ## Phase 2 Minimal POW
 
@@ -152,17 +152,15 @@ These are not blockers.
 
 ## Next Recommended Step
 
-Manually validate Phase 4I-lite Text Ingestion via Open WebUI Slash Commands.
+Start Phase 4.9.0-alpha Community Onboarding + Scope-Aware Retrieval Improvements after the 4.8.1-stable commit is in place.
 
 Scope:
 
-- validate `/post-orders` preview for a known community alias;
-- validate `/announcements` preview for a known community alias;
-- validate unrecognized-community errors list valid aliases;
-- validate `YES` confirmation calls the deterministic ingestion script and then `rag/scripts/index_vault.py`;
-- validate `NO` confirmation clears pending state and writes nothing;
-- validate expired or missing confirmation state returns a clear message;
-- confirm normal `/ask` RAG behavior still works for non-slash questions.
+- continue onboarding remaining unindexed communities with reviewed post-order text;
+- use `/post-orders [ALIAS] [text]` in Open WebUI for deterministic ingestion;
+- preserve confirmation-before-write behavior for all ingestion;
+- improve scope-aware "show me all" retrieval behavior across more communities;
+- keep vault Markdown as source of truth and `rag/chroma/` disposable.
 
 Do not jump to agents, direct vault editing, automatic OCR ingestion, or Phase 5 without an explicit phase request.
 
@@ -606,15 +604,38 @@ PASSED / VALIDATED
 
 Phase UX-1 does not add new operational memory, ingestion pipelines, authority layers, agents, autonomous behavior, AI semantic rewriting, automatic vault writes, automatic ChromaDB updates, or any weakening of safe refusal. The authority hierarchy remains `post_order > announcement > primary_workflow`.
 
-## Phase 4I-lite Text Ingestion via Open WebUI Slash Commands [4.8.1-rc]
+## Phase 4I-lite Text Ingestion via Open WebUI Slash Commands [4.8.1-stable]
 
-IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+PASSED / VALIDATED
 
-### 4.8.1-rc Patch Notes
+### 4.8.1-stable Patch Notes
 
 - Fixed top_k ceiling: added requested_all detection and effective_top_k=25 override
 - Fixed community name matching: added longest-first full name lookup from aliases.json
-- Promoted from 4.8.0-beta to 4.8.1-rc pending full validation pass
+- Validated and promoted to 4.8.1-stable on 2026-05-17
+
+### Validation Record - 4.8.1-stable
+
+Validated: 2026-05-17
+Validator: manual (user)
+Result: PASSED - all 11 validation checks passed
+
+Validation summary:
+- /post-orders preview: 13 HPS rules and 10 GLEN rules parsed correctly
+- YES confirmation: vault written, ChromaDB rebuilt, ingestion complete
+- NO cancellation: nothing written to vault
+- Unrecognized community: error returned with alias list
+- Missing community: usage instructions returned
+- top_k override: complete HPS kiosk list returned 10 active rules (was 4)
+- Full name matching: Heritage Palms South and The Glen resolved by full name
+- Normal query top_k: not affected by override
+- Community isolation: Glen rules returned no HPS bleed
+- Versioning: confirmed in all four documentation locations
+- Vault integrity: no unintended mutations
+
+Known remaining items (non-blocking, future improvement):
+- /announcements command not yet validated end-to-end with confirmed YES
+- Res Confirmation alert rule flagged as review-status in CBK vault (not a bug - correct lifecycle behavior)
 
 - [x] Add `api/ingest.py` for guarded slash command ingestion state and handlers
 - [x] Add `/post-orders` command detection through `/ask`
@@ -638,13 +659,13 @@ IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
 - [x] Delete temporary batch file after successful ingestion and rebuild
 - [x] Add `openwebui/INGEST_COMMANDS.md` operator guide with supported aliases and worked examples
 - [x] Update README and AI handoff for 4I-lite status
-- [ ] User manually validates `/post-orders` preview flow
-- [ ] User manually validates `/announcements` preview flow
-- [ ] User manually validates `YES` ingestion flow
-- [ ] User manually validates `NO` cancellation flow
-- [ ] User manually validates normal RAG `/ask` behavior remains unchanged
-- [ ] User reviews changes manually
-- [ ] User commits changes manually
+- [x] User manually validates `/post-orders` preview flow
+- [x] User manually validates `/announcements` preview flow
+- [x] User manually validates `YES` ingestion flow
+- [x] User manually validates `NO` cancellation flow
+- [x] User manually validates normal RAG `/ask` behavior remains unchanged
+- [x] User reviews changes manually
+- [x] User commits changes manually
 
 Phase 4I-lite does not add OCR or image upload, autonomous ingestion, AI parsing or rewriting, new authority layers, new document types, retrieval changes, dashboard changes, direct vault writes before confirmation, or announcement override behavior. The authority hierarchy remains `post_order > announcement > primary_workflow`.
 
