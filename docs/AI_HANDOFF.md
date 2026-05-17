@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 4J-lite OPERATIONAL DASHBOARD / SHIFT BRIEFING. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, Phase 4D query parsing, Phase 4E OCR intake using pytesseract, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, and Phase 4G1 announcement retrieval precision hardening are validated or mostly working. Phase 4J-lite implementation is added and awaiting manual validation.
+PHASE 4I-lite Text Ingestion via Open WebUI Slash Commands. Implementation added, manual validation pending. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, Phase 4D query parsing, Phase 4E OCR intake using pytesseract, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, Phase 4G1 announcement retrieval precision hardening, Phase 4J-lite operational dashboard / shift briefing, and Phase UX-1 dashboard/OpenWebUI usability hardening are validated or mostly working.
 
 ## What Exists
 
@@ -35,6 +35,10 @@ PHASE 4J-lite OPERATIONAL DASHBOARD / SHIFT BRIEFING. Phase 2 Minimal POW, Phase
 - Phase 4J-lite dashboard aggregation in `rag/dashboard.py`.
 - Phase 4J-lite FastAPI dashboard routes in `api/dashboard.py`.
 - Phase 4J-lite read-only CLI preview at `automation/dashboard/preview_briefing.py`.
+- Phase UX-1 Open WebUI VA operator shift reference at `openwebui/USAGE_GUIDE.md`.
+- Full virtual community alias table in `rag/config/community_aliases.json`.
+- Phase 4I-lite slash command ingestion handler at `api/ingest.py`.
+- Phase 4I-lite Open WebUI ingest command guide at `openwebui/INGEST_COMMANDS.md`.
 
 ## Current Stable Components
 
@@ -74,14 +78,48 @@ Future AI work should:
 
 - Do not move retrieval, embeddings, ChromaDB, memory, ingestion, or business logic into Open WebUI.
 - Do not add advanced automations beyond the documented Phase 2 ingestion workflow.
-- Do not add autonomous agents, advanced memory systems, automatic memory editing, or dashboards.
+- Do not add autonomous agents, advanced memory systems, automatic memory editing, or dashboard behavior beyond the validated read-only dashboard without an explicit phase request.
 - Do not use cloud embeddings.
 - Do not expand Phase 3B beyond retrieved-context answer generation.
 - Do not commit secrets, real API keys, `.env`, `n8n_data`, or generated credential files.
 
 ## Recommended Next Step
 
-Manually validate Phase 4J-lite Operational Dashboard / Shift Briefing.
+After 4I-lite manual validation, next is Phase 4H OpenWebUI Upload + OCR Bridge.
+
+## Phase 4I-lite Implementation Added
+
+Phase 4I-lite adds guarded text ingestion through Open WebUI chat messages sent to the existing `/ask` endpoint. It does not add OCR upload, autonomous ingestion, AI parsing, new authority layers, new document types, retrieval changes, or dashboard changes.
+
+Implemented:
+
+- `api/ingest.py` contains module-level pending state under `pending_ingest`, with a 5-minute expiry.
+- `/post-orders` parses a known community alias or full community name, then deterministic dated `Post Order (K/C/K&C)` entries.
+- `/announcements` parses a known community alias or full community name, then announcement blocks or numbered items with fixed keyword category inference.
+- `api/service.py` routes `/post-orders`, `/announcements`, `YES`, and `NO` before normal RAG retrieval.
+- Preview responses use the normal `AskResponse` shape with empty sources/citations and no AI.
+- `YES` calls the existing deterministic ingestion script, then `rag/scripts/index_vault.py`; it does not call `reset_chroma.py`.
+- `NO` clears pending state and writes nothing.
+- Temporary batch files are written under `automation/ingestion/` and are deleted after successful ingestion plus rebuild.
+- `openwebui/INGEST_COMMANDS.md` documents operator usage, confirmation, cancellation, common mistakes, supported aliases, and worked CBK examples.
+
+Manual validation remains pending. Do not treat 4I-lite as validated until the user confirms slash command preview, confirmation, cancellation, error handling, ingestion script execution, ChromaDB rebuild, and unchanged normal RAG `/ask` behavior.
+
+## Phase UX-1 Validated
+
+Phase UX-1 is a usability hardening pass. It does not add operational memory, ingestion pipelines, authority layers, agents, autonomous behavior, or AI semantic rewriting.
+
+Implemented:
+
+- `rag/dashboard.py` now deduplicates dashboard items by `(source_file, title)` instead of `(source_file, section)`.
+- `rag/dashboard.py` excludes dashboard items from `vault/08_Reports/`, `vault/07_Visitor_Logs/`, `vault/06_Incidents/`, and `vault/01_Daily_Briefings/`.
+- `rag/config/community_aliases.json` now reflects the full current virtual community alias table using uppercase letter-only aliases.
+- `openwebui/USAGE_GUIDE.md` gives VA operators practical shift guidance for prompts, citations, refusals, warning responses, shift-start checks, dashboard briefing endpoints, and operational boundaries.
+- `README.md`, `docs/PHASE_LOG.md`, and this handoff were updated for UX-1 implementation status.
+
+UX-1 is validated. Dashboard deduplication, source-prefix exclusion, expanded alias behavior, and Open WebUI usage documentation are part of the current working baseline.
+
+## Phase 4J-lite Dashboard Context
 
 Phase 4J-lite adds read-only operational visibility over indexed memory. It does not retrieve through an agent or generate new operational memory. It reads ChromaDB metadata derived from vault Markdown, groups active operational context deterministically, and returns compact shift briefing sections.
 
@@ -107,8 +145,6 @@ Retrieval now uses deterministic reranking after vector retrieval. The reranker 
 Phase 4G adds deterministic date-aware lifecycle interpretation for managed operational memory. Temporal states are `active`, `pending`, `not_yet_active`, `expired`, `superseded`, `archived`, `review`, and `unknown`. Retrieval still preserves `post_order > announcement > primary_workflow`, but active temporal sources should rank above stale, future-dated, review, archived, superseded, or unknown-temporal sources.
 
 Generated temporal reports under `vault/08_Reports/temporal-lifecycle/` are reports only. They are not operational memory unless separately reviewed and ingested by deterministic processes. The report script must not delete or mutate source vault documents, run ingestion scripts, or update ChromaDB.
-
-After Phase 4J-lite manual validation, the next recommended step is UX-1 User Workflow & OpenWebUI Usability Pass.
 
 OCR is operational using pytesseract. PaddleOCR did not pass Windows runtime validation and should be treated as experimental/deferred unless a future phase pins a compatible version or moves OCR to Linux/Docker.
 
@@ -366,7 +402,7 @@ Behavior:
 - writes raw text and review Markdown artifacts;
 - includes OCR engine and confidence when available;
 - performs conservative whitespace cleanup only;
-- preserves community aliases such as `CBK`, `PBP`, `SR`, `SSR`, and `OPB`;
+- preserves community aliases such as `CBK`, `PBM`, `SR`, `SSR`, and `OPB`;
 - never writes to `vault/`;
 - never calls `refresh_announcements.py` or `refresh_post_orders.py`;
 - never bypasses human review.
