@@ -147,6 +147,17 @@ def check_ambiguous_community(community: str) -> str:
     return ""
 
 
+def resolve_community_from_history(history: list[str]) -> tuple[str, str]:
+    try:
+        for turn in reversed(history[-5:]):
+            intent = parse_query_intent(str(turn))
+            if intent.community:
+                return intent.community, intent.community_alias
+    except Exception:
+        pass
+    return "", ""
+
+
 def answer_question(request: AskRequest) -> AskResponse:
     question_stripped = request.question.strip()
     question_upper = question_stripped.upper()
@@ -173,10 +184,18 @@ def answer_question(request: AskRequest) -> AskResponse:
     if _clarification:
         return _ingest_response(request, _clarification)
 
+    retrieval_question = question_stripped
+    # Resolve community from history if current query has none.
+    _current_intent = parse_query_intent(question_stripped)
+    if not _current_intent.community and request.history:
+        _hist_community, _hist_alias = resolve_community_from_history(request.history)
+        if _hist_community:
+            retrieval_question = f"{question_stripped} {_hist_community}"
+
     warnings: list[str] = []
     try:
         chunks, hints, assessment = retrieve_chunks(
-            request.question,
+            retrieval_question,
             request.top_k,
             request.include_low_value_sections,
         )
