@@ -20,11 +20,29 @@ http://host.docker.internal:8000/ask
 
 ```json
 {
-  "question": "What should I do if a Sierra Ridge visitor presents digital ID instead of physical ID?",
+  "question": "do you have any information on SR?",
   "top_k": 5,
   "show_context": false,
-  "no_ai": false
+  "no_ai": false,
+  "history": [
+    "/post-orders SR 5/17/2026 Post Order (K): Contact the resident twice for access."
+  ]
 }
+```
+
+## Conversation Context
+
+The `history` field is optional. Omit it or pass `[]` for stateless queries.
+
+Pass up to 5 prior user turn strings. Include questions only, not assistant answers.
+
+The backend uses history only to resolve community/topic context when the current question is ambiguous. It does not send history to DeepSeek.
+
+In an Open WebUI Pipe, build history from `messages[:-1]` (all turns except the current one), extracting only `role=user` content strings:
+
+```python
+history = [m["content"] for m in body.get("messages", [])[:-1] if m.get("role") == "user"]
+history = history[-5:]
 ```
 
 ## Response Fields To Render
