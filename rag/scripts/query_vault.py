@@ -17,6 +17,7 @@ from sentence_transformers import SentenceTransformer
 
 from rag.lifecycle import temporal_lifecycle
 from rag.query_intent import expand_query_with_intent, parse_query_intent
+from rag.retrieval_rerank import rerank_adjustment
 
 
 COLLECTION_NAME = "safepassage_vault_chunks"
@@ -350,6 +351,18 @@ def main() -> int:
             adjusted_distance += primary_specific_community_penalty
         if authority == "primary_workflow" and hints.get("is_default_workflow_query"):
             adjusted_distance -= primary_default_boost
+        rerank_delta, rerank_reasons = rerank_adjustment(
+            query=args.query,
+            document=str(document),
+            metadata=metadata,
+            hints=hints,
+            config=config,
+        )
+        adjusted_distance += rerank_delta
+        metadata = dict(metadata)
+        metadata["rerank_score"] = f"{adjusted_distance:.4f}"
+        metadata["rerank_delta"] = f"{rerank_delta:.4f}"
+        metadata["rerank_reasons"] = "; ".join(rerank_reasons)
         raw_candidates.append((adjusted_distance, float(distance), str(document), metadata))
 
     raw_candidates.sort(key=lambda candidate: (candidate[0], candidate[1]))
@@ -414,7 +427,7 @@ def main() -> int:
         print("Re-index with --include-low-value-sections or query with --include-low-value-sections to inspect filtered sections.")
         return 0
 
-    best_distance = candidates[0][1] if candidates else None
+    best_distance = candidates[0][0] if candidates else None
     has_mismatch = bool(hints["missing_community"]) or (
         bool(hints["community"])
         and all(normalize_key(str(candidate[3].get("community", ""))) != normalize_key(hints["community"]) for candidate in candidates)
@@ -447,11 +460,14 @@ def main() -> int:
         print(f"Scope Hint: {hints['scope_hint']}")
     print("-" * 80)
 
-    for index, (_adjusted_distance, distance, document, metadata) in enumerate(candidates[: args.top_k], start=1):
+    for index, (adjusted_distance, distance, document, metadata) in enumerate(candidates[: args.top_k], start=1):
         preview = shorten(" ".join(str(document).split()), width=320, placeholder="...")
 
         print(f"Rank: {index}")
         print(f"Distance: {distance}")
+        print(f"Rerank Score: {adjusted_distance}")
+        if metadata.get("rerank_reasons", ""):
+            print(f"Rerank Reasons: {metadata.get('rerank_reasons', '')}")
         print(f"Title: {metadata.get('title', '')}")
         print(f"Type: {metadata.get('type', '')}")
         print(f"Authority: {authority_level(metadata)}")
