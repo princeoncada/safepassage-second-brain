@@ -28,7 +28,14 @@ def chunk_to_source(chunk: dict[str, Any], show_context: bool) -> Source:
         authority_level=str(chunk.get("authority_level", "")),
         scope=str(chunk.get("scope", "")),
         status=str(chunk.get("status", "")),
+        lifecycle_status=str(chunk.get("lifecycle_status", "")),
         lifecycle_generation=str(chunk.get("lifecycle_generation", "")),
+        temporal_state=str(chunk.get("temporal_state", "")),
+        temporal_warning=str(chunk.get("temporal_warning", "")),
+        temporal_start_date=str(chunk.get("temporal_start_date", "")),
+        temporal_start_field=str(chunk.get("temporal_start_field", "")),
+        temporal_end_date=str(chunk.get("temporal_end_date", "")),
+        temporal_end_field=str(chunk.get("temporal_end_field", "")),
         announcement_id=str(chunk.get("announcement_id", "")),
         announcement_hash=str(chunk.get("announcement_hash", "")),
         category=str(chunk.get("category", "")),
@@ -37,6 +44,12 @@ def chunk_to_source(chunk: dict[str, Any], show_context: bool) -> Source:
         source_batch=str(chunk.get("source_batch", "")),
         source_name=str(chunk.get("source_name", "")),
         effective_date=str(chunk.get("effective_date", "")),
+        active_from=str(chunk.get("active_from", "")),
+        start_date=str(chunk.get("start_date", "")),
+        active_until=str(chunk.get("active_until", "")),
+        expires_at=str(chunk.get("expires_at", "")),
+        expiry_date=str(chunk.get("expiry_date", "")),
+        end_date=str(chunk.get("end_date", "")),
         expires_on=str(chunk.get("expires_on", "")),
         event_dates=str(chunk.get("event_dates", "")),
         source_legacy_file=str(chunk.get("source_legacy_file", "")),
@@ -104,7 +117,12 @@ def answer_question(request: AskRequest) -> AskResponse:
         warnings.append("retrieved context is weak")
     advisory_note = lifecycle_advisory_note(chunks)
     if advisory_note:
-        warnings.append("pending lifecycle context is present; active rules remain authoritative")
+        warnings.append("non-current or uncertain temporal lifecycle context is present; active rules remain authoritative")
+    for chunk in chunks:
+        if chunk.get("temporal_warning"):
+            warnings.append(
+                f"source {chunk.get('source_id')} temporal warning: {chunk.get('temporal_warning')}"
+            )
 
     if request.no_ai:
         return build_response(
