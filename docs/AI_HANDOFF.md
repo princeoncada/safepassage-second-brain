@@ -1,18 +1,22 @@
 # AI Handoff
 
-## Current Version: 4.10.0-rc
+## Current Version: 4.10.0-stable
 
 ## Current Phase
 
-PHASE 4.10.0 [4.10.0-rc] - Conversation Context Resolution. VALIDATED - all checks passed 2026-05-17. Awaiting user commit to master. Current stable remains Phase 4.9.0 [4.9.0-stable]. Phase 2 [2.0.0-stable] Minimal POW, Phase 3A [3.0.0-stable] Retrieval POW, Phase 3B [3.1.0-stable] Grounded Answering POW, Phase 3C [3.2.0-stable] RAG Quality Hardening, Phase 3D [3.3.0-stable] Local API Wrapper, Phase 3E [3.4.0-stable] Open WebUI Integration, Phase 4A [4.0.0-stable] Retrieval Quality Hardening, Phase 4B [4.1.0-stable] Primary Workflow Ingestion, Phase 4B2 [4.1.1-stable] fallback confidence, Phase 4C [4.2.0-stable] post order refresh, Phase 4C1 [4.2.1-stable] lifecycle retrieval hardening, Phase 4C2 [4.2.2-stable] managed post-order conversion, Phase 4C3 [4.2.3-stable] announcement ingestion, Phase 4D [4.3.0-stable] query parsing, Phase 4E [4.4.0-stable] OCR intake using pytesseract, Phase 4F [4.4.1-stable] OCR review + ingestion bridge, Phase 4G [4.5.0-stable] temporal expiry / activation, Phase 4G1 [4.5.1-stable] announcement retrieval precision hardening, Phase 4J-lite [4.6.0-stable] operational dashboard / shift briefing, Phase UX-1 [4.7.0-stable] dashboard/OpenWebUI usability hardening, Phase 4I-lite [4.8.2-stable] slash command ingestion, and Phase 4.9.0 [4.9.0-stable] scope retrieval/source dedup/alias hardening are validated or stable unless their phase sections say otherwise.
+PHASE 4.11.0 [4.11.0-alpha] - Workflow Simplification - in progress. Phase 4.10.0 [4.10.0-stable] Conversation Context Resolution is validated and stable. Phase 2 [2.0.0-stable] Minimal POW, Phase 3A [3.0.0-stable] Retrieval POW, Phase 3B [3.1.0-stable] Grounded Answering POW, Phase 3C [3.2.0-stable] RAG Quality Hardening, Phase 3D [3.3.0-stable] Local API Wrapper, Phase 3E [3.4.0-stable] Open WebUI Integration, Phase 4A [4.0.0-stable] Retrieval Quality Hardening, Phase 4B [4.1.0-stable] Primary Workflow Ingestion, Phase 4B2 [4.1.1-stable] fallback confidence, Phase 4C [4.2.0-stable] post order refresh, Phase 4C1 [4.2.1-stable] lifecycle retrieval hardening, Phase 4C2 [4.2.2-stable] managed post-order conversion, Phase 4C3 [4.2.3-stable] announcement ingestion, Phase 4D [4.3.0-stable] query parsing, Phase 4E [4.4.0-stable] OCR intake using pytesseract, Phase 4F [4.4.1-stable] OCR review + ingestion bridge, Phase 4G [4.5.0-stable] temporal expiry / activation, Phase 4G1 [4.5.1-stable] announcement retrieval precision hardening, Phase 4J-lite [4.6.0-stable] operational dashboard / shift briefing, Phase UX-1 [4.7.0-stable] dashboard/OpenWebUI usability hardening, Phase 4I-lite [4.8.2-stable] slash command ingestion, and Phase 4.9.0 [4.9.0-stable] scope retrieval/source dedup/alias hardening are validated or stable unless their phase sections say otherwise.
 
-## Phase 4.10.0 [4.10.0-rc] - Conversation Context Resolution
+## Phase 4.11.0 In Progress
 
-Phase 4.10.0-rc adds request-local conversation context resolution. `api/schemas.py` now accepts an optional `history` list of prior user turns. `api/service.py` adds `resolve_community_from_history()` and, when the current question has no resolved community, appends the most recent community found in the last 5 user turns to the retrieval query only. The original user question remains unchanged in the API response, and history is not sent to DeepSeek or stored server-side.
+Phase 4.11.0 removes rc from the active phase cycle across docs/WORKFLOW.md, docs/VERSIONING.md, docs/AI_HANDOFF.md, and the session checkpoint and opener prompts. After this phase, all future phases promote directly from alpha (or beta if partial validation) to stable when the user commits. No rc step.
+
+## Phase 4.10.0 [4.10.0-stable] - Conversation Context Resolution
+
+Phase 4.10.0-stable adds request-local conversation context resolution. `api/schemas.py` now accepts an optional `history` list of prior user turns. `api/service.py` adds `resolve_community_from_history()` and, when the current question has no resolved community, appends the most recent community found in the last 5 user turns to the retrieval query only. The original user question remains unchanged in the API response, and history is not sent to DeepSeek or stored server-side.
 
 `openwebui/examples/openwebui_connection_example.md` now documents the `history` field and shows an Open WebUI Pipe snippet that builds history from prior user messages only.
 
-Files changed for 4.10.0-rc: `api/schemas.py`, `api/service.py`, `openwebui/examples/openwebui_connection_example.md`, `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`. VALIDATED - all checks passed 2026-05-17. Awaiting user commit to master.
+Files changed for 4.10.0-stable: `api/schemas.py`, `api/service.py`, `openwebui/examples/openwebui_connection_example.md`, `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`. VALIDATED and STABLE - committed to master 2026-05-17.
 
 ## Phase 4.9.0 [4.9.0-stable]
 
@@ -97,7 +101,7 @@ Future AI work should:
 11. Read docs/WORKFLOW.md at the start of every session.
 12. Read docs/VERSIONING.md before touching any version-related documentation.
 13. Pull master before writing any Codex prompt.
-14. Write a post-validation documentation prompt after every successful validation.
+14. Write a post-validation documentation prompt after every successful validation (promotes directly to stable - no rc step).
 15. Write a session checkpoint prompt before closing a large chathead.
 
 ## Do Not Touch Without Explicit Request
@@ -124,7 +128,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Commit 4.10.0-rc to master to promote to stable. After commit, next phase is 4.11.0 - Community Onboarding: ingest post orders for remaining unindexed communities, then update the Open WebUI Pipe to forward history.
+Validate Phase 4.11.0 (documentation-only). After validation, run the post-validation doc prompt which will promote directly to stable - no rc step.
 
 ## Phase 4I-lite Implementation Added
 
