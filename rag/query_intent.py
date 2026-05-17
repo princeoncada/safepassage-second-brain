@@ -88,6 +88,14 @@ REQUESTED_ALL_PHRASES = {
     "show me all",
     "all active",
     "full post order",
+    "relevant to kiosk",
+    "for kiosk agents",
+    "relevant to concierge",
+    "for concierge agents",
+    "kiosk post orders",
+    "concierge post orders",
+    "all kiosk post orders",
+    "all concierge post orders",
 }
 
 
@@ -145,7 +153,7 @@ def load_query_topics() -> dict[str, dict[str, Any]]:
 
 
 def alias_tokens(query: str) -> list[str]:
-    tokens = re.findall(r"\b[A-Za-z]{2,6}\d*\b", query)
+    tokens = re.findall(r"\b[A-Za-z]{2,20}\d*\b", query)
     output: list[str] = []
     for token in tokens:
         match = re.match(r"[A-Za-z]+", token)
@@ -226,6 +234,8 @@ def detect_scope(intent: QueryIntent) -> None:
 def detect_requested_all(intent: QueryIntent) -> None:
     if any(phrase in intent.normalized_query for phrase in REQUESTED_ALL_PHRASES):
         intent.requested_all = True
+    if intent.scope_hint and intent.community and "post_order" in intent.expected_types:
+        intent.requested_all = True
 
 
 def phrase_is_operational_topic(phrase: str) -> bool:
@@ -285,6 +295,8 @@ def parse_query_intent(query: str, known_communities: set[str] | None = None) ->
     detect_keyword_intent(intent)
     detect_requested_all(intent)
     detect_scope(intent)
+    if intent.scope_hint and intent.community and "post_order" in intent.expected_types:
+        intent.requested_all = True
 
     if not intent.community:
         intent.missing_community = unknown_community_phrase(query, known_communities)
