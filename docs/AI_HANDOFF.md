@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-PHASE 4G TEMPORAL EXPIRY / ACTIVATION ENGINE. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, Phase 4D query parsing, Phase 4E OCR intake using pytesseract, and Phase 4F OCR review + ingestion bridge are validated or mostly working. Phase 4G implementation is added and awaiting manual validation.
+PHASE 4G1 ANNOUNCEMENT RETRIEVAL PRECISION HARDENING. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, Phase 4D query parsing, Phase 4E OCR intake using pytesseract, Phase 4F OCR review + ingestion bridge, and Phase 4G temporal expiry / activation are validated or mostly working. Phase 4G1 implementation is added and awaiting manual validation.
 
 ## What Exists
 
@@ -31,6 +31,7 @@ PHASE 4G TEMPORAL EXPIRY / ACTIVATION ENGINE. Phase 2 Minimal POW, Phase 3A Retr
 - Reviewed OCR staging folder under `automation/ingestion/reviewed_ocr_inputs/`.
 - Phase 4G deterministic temporal lifecycle utility in `rag/lifecycle.py`.
 - Phase 4G read-only temporal report script at `automation/ingestion/report_temporal_lifecycle.py`.
+- Phase 4G1 deterministic retrieval reranking helpers in `rag/retrieval_rerank.py`.
 
 ## Current Stable Components
 
@@ -77,13 +78,17 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Manually validate Phase 4G Temporal Expiry / Activation Engine.
+Manually validate Phase 4G1 Announcement Retrieval Precision Hardening.
+
+Phase 4G1 was needed after Phase 4G validation exposed a retrieval precision regression: `What is the Red Zone Protocol reminder?` parsed correctly but could retrieve nearby reminder chunks instead of the exact Red Zone Protocol announcement. The failure was chunk/ranking specificity, not safe refusal or intent extraction.
+
+Retrieval now uses deterministic reranking after vector retrieval. The reranker considers exact topic phrase matches, title overlap, keyword overlap, category match, direct answer section weighting, authority, lifecycle, and temporal state. It boosts the direct `Announcement` body section and penalizes `Operational Notes`, `Source`, migration notes, and other metadata-heavy sections for direct operational questions without fully excluding them.
 
 Phase 4G adds deterministic date-aware lifecycle interpretation for managed operational memory. Temporal states are `active`, `pending`, `not_yet_active`, `expired`, `superseded`, `archived`, `review`, and `unknown`. Retrieval still preserves `post_order > announcement > primary_workflow`, but active temporal sources should rank above stale, future-dated, review, archived, superseded, or unknown-temporal sources.
 
 Generated temporal reports under `vault/08_Reports/temporal-lifecycle/` are reports only. They are not operational memory unless separately reviewed and ingested by deterministic processes. The report script must not delete or mutate source vault documents, run ingestion scripts, or update ChromaDB.
 
-After Phase 4G manual validation, the next recommended step is Phase 4J-lite Operational Dashboard / Shift Briefing.
+After Phase 4G1 manual validation, the next recommended step is Phase 4J-lite Operational Dashboard / Shift Briefing.
 
 OCR is operational using pytesseract. PaddleOCR did not pass Windows runtime validation and should be treated as experimental/deferred unless a future phase pins a compatible version or moves OCR to Linux/Docker.
 
