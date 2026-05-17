@@ -59,6 +59,28 @@ def metadata_text(metadata: dict[str, Any], *keys: str) -> str:
     return " ".join(str(metadata.get(key, "")) for key in keys if metadata.get(key, ""))
 
 
+def resolve_scope_key(metadata: dict[str, Any]) -> str:
+    scope_key = str(metadata.get("scope_key", "")).strip().lower()
+    if scope_key in {"k", "c", "kc"}:
+        return scope_key
+    scope_raw = metadata.get("scope", "")
+    if isinstance(scope_raw, list):
+        values = {str(value).strip().lower() for value in scope_raw}
+    else:
+        values = {
+            value.strip().lower().strip("'\"[]")
+            for value in str(scope_raw).split(",")
+            if value.strip()
+        }
+    if "kiosk" in values and "concierge" in values:
+        return "kc"
+    if "kiosk" in values:
+        return "k"
+    if "concierge" in values:
+        return "c"
+    return ""
+
+
 def rerank_adjustment(
     *,
     query: str,
@@ -133,5 +155,24 @@ def rerank_adjustment(
         boost = float(config.get("announcement_body_section_boost", 0.12))
         adjustment -= boost
         reasons.append(f"announcement_body_section:-{boost:.2f}")
+
+    scope_hint = str(hints.get("scope_hint", "")).strip().lower()
+    scope_key = resolve_scope_key(metadata)
+    if scope_hint == "kiosk" and scope_key in {"k", "kc"}:
+        boost = float(config.get("scope_match_boost", 0.20))
+        adjustment -= boost
+        reasons.append(f"scope_match:{scope_key}:-{boost:.2f}")
+    elif scope_hint == "concierge" and scope_key in {"c", "kc"}:
+        boost = float(config.get("scope_match_boost", 0.20))
+        adjustment -= boost
+        reasons.append(f"scope_match:{scope_key}:-{boost:.2f}")
+    elif scope_hint == "kiosk" and scope_key == "c":
+        penalty = float(config.get("scope_mismatch_penalty", 0.15))
+        adjustment += penalty
+        reasons.append(f"scope_mismatch:{scope_key}:+{penalty:.2f}")
+    elif scope_hint == "concierge" and scope_key == "k":
+        penalty = float(config.get("scope_mismatch_penalty", 0.15))
+        adjustment += penalty
+        reasons.append(f"scope_mismatch:{scope_key}:+{penalty:.2f}")
 
     return adjustment, reasons
