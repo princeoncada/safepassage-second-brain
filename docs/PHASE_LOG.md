@@ -2,13 +2,13 @@
 
 ## Current Phase
 
-POST PHASE 4E DOCUMENTATION ALIGNMENT
+PHASE 4F OCR REVIEW + INGESTION BRIDGE
 
 ## Overall System Status
 
 WORKING PROOF OF WORK
 
-The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, and Phase 4E OCR intake using pytesseract fallback.
+The final project is not complete. The current validated checkpoint proves local ingestion, retrieval, grounded answering, local API access, Open WebUI presentation integration, Phase 4A retrieval hardening, Phase 4B primary workflow ingestion, Phase 4B2 fallback confidence, Phase 4C batch post order refresh/diffing, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 legacy post-order managed conversion, Phase 4C3 announcement lifecycle ingestion, Phase 4D query intent parsing, and Phase 4E OCR intake using pytesseract fallback. Phase 4F implementation adds a reviewed OCR staging bridge and is awaiting manual validation.
 
 ## Phase 2 Minimal POW
 
@@ -125,17 +125,19 @@ These are not blockers.
 
 ## Next Recommended Step
 
-Keep documentation aligned with the validated Phase 4E result.
+Manually validate Phase 4F OCR Review + Ingestion Bridge.
 
 Scope:
 
-- validated OCR backend is pytesseract;
-- PaddleOCR is experimental and deferred due to Windows runtime compatibility failure;
+- validated OCR backend remains pytesseract;
+- PaddleOCR remains experimental and deferred due to Windows runtime compatibility failure;
 - OCR output stays under `automation/ocr/output/`;
-- OCR does not write to `vault/` or call ingestion scripts;
+- reviewed OCR files may be organized under `automation/ocr/review_queue/`;
+- approved reviewed OCR text may be staged under `automation/ingestion/reviewed_ocr_inputs/`;
+- OCR and the review bridge do not write to `vault/`, call ingestion scripts, or update ChromaDB;
 - human review remains required before any extracted text enters announcement or post-order ingestion.
 
-After Phase 4E, consider a narrow reviewed-OCR handoff improvement if needed. Do not jump to agents, direct vault editing, automatic OCR ingestion, or Phase 5 without an explicit phase request.
+Do not jump to agents, direct vault editing, automatic OCR ingestion, or Phase 5 without an explicit phase request.
 
 ## Phase 3C RAG Quality Hardening
 
@@ -412,6 +414,53 @@ Validation notes:
 - PaddleOCR did not pass validation and is not the production OCR backend.
 - pytesseract fallback succeeded and generated OCR review artifacts.
 - The OCR architecture passed because it remains intake-only and requires human review before ingestion.
+
+## Phase 4F OCR Review + Ingestion Bridge
+
+IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+
+- [x] Add OCR review queue folders for pending, approved, and rejected review artifacts
+- [x] Add `.gitkeep` files for empty review queue folders
+- [x] Add deterministic OCR review metadata fields to generated review Markdown
+- [x] Default new review artifacts to `review_status: pending_review`
+- [x] Default `approved_for_ingestion: false`
+- [x] Default `target_ingestion_type: none`
+- [x] Preserve OCR warnings about formatting, aliases, dates, times, emergency codes, gate names, and manual review
+- [x] Add deterministic `automation/ocr/ocr_review_bridge.py`
+- [x] Require `review_status: approved`
+- [x] Require `approved_for_ingestion: true`
+- [x] Require `target_ingestion_type: announcement` or `post_order`
+- [x] Extract reviewed text from `## Extracted Text`
+- [x] Stage reviewed text under `automation/ingestion/reviewed_ocr_inputs/`
+- [x] Avoid writing to `vault/`
+- [x] Avoid calling announcement or post-order ingestion scripts
+- [x] Avoid ChromaDB indexing
+- [x] Preserve reviewed text without summarizing or rewriting it
+- [ ] User manually validates refusal for pending review files
+- [ ] User manually validates refusal for unapproved files
+- [ ] User manually validates announcement staging output
+- [ ] User manually validates post-order staging output
+- [ ] User manually runs the appropriate deterministic ingestion script if staging output is acceptable
+- [ ] User manually rebuilds ChromaDB after ingestion
+- [ ] User reviews changes manually
+- [ ] User commits changes manually
+
+Phase 4F workflow:
+
+```text
+image
+-> OCR extraction
+-> raw OCR artifact
+-> review Markdown artifact
+-> human review/edit
+-> approved review bridge
+-> reviewed OCR staging input under automation/ingestion/reviewed_ocr_inputs/
+-> user manually runs existing deterministic ingestion script
+-> vault Markdown
+-> user manually rebuilds ChromaDB
+```
+
+No automatic OCR-to-vault ingestion, autonomous agents, AI semantic rewriting, alias expansion during OCR cleanup, ingestion-script calls, direct vault writes, artifact deletion, or ChromaDB updates were added.
 
 ## Deferred
 
