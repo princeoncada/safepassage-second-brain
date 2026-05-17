@@ -1,8 +1,10 @@
 # AI Handoff
 
+## Current Version: 4.8.1-rc
+
 ## Current Phase
 
-PHASE 4I-lite Text Ingestion via Open WebUI Slash Commands. Implementation added, manual validation pending. Phase 2 Minimal POW, Phase 3A Retrieval POW, Phase 3B Grounded Answering POW, Phase 3C RAG Quality Hardening, Phase 3D Local API Wrapper, Phase 3E Open WebUI Integration, Phase 4A Retrieval Quality Hardening, Phase 4B Primary Workflow Ingestion, Phase 4B2 fallback confidence, Phase 4C post order refresh, Phase 4C1 lifecycle retrieval hardening, Phase 4C2 managed post-order conversion, Phase 4C3 announcement ingestion, Phase 4D query parsing, Phase 4E OCR intake using pytesseract, Phase 4F OCR review + ingestion bridge, Phase 4G temporal expiry / activation, Phase 4G1 announcement retrieval precision hardening, Phase 4J-lite operational dashboard / shift briefing, and Phase UX-1 dashboard/OpenWebUI usability hardening are validated or mostly working.
+PHASE 4I-lite [4.8.1-rc] - Text Ingestion via Open WebUI Slash Commands. Both known bugs fixed. Manual validation pending to promote to stable. Phase 2 [2.0.0-stable] Minimal POW, Phase 3A [3.0.0-stable] Retrieval POW, Phase 3B [3.1.0-stable] Grounded Answering POW, Phase 3C [3.2.0-stable] RAG Quality Hardening, Phase 3D [3.3.0-stable] Local API Wrapper, Phase 3E [3.4.0-stable] Open WebUI Integration, Phase 4A [4.0.0-stable] Retrieval Quality Hardening, Phase 4B [4.1.0-stable] Primary Workflow Ingestion, Phase 4B2 [4.1.1-stable] fallback confidence, Phase 4C [4.2.0-stable] post order refresh, Phase 4C1 [4.2.1-stable] lifecycle retrieval hardening, Phase 4C2 [4.2.2-stable] managed post-order conversion, Phase 4C3 [4.2.3-stable] announcement ingestion, Phase 4D [4.3.0-stable] query parsing, Phase 4E [4.4.0-stable] OCR intake using pytesseract, Phase 4F [4.4.1-stable] OCR review + ingestion bridge, Phase 4G [4.5.0-stable] temporal expiry / activation, Phase 4G1 [4.5.1-stable] announcement retrieval precision hardening, Phase 4J-lite [4.6.0-stable] operational dashboard / shift briefing, and Phase UX-1 [4.7.0-stable] dashboard/OpenWebUI usability hardening are validated or mostly working.
 
 ## What Exists
 
@@ -85,7 +87,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-After 4I-lite manual validation, next is Phase 4H OpenWebUI Upload + OCR Bridge.
+After 4I-lite manual validation and commit (-> 4.8.1-stable), next phase is 4.9.0-alpha: scope-aware complete listing improvements and additional community onboarding workflows.
 
 ## Phase 4I-lite Implementation Added
 
