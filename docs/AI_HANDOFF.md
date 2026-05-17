@@ -1,14 +1,16 @@
 # AI Handoff
 
-## Current Version: 4.10.0-stable
+## Current Version: 4.11.0-stable
 
 ## Current Phase
 
-PHASE 4.11.0 [4.11.0-alpha] - Workflow Simplification - in progress. Phase 4.10.0 [4.10.0-stable] Conversation Context Resolution is validated and stable. Phase 2 [2.0.0-stable] Minimal POW, Phase 3A [3.0.0-stable] Retrieval POW, Phase 3B [3.1.0-stable] Grounded Answering POW, Phase 3C [3.2.0-stable] RAG Quality Hardening, Phase 3D [3.3.0-stable] Local API Wrapper, Phase 3E [3.4.0-stable] Open WebUI Integration, Phase 4A [4.0.0-stable] Retrieval Quality Hardening, Phase 4B [4.1.0-stable] Primary Workflow Ingestion, Phase 4B2 [4.1.1-stable] fallback confidence, Phase 4C [4.2.0-stable] post order refresh, Phase 4C1 [4.2.1-stable] lifecycle retrieval hardening, Phase 4C2 [4.2.2-stable] managed post-order conversion, Phase 4C3 [4.2.3-stable] announcement ingestion, Phase 4D [4.3.0-stable] query parsing, Phase 4E [4.4.0-stable] OCR intake using pytesseract, Phase 4F [4.4.1-stable] OCR review + ingestion bridge, Phase 4G [4.5.0-stable] temporal expiry / activation, Phase 4G1 [4.5.1-stable] announcement retrieval precision hardening, Phase 4J-lite [4.6.0-stable] operational dashboard / shift briefing, Phase UX-1 [4.7.0-stable] dashboard/OpenWebUI usability hardening, Phase 4I-lite [4.8.2-stable] slash command ingestion, and Phase 4.9.0 [4.9.0-stable] scope retrieval/source dedup/alias hardening are validated or stable unless their phase sections say otherwise.
+PHASE 4.11.0 [4.11.0-stable] - Workflow Simplification. VALIDATED and STABLE - committed to master 2026-05-17. Phase 4.10.0 [4.10.0-stable] Conversation Context Resolution is validated and stable. Phase 2 [2.0.0-stable] Minimal POW, Phase 3A [3.0.0-stable] Retrieval POW, Phase 3B [3.1.0-stable] Grounded Answering POW, Phase 3C [3.2.0-stable] RAG Quality Hardening, Phase 3D [3.3.0-stable] Local API Wrapper, Phase 3E [3.4.0-stable] Open WebUI Integration, Phase 4A [4.0.0-stable] Retrieval Quality Hardening, Phase 4B [4.1.0-stable] Primary Workflow Ingestion, Phase 4B2 [4.1.1-stable] fallback confidence, Phase 4C [4.2.0-stable] post order refresh, Phase 4C1 [4.2.1-stable] lifecycle retrieval hardening, Phase 4C2 [4.2.2-stable] managed post-order conversion, Phase 4C3 [4.2.3-stable] announcement ingestion, Phase 4D [4.3.0-stable] query parsing, Phase 4E [4.4.0-stable] OCR intake using pytesseract, Phase 4F [4.4.1-stable] OCR review + ingestion bridge, Phase 4G [4.5.0-stable] temporal expiry / activation, Phase 4G1 [4.5.1-stable] announcement retrieval precision hardening, Phase 4J-lite [4.6.0-stable] operational dashboard / shift briefing, Phase UX-1 [4.7.0-stable] dashboard/OpenWebUI usability hardening, Phase 4I-lite [4.8.2-stable] slash command ingestion, and Phase 4.9.0 [4.9.0-stable] scope retrieval/source dedup/alias hardening are validated or stable unless their phase sections say otherwise.
 
-## Phase 4.11.0 In Progress
+## Phase 4.11.0 [4.11.0-stable]
 
 Phase 4.11.0 removes rc from the active phase cycle across docs/WORKFLOW.md, docs/VERSIONING.md, docs/AI_HANDOFF.md, and the session checkpoint and opener prompts. After this phase, all future phases promote directly from alpha (or beta if partial validation) to stable when the user commits. No rc step.
+
+Status: VALIDATED and STABLE - committed to master 2026-05-17.
 
 ## Phase 4.10.0 [4.10.0-stable] - Conversation Context Resolution
 
@@ -128,7 +130,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Validate Phase 4.11.0 (documentation-only). After validation, run the post-validation doc prompt which will promote directly to stable - no rc step.
+Next phase is 4.12.0 - Community Onboarding: ingest post orders for remaining unindexed communities via /post-orders [ALIAS] [text] in Open WebUI. Currently indexed communities: CBK, HPS, GLEN, SR. All other aliases in community_aliases.json have no post orders in vault.
 
 ## Phase 4I-lite Implementation Added
 
