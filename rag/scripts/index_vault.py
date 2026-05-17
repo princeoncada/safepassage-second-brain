@@ -188,6 +188,7 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
         announcement_id = normalize_metadata_value(frontmatter.get("announcement_id"))
         announcement_hash = normalize_metadata_value(frontmatter.get("announcement_hash"))
         category = normalize_metadata_value(frontmatter.get("category"))
+        normalized_announcement = normalize_metadata_value(frontmatter.get("normalized_announcement"))
         rule_id = normalize_metadata_value(frontmatter.get("rule_id"))
         rule_hash = normalize_metadata_value(frontmatter.get("rule_hash"))
         source_batch = normalize_metadata_value(frontmatter.get("source_batch"))
@@ -246,6 +247,8 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
                     f"Section: {section}",
                     f"Type: {doc_type}",
                     f"Community: {community}",
+                    f"Category: {category}" if category else "",
+                    f"Announcement Topic: {normalized_announcement}" if doc_type == "announcement" and normalized_announcement else "",
                     "",
                     content,
                 ]
@@ -268,6 +271,7 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
                     "announcement_id": announcement_id,
                     "announcement_hash": announcement_hash,
                     "category": category,
+                    "normalized_announcement": normalized_announcement,
                     "rule_id": rule_id,
                     "rule_hash": rule_hash,
                     "source_batch": source_batch,
