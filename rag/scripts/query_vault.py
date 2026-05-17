@@ -15,6 +15,7 @@ if str(REPO_ROOT) not in sys.path:
 import chromadb
 from sentence_transformers import SentenceTransformer
 
+from rag.lifecycle import temporal_lifecycle
 from rag.query_intent import expand_query_with_intent, parse_query_intent
 
 
@@ -103,6 +104,13 @@ def authority_level(metadata: dict[str, Any]) -> str:
     if doc_type == "workflow":
         return "primary_workflow"
     return ""
+
+
+def temporal_state(metadata: dict[str, Any]) -> str:
+    explicit = str(metadata.get("temporal_state", "")).strip()
+    if explicit:
+        return explicit
+    return temporal_lifecycle(metadata).temporal_state
 
 
 def is_default_workflow_query(query: str) -> bool:
@@ -251,6 +259,8 @@ def main() -> int:
     }
     status_boosts = {str(status): float(boost) for status, boost in config.get("status_boosts", {}).items()}
     status_penalties = {str(status): float(penalty) for status, penalty in config.get("status_penalties", {}).items()}
+    temporal_boosts = {str(state): float(boost) for state, boost in config.get("temporal_state_boosts", {}).items()}
+    temporal_penalties = {str(state): float(penalty) for state, penalty in config.get("temporal_state_penalties", {}).items()}
     lifecycle_boosts = {
         str(generation): float(boost)
         for generation, boost in config.get("lifecycle_generation_boosts", {}).items()
@@ -312,6 +322,7 @@ def main() -> int:
             continue
         if skip_legacy and lifecycle_generation == "legacy":
             continue
+        temporal = temporal_state(metadata)
 
         distance = distances[index] if index < len(distances) else 999.0
         adjusted_distance = float(distance) - section_boosts.get(normalized_section, 0.0)
@@ -331,6 +342,8 @@ def main() -> int:
         adjusted_distance -= authority_boosts.get(authority, 0.0)
         adjusted_distance -= status_boosts.get(status, 0.0)
         adjusted_distance += status_penalties.get(status, 0.0)
+        adjusted_distance -= temporal_boosts.get(temporal, 0.0)
+        adjusted_distance += temporal_penalties.get(temporal, 0.0)
         adjusted_distance -= lifecycle_boosts.get(lifecycle_generation, 0.0)
         adjusted_distance += lifecycle_penalties.get(lifecycle_generation, 0.0)
         if authority == "primary_workflow" and hints["community"]:
@@ -444,6 +457,13 @@ def main() -> int:
         print(f"Authority: {authority_level(metadata)}")
         print(f"Status: {metadata.get('status', '')}")
         print(f"Lifecycle Generation: {metadata.get('lifecycle_generation', '')}")
+        print(f"Temporal State: {temporal_state(metadata)}")
+        if metadata.get("temporal_warning", ""):
+            print(f"Temporal Warning: {metadata.get('temporal_warning', '')}")
+        if metadata.get("temporal_start_date", ""):
+            print(f"Temporal Start: {metadata.get('temporal_start_date', '')} ({metadata.get('temporal_start_field', '')})")
+        if metadata.get("temporal_end_date", ""):
+            print(f"Temporal End: {metadata.get('temporal_end_date', '')} ({metadata.get('temporal_end_field', '')})")
         print(f"Category: {metadata.get('category', '')}")
         print(f"Announcement ID: {metadata.get('announcement_id', '')}")
         print(f"Rule ID: {metadata.get('rule_id', '')}")
