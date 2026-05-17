@@ -1,8 +1,35 @@
+# Version History
+
+| Version | Phase | State | Date | Summary |
+| --- | --- | --- | --- | --- |
+| 4.8.1-rc | Phase 4I-lite | rc | 2026-05-17 | top_k fix + name match fix |
+| 4.8.0-beta | Phase 4I-lite | beta | 2026-05-17 | slash commands, scope rerank partial |
+| 4.7.0-stable | Phase UX-1 | stable | 2026-05-17 | dashboard + alias expansion |
+| 4.6.0-stable | Phase 4J-lite | stable | 2026-05-17 | operational dashboard |
+| 4.5.1-stable | Phase 4G1 | stable | 2026-05-17 | retrieval precision hardening |
+| 4.5.0-stable | Phase 4G | stable | 2026-05-17 | temporal lifecycle engine |
+| 4.4.1-stable | Phase 4F | stable | 2026-05-17 | OCR review bridge |
+| 4.4.0-stable | Phase 4E | stable | 2026-05-17 | OCR intake layer |
+| 4.3.0-stable | Phase 4D | stable | 2026-05-17 | query intent parser |
+| 4.2.3-stable | Phase 4C3 | stable | 2026-05-17 | announcement ingestion |
+| 4.2.2-stable | Phase 4C2 | stable | 2026-05-17 | legacy post order migration |
+| 4.2.1-stable | Phase 4C1 | stable | 2026-05-17 | lifecycle retrieval hardening |
+| 4.2.0-stable | Phase 4C | stable | 2026-05-17 | batch post order refresh |
+| 4.1.1-stable | Phase 4B2 | stable | 2026-05-17 | fallback confidence fix |
+| 4.1.0-stable | Phase 4B | stable | 2026-05-17 | primary workflow ingestion |
+| 4.0.0-stable | Phase 4A | stable | 2026-05-17 | retrieval quality hardening |
+| 3.4.0-stable | Phase 3E | stable | 2026-05-17 | Open WebUI integration |
+| 3.3.0-stable | Phase 3D | stable | 2026-05-17 | FastAPI local wrapper |
+| 3.2.0-stable | Phase 3C | stable | 2026-05-17 | RAG quality hardening |
+| 3.1.0-stable | Phase 3B | stable | 2026-05-17 | grounded answering |
+| 3.0.0-stable | Phase 3A | stable | 2026-05-17 | retrieval POW |
+| 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
+
 # Phase Log
 
 ## Current Phase
 
-PHASE 4I-lite TEXT INGESTION VIA OPEN WEBUI SLASH COMMANDS
+PHASE 4I-lite [4.8.1-rc] TEXT INGESTION VIA OPEN WEBUI SLASH COMMANDS
 
 ## Overall System Status
 
@@ -579,9 +606,15 @@ PASSED / VALIDATED
 
 Phase UX-1 does not add new operational memory, ingestion pipelines, authority layers, agents, autonomous behavior, AI semantic rewriting, automatic vault writes, automatic ChromaDB updates, or any weakening of safe refusal. The authority hierarchy remains `post_order > announcement > primary_workflow`.
 
-## Phase 4I-lite Text Ingestion via Open WebUI Slash Commands
+## Phase 4I-lite Text Ingestion via Open WebUI Slash Commands [4.8.1-rc]
 
 IMPLEMENTATION ADDED, MANUAL VALIDATION PENDING
+
+### 4.8.1-rc Patch Notes
+
+- Fixed top_k ceiling: added requested_all detection and effective_top_k=25 override
+- Fixed community name matching: added longest-first full name lookup from aliases.json
+- Promoted from 4.8.0-beta to 4.8.1-rc pending full validation pass
 
 - [x] Add `api/ingest.py` for guarded slash command ingestion state and handlers
 - [x] Add `/post-orders` command detection through `/ask`
