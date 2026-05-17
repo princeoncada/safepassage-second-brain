@@ -121,6 +121,11 @@ Every version change must be applied consistently across all four locations. Par
 
 When continuing this project, an AI agent MUST:
 
+0. Read docs/WORKFLOW.md at the start of every session.
+   It defines the full phase cycle, Codex prompt standards,
+   context window management, and repo awareness rules.
+   VERSIONING.md handles what version to assign.
+   WORKFLOW.md handles how to work.
 1. Read docs/VERSIONING.md first - this file - before touching any documentation.
 2. Read docs/AI_HANDOFF.md to understand the current phase and what exists.
 3. Read docs/PHASE_LOG.md to understand the full history and what was validated.
