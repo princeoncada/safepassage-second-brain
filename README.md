@@ -8,7 +8,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4E validation:
+Working proof of work through Phase 4E validation, with Phase 4F implementation added for manual validation:
 
 - Phase 2 Minimal POW ingestion: passed
 - Phase 3A retrieval: passed
@@ -25,6 +25,7 @@ Working proof of work through Phase 4E validation:
 - Phase 4C3 announcement / reminder lifecycle ingestion: passed with minor retrieval edge case
 - Phase 4D operational query parser / intent extraction: passed
 - Phase 4E OCR intake layer: passed using pytesseract fallback
+- Phase 4F OCR review + ingestion bridge: implementation added, manual validation pending
 
 Current architecture:
 
@@ -58,6 +59,8 @@ Phase 4E adds a local OCR intake layer for screenshots and images. OCR creates r
 
 The current validated OCR backend is `pytesseract`. PaddleOCR did not pass Windows runtime validation and is deferred as an experimental future Linux, Docker, or pinned-version candidate.
 
+Phase 4F adds an explicit OCR review queue and a deterministic review bridge. The bridge only copies human-approved reviewed OCR text into staging files under `automation/ingestion/reviewed_ocr_inputs/`; it does not write to `vault/`, trigger ingestion scripts, or update ChromaDB.
+
 ## OCR Intake
 
 ```powershell
@@ -68,6 +71,22 @@ python automation/ocr/ocr_extract.py --input-dir path/to/screenshots
 Review the generated Markdown under `automation/ocr/output/` before copying corrected text into announcement or post-order ingestion inputs.
 
 OCR remains intake-only. Human review is mandatory before any OCR text is used for operational ingestion.
+
+Reviewed OCR files can be organized under:
+
+```text
+automation/ocr/review_queue/pending/
+automation/ocr/review_queue/approved/
+automation/ocr/review_queue/rejected/
+```
+
+After human review, approved files may be staged for deterministic ingestion input:
+
+```powershell
+python automation/ocr/ocr_review_bridge.py --input automation/ocr/review_queue/approved/example_ocr_review.md
+```
+
+The bridge writes only to reviewed OCR staging inputs. The user must still run the appropriate announcement or post-order ingestion script manually, then rebuild ChromaDB manually.
 
 ## Post Order Batch Refresh
 
