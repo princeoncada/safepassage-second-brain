@@ -287,6 +287,25 @@ OCR output is not operational memory. It must not write directly to `vault/`, ca
 
 The validated OCR backend is local pytesseract. PaddleOCR is deferred as experimental because it did not pass Windows/Paddle runtime validation. The OCR layer does not use cloud OCR, OpenAI OCR, or LLM cleanup.
 
+### Phase 4F OCR Review + Ingestion Bridge
+
+```text
+image screenshot
+-> local OCR extraction
+-> raw OCR text
+-> review Markdown artifact
+-> human review/edit
+-> approved review bridge
+-> reviewed OCR staging input
+-> user manually runs existing ingestion script
+-> vault Markdown
+-> user manually rebuilds ChromaDB
+```
+
+Phase 4F adds queue folders under `automation/ocr/review_queue/` and a deterministic bridge that writes only to `automation/ingestion/reviewed_ocr_inputs/`.
+
+The bridge requires explicit review metadata: `review_status: approved`, `approved_for_ingestion: true`, and `target_ingestion_type: announcement` or `post_order`. It preserves reviewed text as-is. It does not write to `vault/`, call ingestion scripts, update ChromaDB, infer policy, rewrite OCR text, or bypass human review.
+
 ## Phase 3A Retrieval Flow
 
 Markdown files in `vault/`
