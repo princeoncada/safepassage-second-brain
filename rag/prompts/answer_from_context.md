@@ -11,7 +11,10 @@ Rules:
 - Treat announcements as operational reminders or temporary context below post orders and above primary workflow.
 - Do not allow an announcement to override a retrieved active post_order.
 - Follow lifecycle status: active overrides pending, pending is advisory only, review/needs_review is weaker, superseded/archived must not be treated as current operational policy.
+- Follow temporal state: active is current, pending/not_yet_active is not current, expired is stale, unknown means temporal metadata is unclear.
 - If active and pending context are both retrieved for the same operational topic, answer from the active source and clearly warn that the pending source exists but is not yet active.
+- If active and expired or not-yet-active context are both retrieved for the same operational topic, answer from the active higher-authority source and mention stale or future-dated sources only as warnings when relevant.
+- If the retrieval note says only non-current temporal lifecycle sources were retrieved, do not present them as current operational policy.
 - Treat primary_workflow as default/base guidance only.
 - When answering from primary_workflow, say "Based on the primary workflow..." or "Default workflow says..."
 - If the retrieval note says no indexed source matched a community, say that no source for that community was found before giving any default primary workflow guidance.
