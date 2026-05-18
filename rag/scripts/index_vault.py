@@ -159,7 +159,11 @@ def iter_markdown_files(include_archive: bool) -> list[Path]:
     return [path for path in files if "99_Archive" not in path.relative_to(VAULT_DIR).parts]
 
 
-def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tuple[list[str], list[str], list[dict[str, str]]]:
+def build_chunks(
+    include_archive: bool,
+    include_low_value_sections: bool,
+    files: list[Path] | None = None,
+) -> tuple[list[str], list[str], list[dict[str, str]]]:
     config = load_retrieval_config()
     low_value_sections = {normalize_section_name(section) for section in config.get("low_value_sections", [])}
     preferred_sections = {normalize_section_name(section) for section in config.get("preferred_sections", [])}
@@ -174,7 +178,19 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
     skipped_low_value = 0
     skipped_duplicates = 0
 
-    for markdown_path in iter_markdown_files(include_archive):
+    if files is None:
+        markdown_files = iter_markdown_files(include_archive)
+    else:
+        markdown_files = []
+        for path in files:
+            markdown_path = path if path.is_absolute() else REPO_ROOT / path
+            markdown_path = markdown_path.resolve()
+            if not markdown_path.exists():
+                print(f"Warning: vault file not found, skipping: {markdown_path}")
+                continue
+            markdown_files.append(markdown_path)
+
+    for markdown_path in markdown_files:
         raw = markdown_path.read_text(encoding="utf-8")
         frontmatter, body = parse_frontmatter(raw)
         relative_path = markdown_path.relative_to(REPO_ROOT).as_posix()
@@ -341,16 +357,32 @@ def main() -> int:
         action="store_true",
         help="Index low-value sections such as Change History, Open Questions, and Source Input.",
     )
+    parser.add_argument(
+        "--files",
+        nargs="+",
+        metavar="FILE",
+        help=(
+            "One or more vault Markdown files to index incrementally. "
+            "Only these files are embedded and upserted. "
+            "The ChromaDB collection is NOT cleared. "
+            "Omit to run a full rebuild (default behaviour)."
+        ),
+    )
     args = parser.parse_args()
 
     if not VAULT_DIR.exists():
         raise SystemExit(f"Vault directory not found: {VAULT_DIR}")
 
+    file_paths = [Path(f) for f in args.files] if args.files else None
     ids, documents, metadatas = build_chunks(
         include_archive=args.include_archive,
         include_low_value_sections=args.include_low_value_sections,
+        files=file_paths,
     )
     if not documents:
+        if file_paths is not None:
+            print("No Markdown chunks found to index.")
+            return 0
         raise SystemExit("No Markdown chunks found to index.")
 
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
@@ -358,15 +390,17 @@ def main() -> int:
     embeddings = model.encode(documents, normalize_embeddings=True).tolist()
 
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-    try:
-        client.delete_collection(name=COLLECTION_NAME)
-    except Exception:
-        pass
+    if file_paths is None:
+        try:
+            client.delete_collection(name=COLLECTION_NAME)
+        except Exception:
+            pass
     collection = client.get_or_create_collection(name=COLLECTION_NAME)
     collection.upsert(ids=ids, documents=documents, metadatas=metadatas, embeddings=embeddings)
 
     indexed_files = len(set(metadata["source_file"] for metadata in metadatas))
-    print(f"Indexed {len(documents)} chunks from {indexed_files} files.")
+    mode = "incremental" if file_paths else "full rebuild"
+    print(f"Indexed {len(documents)} chunks from {indexed_files} files ({mode}).")
     print(f"Collection: {COLLECTION_NAME}")
     print(f"Chroma path: {CHROMA_DIR}")
     return 0
