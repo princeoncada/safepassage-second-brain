@@ -111,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.12.1 |
-| Phase | Patch |
+| Version | 4.13.0-stable |
+| Phase | Phase 4.13.0 |
 | State | stable |
 | Date | 2026-05-17 |
-| Commit | pending |
-| Summary | lock X.Y.Z versioning convention |
+| Commit | master |
+| Summary | archive redundant legacy SR K files |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.13.0-stable | Phase 4.13.0 | stable | 2026-05-17 | archive redundant legacy SR K files - VALIDATED |
 | 4.12.1 | Patch | stable | 2026-05-17 | lock X.Y.Z versioning convention |
 | 4.12.0-alpha | Phase 4.12.0 | alpha | 2026-05-17 | scope filter fix - scope_key |
 | 4.11.0-stable | Phase 4.11.0 | stable | 2026-05-17 | workflow simplification - remove rc state - VALIDATED |
@@ -174,9 +175,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.12.0-alpha
-Current working phase: Scope Filter Fix - scope_key
-Validation status: alpha; manual validation pending.
-Next after stable: Phase 4.13.0 - Community Onboarding. Goal: ingest post orders for remaining unindexed communities.
+Current working version: 4.13.0-stable
+Current working phase: Phase 4.13.0 - Archive Redundant Legacy SR K Files
+Validation status: stable.
+Next phase: 4.13.1 - surface pending rules in scoped listing answers.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-17-session-04.md` records the workflow documentation update clarifying when to use the 3-section prompt format. No version change was made for that documentation-only update.
