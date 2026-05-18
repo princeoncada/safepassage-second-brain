@@ -544,22 +544,31 @@ def main() -> int:
 
         same_topic = find_same_topic(incoming, active_rules)
         if same_topic:
-            path = None if args.dry_run else write_rule(
-                incoming,
-                "active",
-                input_path,
-                supersedes=str(same_topic.frontmatter.get("rule_id", "")),
+            _incoming_is_pending = bool(
+                re.search(r"\(Pending\)\s*$", incoming.original_text, re.IGNORECASE)
             )
-            if not args.dry_run:
-                update_existing_frontmatter(
-                    same_topic,
-                    {
-                        "status": "superseded",
-                        "superseded_by": incoming.rule_id,
-                        "last_updated": now_iso(),
-                    },
+            if _incoming_is_pending:
+                # Pending rules never supersede active rules.
+                # Write the incoming rule as pending without touching the existing rule.
+                path = None if args.dry_run else write_rule(incoming, "active", input_path)
+                added.append((incoming, path))
+            else:
+                path = None if args.dry_run else write_rule(
+                    incoming,
+                    "active",
+                    input_path,
+                    supersedes=str(same_topic.frontmatter.get("rule_id", "")),
                 )
-            superseded.append((same_topic, incoming, path))
+                if not args.dry_run:
+                    update_existing_frontmatter(
+                        same_topic,
+                        {
+                            "status": "superseded",
+                            "superseded_by": incoming.rule_id,
+                            "last_updated": now_iso(),
+                        },
+                    )
+                superseded.append((same_topic, incoming, path))
             continue
 
         if incoming.supersede_mode.lower() == "conservative":
