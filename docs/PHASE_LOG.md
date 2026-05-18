@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.13.1 | Patch | stable | 2026-05-17 | surface pending rules in scoped listing |
 | 4.13.0-stable | Phase 4.13.0 | stable | 2026-05-17 | archive redundant legacy SR K files - VALIDATED |
 | 4.12.1 | Patch | stable | 2026-05-17 | lock X.Y.Z versioning convention |
 | 4.12.0-alpha | Phase 4.12.0 | alpha | 2026-05-17 | scope filter fix - scope_key |
@@ -33,6 +34,32 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.13.1 Surface Pending Rules in Scoped Listing Answers
+
+Status: IN PROGRESS
+
+Version: 4.13.1
+
+Date: 2026-05-17
+
+Purpose:
+
+Update the answer prompt so full scoped post-order listing queries include pending rules inline instead of only footnoting them.
+
+Implementation scope:
+
+- `rag/prompts/answer_from_context.md`: add full-listing instruction requiring active rules first and pending rules in a separate `Pending — Not Yet Active` section with each pending entry labelled `[PENDING]`.
+- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.13.1 as the current prompt-only patch.
+
+Validation checklist:
+
+- [ ] User validates full kiosk scoped listing includes active K/KC rules and pending K/KC rules.
+- [ ] User validates full concierge scoped listing includes active C/KC rules and pending C/KC rules.
+- [ ] User validates every pending rule in a full listing starts with `[PENDING]`.
+- [ ] User validates pending rules appear under `Pending — Not Yet Active`.
+- [ ] User validates specific non-listing operational questions still answer from active sources and warn about pending sources.
+- [ ] User validates no Python code, config, vault, indexing, or retrieval logic changed.
 
 ## Phase 4.13.0 Archive Redundant Legacy SR K Files
 
