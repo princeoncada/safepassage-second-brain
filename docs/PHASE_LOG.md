@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.13.2 | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order |
+| 4.13.2-stable | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order - VALIDATED |
 | 4.13.1-stable | Patch | stable | 2026-05-17 | surface pending rules in scoped listing - VALIDATED |
 | 4.13.0-stable | Phase 4.13.0 | stable | 2026-05-17 | archive redundant legacy SR K files - VALIDATED |
 | 4.12.1 | Patch | stable | 2026-05-17 | lock X.Y.Z versioning convention |
@@ -38,9 +38,9 @@
 
 ## Phase 4.13.2 Fix Pending Detection + Reverse Rule Order
 
-Status: IN PROGRESS
+Status: PASSED — stable
 
-Version: 4.13.2
+Version: 4.13.2-stable
 
 Date: 2026-05-17
 
@@ -52,7 +52,7 @@ Implementation scope:
 
 - `automation/ingestion/refresh_post_orders.py`: pending status is set only when the original pasted rule ends with `(Pending)`, case-insensitive.
 - `automation/ingestion/refresh_post_orders.py`: parsed rules are reversed before processing so the first pasted rule is written and indexed first.
-- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.13.2 as the current parser patch.
+- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.13.2-stable as the current parser patch.
 
 Validation checklist:
 
@@ -62,6 +62,14 @@ Validation checklist:
 - [ ] User validates rule 1 from pasted text is written/indexed with intended higher retrieval priority.
 - [ ] User validates no other ingestion parser behavior changed.
 - [ ] User validates no config, vault, indexing, or unrelated automation files changed.
+
+### Validation Record — 4.13.2-stable
+Date: 2026-05-17
+All checks passed. Committed to master.
+- [x] Pending marker check uses original_text trailing (Pending) only
+- [x] Body text "pending" no longer triggers pending status
+- [x] Rule order reversed in parse_batch
+Non-blocking: SR vault files need re-ingestion to pick up fix
 
 ## Phase 4.13.1 Surface Pending Rules in Scoped Listing Answers
 
