@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.12.0-alpha |
-| Last Stable | 4.11.0-stable (Phase 4.11.0) |
-| Status | alpha - manual validation pending |
+| Current | 4.12.1 |
+| Last Stable | 4.12.1 (Patch) |
+| Status | stable |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.11.0 validation, with Phase 4.12.0-alpha in progress:
+Working proof of work through Phase 4.12.1 documentation patch, with Phase 4.12.0-alpha scope filtering still pending validation:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
