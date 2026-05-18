@@ -92,3 +92,20 @@ Warnings:
 ```
 
 Use this first to confirm Open WebUI can reach the backend before enabling DeepSeek answer generation.
+
+## Streaming Pipe (Recommended)
+
+For live token streaming (ChatGPT/Claude-style), install the pipe at
+`openwebui/pipe.py` instead of a manual connector.
+
+Install steps:
+1. Open WebUI > Workspace > Pipes > New Pipe
+2. Paste the contents of `openwebui/pipe.py`
+3. Set BASE_URL in Valves to your FastAPI host
+4. Save and enable the pipe
+
+The pipe calls `/ask/stream` and yields tokens live. Citations, confidence,
+and warnings appear at the end of each response.
+
+The non-streaming `/ask` endpoint remains available for API clients
+and validation scripts.
