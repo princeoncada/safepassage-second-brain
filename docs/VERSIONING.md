@@ -111,18 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.13.4-alpha |
+| Version | 4.13.4-stable |
 | Phase | Patch |
-| State | alpha |
+| State | stable |
 | Date | 2026-05-18 |
-| Commit | pending |
-| Summary | fix double sources display in CLI output |
+| Commit | master |
+| Summary | fix double sources display in CLI output - VALIDATED |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.13.4-alpha | Patch | alpha | 2026-05-18 | fix double sources display in CLI output |
+| 4.13.4-stable | Patch | stable | 2026-05-18 | fix double sources display in CLI output - VALIDATED |
 | 4.13.3-stable | Patch | stable | 2026-05-18 | emergency code vault fix + ingestion/indexing/dedup fixes - VALIDATED |
 | 4.13.2-stable | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order - VALIDATED |
 | 4.13.1-stable | Patch | stable | 2026-05-17 | surface pending rules in scoped listing - VALIDATED |
@@ -179,9 +179,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.13.4-alpha
+Current working version: 4.13.4-stable
 Current working phase: Fix Double Sources Display in CLI Output
-Validation status: alpha; implementation pending validation.
-Next phase after stable: 4.14.0 — conflict detection during ingestion preview.
+Validation status: stable; validated and committed to master.
+Next phase: 4.14.0 — conflict detection during ingestion preview.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md` records the 4.12.1 through 4.13.3-stable session handoff and next action. No version change was made for that checkpoint documentation-only update.
