@@ -1,6 +1,6 @@
 # AI Handoff
 
-## Current Version: 4.13.3
+## Current Version: 4.13.3-stable
 
 ## Current Phase
 
@@ -27,7 +27,9 @@ Status: VALIDATED and STABLE — committed to master 2026-05-17.
 
 Phase 4.13.1 updates `rag/prompts/answer_from_context.md` so full scoped post-order listing answers include pending rules instead of only footnoting them. For full kiosk or concierge listing queries, pending rules must be shown in a separate `Pending — Not Yet Active` section and each pending entry must start with `[PENDING]`. Non-listing operational questions keep the existing behavior: answer from active sources and warn about pending sources.
 
-## Phase 4.13.3 [4.13.3]
+## Phase 4.13.3 [4.13.3-stable]
+
+Status: VALIDATED and STABLE — committed to master 2026-05-18.
 
 Phase 4.13.3 fixes Sierra Ridge emergency-code vault metadata directly. The active concierge emergency code rule without a `(Pending)` marker is restored to `status: active` with no `superseded_by` reference, and the pending emergency-code variant keeps `status: pending` but no longer supersedes the active rule. This is a vault data fix only; no code, config, ingestion, or indexing scripts are changed or run in this phase.
 
@@ -163,7 +165,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-After committing 4.13.3: reingest SR post orders in Open WebUI to apply 4.13.2 pending detection fix, then rebuild ChromaDB with reset_chroma.py + index_vault.py. Then proceed to Phase 4.13.4 — fix strip_sources_section() double sources display.
+Next: Phase 4.13.4 — fix strip_sources_section() double sources display. Then Phase 4.14.0 — conflict detection during ingestion preview.
 
 ## Phase 4I-lite Implementation Added
 
