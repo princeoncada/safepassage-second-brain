@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.13.4-stable |
+| Current | 4.14.0-alpha |
 | Last Stable | 4.13.4-stable (Patch) |
-| Status | stable |
+| Status | alpha |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.13.4-stable double sources display fix:
+Working proof of work through Phase 4.13.4-stable double sources display fix. Current implementation is Phase 4.14.0-alpha incremental indexing with `--files`, pending manual validation:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -48,6 +48,7 @@ Working proof of work through Phase 4.13.4-stable double sources display fix:
 - Phase 4.13.2 [4.13.2-stable] - Fix pending detection + reverse rule order: stable
 - Phase 4.13.3 [4.13.3-stable] - Fix emergency code vault data: stable
 - Phase 4.13.4 [4.13.4-stable] - Fix double sources display in CLI output: stable
+- Phase 4.14.0 [4.14.0-alpha] - Incremental indexing with --files flag: alpha
 
 Current architecture:
 
@@ -112,6 +113,8 @@ Phase 4.13.2-stable fixes post-order ingestion pending detection so only a trail
 Phase 4.13.3-stable fixes Sierra Ridge emergency-code vault metadata, ingestion supersede behavior, retrieval near-duplicate handling, indexing near-duplicate status awareness, and the direct inference prompt gap for physical ID versus digital ID questions.
 
 Phase 4.13.4-stable fixes the CLI double sources display issue by suppressing the early source print in the normal AI answer path. The --no-ai and refusal paths keep their existing source output.
+
+Phase 4.14.0-alpha adds incremental vault indexing. `rag/scripts/index_vault.py --files [path ...]` embeds and upserts only the specified Markdown files without clearing the ChromaDB collection, while the default no-flag path remains a full rebuild. Slash-command ingestion now indexes recently modified post-order or announcement vault files after confirmed ingestion, with a fallback to full rebuild when no recent files are detected.
 
 Dashboard endpoints:
 
