@@ -183,4 +183,4 @@ Current working phase: Fix Emergency Code Vault Data
 Validation status: stable; validated and committed to master.
 Next phase: 4.13.4 — fix double sources display in CLI output.
 
-Latest checkpoint: `docs/SESSION_LOG/2026-05-17-session-04.md` records the workflow documentation update clarifying when to use the 3-section prompt format. No version change was made for that documentation-only update.
+Latest checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md` records the 4.12.1 through 4.13.3-stable session handoff and next action. No version change was made for that checkpoint documentation-only update.
