@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.13.4-alpha | Patch | alpha | 2026-05-18 | fix double sources display in CLI output |
 | 4.13.3-stable | Patch | stable | 2026-05-18 | emergency code vault fix + ingestion/indexing/dedup fixes - VALIDATED |
 | 4.13.2-stable | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order - VALIDATED |
 | 4.13.1-stable | Patch | stable | 2026-05-17 | surface pending rules in scoped listing - VALIDATED |
@@ -36,6 +37,30 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.13.4 Fix Double Sources Display in CLI Output
+
+Status: alpha
+
+Version: 4.13.4-alpha
+
+Date: 2026-05-18
+
+Purpose:
+
+Fix strip_sources_section() double sources display in CLI output.
+
+Implementation scope:
+
+- `rag/scripts/answer_vault.py`: gate early print_sources call so it is suppressed in the normal AI answer path; sources now print exactly once.
+
+Validation checklist:
+
+- [ ] Normal AI query: sources section appears exactly once in CLI output.
+- [ ] --no-ai query: sources section still appears (from print_citations).
+- [ ] Refuse path: "Closest Retrieved Sources" still appears.
+- [ ] No retrieval behavior changes.
+- [ ] No other files changed except answer_vault.py and docs/.
 
 ## Phase 4.13.3 Fix Emergency Code Vault Data
 
