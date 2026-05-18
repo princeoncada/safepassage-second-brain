@@ -164,6 +164,8 @@ def parse_batch(input_path: Path) -> tuple[str, str, str, str, str, list[Incomin
             )
         )
 
+    rules.reverse()
+
     if not rules:
         raise SystemExit("No post order entries found. Expected lines like: POST ORDER (K): text")
     return community, community_code, batch_date, update_type, supersede_mode, rules
@@ -310,7 +312,11 @@ def yaml_frontmatter(metadata: dict[str, Any]) -> str:
 def build_rule_markdown(incoming: IncomingRule, status: str, input_file: Path, supersedes: str = "") -> str:
     created = now_iso()
     title = f"{incoming.community} Post Order - {incoming.topic_key.replace('-', ' ').title()}"
-    effective_status = "pending" if status == "active" and "pending" in incoming.normalized_text else status
+    effective_status = (
+        "pending"
+        if status == "active" and re.search(r"\(Pending\)\s*$", incoming.original_text, re.IGNORECASE)
+        else status
+    )
     metadata = {
         "title": title,
         "type": "post_order",
