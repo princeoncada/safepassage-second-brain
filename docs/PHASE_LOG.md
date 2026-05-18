@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.16.0-alpha | Phase 4.16.0 | alpha | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders |
 | 4.15.0-stable | Phase 4.15.0 | stable | 2026-05-18 | streaming response - /ask/stream SSE endpoint + Open WebUI pipe - VALIDATED |
 | 4.14.0-stable | Phase 4.14.0 | stable | 2026-05-18 | incremental indexing with --files flag - VALIDATED |
 | 4.13.4-stable | Patch | stable | 2026-05-18 | fix double sources display in CLI output - VALIDATED |
@@ -39,6 +40,41 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.16.0 Conflict Detection + Multi-Turn Wizard UX for /post-orders
+
+Status: alpha
+
+Version: 4.16.0-alpha
+
+Date: 2026-05-18
+
+Purpose:
+
+Conflict detection during ingestion preview + multi-turn wizard UX for /post-orders.
+
+Implementation scope:
+
+- `api/ingest.py`: add `yaml` import, `VAULT_POST_ORDER_DIR`, topic key helpers, `scan_topic_conflicts()`, wizard state (`WIZARD_KEY`, `handle_wizard_start`, `handle_wizard_community`, `handle_wizard_text`, `has_pending_wizard`, `get_wizard_step`, `clear_wizard`), `_build_post_order_preview()`, `handle_keep_new()`, `handle_keep_old()`; refactor `handle_post_orders_command()` to delegate to wizard or `_build_post_order_preview()`.
+- `api/service.py`: add wizard and KEEP NEW/KEEP OLD routing in both `answer_question()` and `stream_answer_question()`; import new functions.
+
+Validation checklist:
+
+- [ ] /post-orders (no payload): wizard starts, asks for community.
+- [ ] Wizard step 1: valid alias advances to step 2, asks for text.
+- [ ] Wizard step 1: invalid alias returns error, stays in wizard.
+- [ ] Wizard step 2: pasted text runs conflict check + shows preview.
+- [ ] Wizard NO at any step: cancels and clears wizard state.
+- [ ] /post-orders CBK [text] (one-liner): skips wizard, normal flow.
+- [ ] No conflict: normal YES/NO preview unchanged.
+- [ ] Conflict detected: side-by-side preview shown with KEEP NEW/KEEP OLD.
+- [ ] KEEP OLD: clears pending, returns cancellation message.
+- [ ] KEEP NEW: writes temp file, sets YES/NO pending, returns confirmation.
+- [ ] YES after KEEP NEW: ingests and rebuilds ChromaDB.
+- [ ] Exact hash duplicate: not flagged as conflict.
+- [ ] No vault files for community: no conflict flagged, normal flow.
+- [ ] Syntax OK: api/ingest.py and api/service.py.
+- [ ] No rag/, vault/, automation/ files changed.
 
 ## Phase 4.15.0 Streaming Response - /ask/stream SSE Endpoint + Open WebUI Pipe
 
@@ -468,7 +504,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.15.0 [4.15.0-stable] STREAMING RESPONSE - /ask/stream SSE ENDPOINT + OPEN WEBUI PIPE
+PHASE 4.16.0 [4.16.0-alpha] CONFLICT DETECTION + MULTI-TURN WIZARD UX FOR /post-orders
 
 ## Overall System Status
 
