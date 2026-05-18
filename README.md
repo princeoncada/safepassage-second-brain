@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.13.4-alpha |
-| Last Stable | 4.13.3-stable (Patch) |
-| Status | alpha |
+| Current | 4.13.4-stable |
+| Last Stable | 4.13.4-stable (Patch) |
+| Status | stable |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.13.3-stable emergency code vault, ingestion, indexing, and dedup patch, with Phase 4.13.4 double sources display fix in alpha:
+Working proof of work through Phase 4.13.4-stable double sources display fix:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -47,7 +47,7 @@ Working proof of work through Phase 4.13.3-stable emergency code vault, ingestio
 - Phase 4.13.1 [4.13.1-stable] - Surface pending rules in scoped listing answers: stable
 - Phase 4.13.2 [4.13.2-stable] - Fix pending detection + reverse rule order: stable
 - Phase 4.13.3 [4.13.3-stable] - Fix emergency code vault data: stable
-- Phase 4.13.4 [4.13.4-alpha] - Fix double sources display in CLI output: alpha
+- Phase 4.13.4 [4.13.4-stable] - Fix double sources display in CLI output: stable
 
 Current architecture:
 
@@ -111,7 +111,7 @@ Phase 4.13.2-stable fixes post-order ingestion pending detection so only a trail
 
 Phase 4.13.3-stable fixes Sierra Ridge emergency-code vault metadata, ingestion supersede behavior, retrieval near-duplicate handling, indexing near-duplicate status awareness, and the direct inference prompt gap for physical ID versus digital ID questions.
 
-Phase 4.13.4-alpha fixes the CLI double sources display issue by suppressing the early source print in the normal AI answer path. The --no-ai and refusal paths keep their existing source output.
+Phase 4.13.4-stable fixes the CLI double sources display issue by suppressing the early source print in the normal AI answer path. The --no-ai and refusal paths keep their existing source output.
 
 Dashboard endpoints:
 
