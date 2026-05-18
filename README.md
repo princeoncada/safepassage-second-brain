@@ -6,8 +6,8 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.13.3 |
-| Last Stable | 4.13.2-stable (Patch) |
+| Current | 4.13.3-stable |
+| Last Stable | 4.13.3-stable (Patch) |
 | Status | stable |
 
 ## Source Of Truth
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.13.3 emergency code vault data patch, with SR reingestion and ChromaDB rebuild recommended next:
+Working proof of work through Phase 4.13.3-stable emergency code vault, ingestion, indexing, and dedup patch, with Phase 4.13.4 double sources display fix recommended next:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -46,7 +46,7 @@ Working proof of work through Phase 4.13.3 emergency code vault data patch, with
 - Phase 4.13.0 [4.13.0-stable] - Archive redundant legacy Sierra Ridge K files: stable
 - Phase 4.13.1 [4.13.1-stable] - Surface pending rules in scoped listing answers: stable
 - Phase 4.13.2 [4.13.2-stable] - Fix pending detection + reverse rule order: stable
-- Phase 4.13.3 [4.13.3] - Fix emergency code vault data: stable
+- Phase 4.13.3 [4.13.3-stable] - Fix emergency code vault data: stable
 
 Current architecture:
 
@@ -108,7 +108,7 @@ Phase 4.13.1-stable updates the answer prompt so full kiosk or concierge scoped 
 
 Phase 4.13.2-stable fixes post-order ingestion pending detection so only a trailing `(Pending)` marker sets pending status, and reverses parsed rule order so the operator's first pasted rule is written and indexed first.
 
-Phase 4.13.3 fixes Sierra Ridge emergency-code vault metadata so the non-pending concierge emergency code remains active and the pending variant no longer supersedes it. Reingest SR post orders and rebuild ChromaDB after committing this patch.
+Phase 4.13.3-stable fixes Sierra Ridge emergency-code vault metadata, ingestion supersede behavior, retrieval near-duplicate handling, indexing near-duplicate status awareness, and the direct inference prompt gap for physical ID versus digital ID questions.
 
 Dashboard endpoints:
 
