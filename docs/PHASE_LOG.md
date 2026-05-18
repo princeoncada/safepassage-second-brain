@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.13.2 | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order |
 | 4.13.1-stable | Patch | stable | 2026-05-17 | surface pending rules in scoped listing - VALIDATED |
 | 4.13.0-stable | Phase 4.13.0 | stable | 2026-05-17 | archive redundant legacy SR K files - VALIDATED |
 | 4.12.1 | Patch | stable | 2026-05-17 | lock X.Y.Z versioning convention |
@@ -34,6 +35,33 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.13.2 Fix Pending Detection + Reverse Rule Order
+
+Status: IN PROGRESS
+
+Version: 4.13.2
+
+Date: 2026-05-17
+
+Purpose:
+
+Fix two targeted ingestion parser issues: pending status detection and rule processing order.
+
+Implementation scope:
+
+- `automation/ingestion/refresh_post_orders.py`: pending status is set only when the original pasted rule ends with `(Pending)`, case-insensitive.
+- `automation/ingestion/refresh_post_orders.py`: parsed rules are reversed before processing so the first pasted rule is written and indexed first.
+- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.13.2 as the current parser patch.
+
+Validation checklist:
+
+- [ ] User validates a rule containing the phrase `pending residency confirmation` without a trailing `(Pending)` remains `status: active`.
+- [ ] User validates a rule ending with `(Pending)` becomes `status: pending`.
+- [ ] User validates parsed rule order is reversed before ingestion processing.
+- [ ] User validates rule 1 from pasted text is written/indexed with intended higher retrieval priority.
+- [ ] User validates no other ingestion parser behavior changed.
+- [ ] User validates no config, vault, indexing, or unrelated automation files changed.
 
 ## Phase 4.13.1 Surface Pending Rules in Scoped Listing Answers
 
