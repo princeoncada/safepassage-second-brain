@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-PHASE 4.12.0 [4.12.0-alpha] - Scope Filter Fix - in progress. Current stable remains Phase 4.11.0 [4.11.0-stable]. Phase 4.10.0 [4.10.0-stable] Conversation Context Resolution is validated and stable. Phase 2 [2.0.0-stable] Minimal POW, Phase 3A [3.0.0-stable] Retrieval POW, Phase 3B [3.1.0-stable] Grounded Answering POW, Phase 3C [3.2.0-stable] RAG Quality Hardening, Phase 3D [3.3.0-stable] Local API Wrapper, Phase 3E [3.4.0-stable] Open WebUI Integration, Phase 4A [4.0.0-stable] Retrieval Quality Hardening, Phase 4B [4.1.0-stable] Primary Workflow Ingestion, Phase 4B2 [4.1.1-stable] fallback confidence, Phase 4C [4.2.0-stable] post order refresh, Phase 4C1 [4.2.1-stable] lifecycle retrieval hardening, Phase 4C2 [4.2.2-stable] managed post-order conversion, Phase 4C3 [4.2.3-stable] announcement ingestion, Phase 4D [4.3.0-stable] query parsing, Phase 4E [4.4.0-stable] OCR intake using pytesseract, Phase 4F [4.4.1-stable] OCR review + ingestion bridge, Phase 4G [4.5.0-stable] temporal expiry / activation, Phase 4G1 [4.5.1-stable] announcement retrieval precision hardening, Phase 4J-lite [4.6.0-stable] operational dashboard / shift briefing, Phase UX-1 [4.7.0-stable] dashboard/OpenWebUI usability hardening, Phase 4I-lite [4.8.2-stable] slash command ingestion, and Phase 4.9.0 [4.9.0-stable] scope retrieval/source dedup/alias hardening are validated or stable unless their phase sections say otherwise.
+PHASE 4.13.3 [4.13.3-stable] - Emergency Code Vault Fix + Ingestion/Indexing/Dedup Fixes - validated and stable. Next phase is 4.13.4: fix `strip_sources_section()` double sources display in CLI output. Then proceed to Phase 4.14.0: conflict detection during ingestion preview.
 
 ## Phase 4.12.0 In Progress
 
@@ -106,6 +106,7 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
 - Session checkpoint logs under `docs/SESSION_LOG/` for clean chathead handoff.
+- Latest session checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md`.
 - Scope-aware retrieval with requested_all detection in `rag/query_intent.py` and effective_top_k override in `rag/scripts/answer_vault.py`.
 - Full community name matching in `rag/query_intent.py` using longest-first lookup from `rag/config/community_aliases.json`.
 
@@ -165,7 +166,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.13.4 — fix strip_sources_section() double sources display. Then Phase 4.14.0 — conflict detection during ingestion preview.
+Next: Phase 4.13.4 — fix strip_sources_section() double sources display in CLI output without changing retrieval behavior. Then Phase 4.14.0 — conflict detection during ingestion preview.
 
 ## Phase 4I-lite Implementation Added
 
