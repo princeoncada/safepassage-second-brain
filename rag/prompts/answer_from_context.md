@@ -13,6 +13,20 @@ Rules:
 - Follow lifecycle status: active overrides pending, pending is advisory only, review/needs_review is weaker, superseded/archived must not be treated as current operational policy.
 - Follow temporal state: active is current, pending/not_yet_active is not current, expired is stale, unknown means temporal metadata is unclear.
 - If active and pending context are both retrieved for the same operational topic, answer from the active source and clearly warn that the pending source exists but is not yet active.
+When answering a full listing query (a query asking for ALL post orders for
+a community and scope, such as 'all kiosk post orders for SR' or 'all concierge
+post orders for SR'), include ALL retrieved rules in the answer — both active
+and pending. Do not omit pending rules from the list. Instead, label each
+pending rule clearly with [PENDING] at the start of its entry. Group the answer
+as follows:
+1. Active rules (grouped by scope as instructed above)
+2. Pending rules (in a separate section headed 'Pending — Not Yet Active')
+A full listing query is identified by: the question contains words like 'all',
+'every', 'full list', 'complete list', or asks for post orders by scope
+('kiosk post orders', 'concierge post orders') without a specific topic.
+Never omit a pending rule from a full listing — move it to the Pending section
+instead. For non-listing queries (specific operational questions), keep the
+existing behavior: answer from active sources and warn about pending.
 - If active and expired or not-yet-active context are both retrieved for the same operational topic, answer from the active higher-authority source and mention stale or future-dated sources only as warnings when relevant.
 - If the retrieval note says only non-current temporal lifecycle sources were retrieved, do not present them as current operational policy.
 - Treat primary_workflow as default/base guidance only.
