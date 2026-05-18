@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.13.3 | Patch | stable | 2026-05-17 | fix emergency code vault data |
+| 4.13.3-stable | Patch | stable | 2026-05-18 | emergency code vault fix + ingestion/indexing/dedup fixes - VALIDATED |
 | 4.13.2-stable | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order - VALIDATED |
 | 4.13.1-stable | Patch | stable | 2026-05-17 | surface pending rules in scoped listing - VALIDATED |
 | 4.13.0-stable | Phase 4.13.0 | stable | 2026-05-17 | archive redundant legacy SR K files - VALIDATED |
@@ -39,9 +39,9 @@
 
 ## Phase 4.13.3 Fix Emergency Code Vault Data
 
-Status: IN PROGRESS
+Status: PASSED — stable
 
-Version: 4.13.3
+Version: 4.13.3-stable
 
 Date: 2026-05-17
 
@@ -53,7 +53,7 @@ Implementation scope:
 
 - `vault/03_Post_Orders/sierra-ridge-post-order-c-emergency-code-as-april-3-2026-efb8cf3049.md`: restore the non-pending emergency-code rule to `status: active`, clear `superseded_by`, and update `last_updated`.
 - `vault/03_Post_Orders/sierra-ridge-post-order-c-emergency-code-as-april-3-2026-6d3afb83e9.md`: keep `status: pending`, clear the incorrect `supersedes` reference, and update `last_updated`.
-- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.13.3 as the current vault data patch.
+- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.13.3-stable as the current vault data patch.
 
 Validation checklist:
 
@@ -65,6 +65,19 @@ Validation checklist:
 - [ ] User reingests SR post orders in Open WebUI to apply 4.13.2 pending detection fix.
 - [ ] User rebuilds ChromaDB with reset_chroma.py and index_vault.py.
 - [ ] User validates no Python code or config files changed.
+
+### Validation Record — 4.13.3-stable
+Date: 2026-05-18
+All checks passed. Committed to master.
+- [x] Vault data fixed (efb8cf3049 active)
+- [x] Ingestion: pending rules never supersede active
+- [x] Retrieval dedup: active beats pending near-dups
+- [x] Indexing dedup: status-aware, active+pending both indexed
+- [x] DeepSeek inference gap fixed
+- [x] Active emergency code surfaces in concierge listing
+- [x] Kiosk listing 8 rules correct
+- [x] Normal queries working
+Non-blocking: double sources display (4.13.4), pending 0714* deduped against active 0714* in listing (correct behavior)
 
 ## Phase 4.13.2 Fix Pending Detection + Reverse Rule Order
 
