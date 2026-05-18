@@ -1,10 +1,10 @@
 # AI Handoff
 
-## Current Version: 4.13.4-alpha
+## Current Version: 4.13.4-stable
 
 ## Current Phase
 
-PHASE 4.13.4 [4.13.4-alpha] - Fix Double Sources Display in CLI Output - alpha. This patch gates the early CLI source display so normal AI answers print sources exactly once while preserving --no-ai and refusal source output.
+PHASE 4.13.4 [4.13.4-stable] - Fix double sources display in CLI output - validated and stable. Next phase is 4.14.0: conflict detection during ingestion preview.
 
 ## Phase 4.12.0 In Progress
 
@@ -35,11 +35,11 @@ Phase 4.13.3 fixes Sierra Ridge emergency-code vault metadata directly. The acti
 
 Patch 2: near-duplicate deduplicator updated to preserve active rules over pending near-duplicates. Ensures active emergency codes are never dropped in favour of their pending variants during scoped listing retrieval.
 
-## Phase 4.13.4 [4.13.4-alpha]
+## Phase 4.13.4 [4.13.4-stable]
 
-Status: alpha.
+Status: VALIDATED and STABLE — committed to master 2026-05-18.
 
-Phase 4.13.4 fixes the CLI double sources display issue in `rag/scripts/answer_vault.py`. The unconditional early `print_sources(chunks)` call before AI answer generation is suppressed for the normal AI path, leaving final citations or review sources as the single source display. The --no-ai path still uses `print_citations(chunks, title="Retrieved Context Citations")`, and the refusal path still uses `print_sources(chunks, title="Closest Retrieved Sources")`. No retrieval, scoring, deduplication, lifecycle, authority, prompt, vault, or API behavior is changed.
+Phase 4.13.4 gates the early print_sources call in answer_vault.py so it is suppressed in the normal AI answer path. Sources now print exactly once per CLI query. The --no-ai and refusal paths retain their existing source output. This is a single-line code change with no retrieval, scoring, or behavior changes.
 
 ## Phase 4.13.2 [4.13.2-stable]
 
