@@ -1,6 +1,6 @@
 # AI Handoff
 
-## Current Version: 4.13.2
+## Current Version: 4.13.2-stable
 
 ## Current Phase
 
@@ -27,7 +27,9 @@ Status: VALIDATED and STABLE — committed to master 2026-05-17.
 
 Phase 4.13.1 updates `rag/prompts/answer_from_context.md` so full scoped post-order listing answers include pending rules instead of only footnoting them. For full kiosk or concierge listing queries, pending rules must be shown in a separate `Pending — Not Yet Active` section and each pending entry must start with `[PENDING]`. Non-listing operational questions keep the existing behavior: answer from active sources and warn about pending sources.
 
-## Phase 4.13.2 [4.13.2]
+## Phase 4.13.2 [4.13.2-stable]
+
+Status: VALIDATED and STABLE — committed to master 2026-05-17.
 
 Phase 4.13.2 applies two targeted fixes in `automation/ingestion/refresh_post_orders.py`. First, pending status detection now checks only for a literal `(Pending)` marker at the end of the original pasted rule text, instead of treating any rule body containing the word `pending` as pending. Second, parsed post-order rules are reversed before processing so the operator's first pasted rule is written and indexed first, preserving intended priority in retrieval.
 
@@ -155,7 +157,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.13.3 — fix emergency code vault data.
+Next: Phase 4.13.3 — fix emergency code active/superseded status in vault directly, then reingest SR post orders to apply corrected pending detection, then rebuild ChromaDB.
 
 ## Phase 4I-lite Implementation Added
 
