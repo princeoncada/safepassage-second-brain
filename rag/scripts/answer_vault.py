@@ -483,6 +483,7 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         if identity_key in seen_identity_keys or preview_key in seen_preview_keys:
             continue
         _near_dup_found = False
+        _replaced_near_dup = False
         for _i, _existing in enumerate(seen_near_duplicates):
             if (
                 _existing["community"] == normalized_community
@@ -514,22 +515,24 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                     candidates.append((adjusted_distance, distance, document, metadata))
                     seen_identity_keys.add(identity_key)
                     seen_preview_keys.add(preview_key)
+                    _replaced_near_dup = True
                 break
-        if _near_dup_found:
+        if _near_dup_found and not _replaced_near_dup:
             continue
 
-        seen_identity_keys.add(identity_key)
-        seen_preview_keys.add(preview_key)
-        seen_near_duplicates.append(
-            {
-                "community": normalized_community,
-                "type": normalized_type,
-                "section": normalized_section,
-                "document": document,
-                "status": str(metadata.get("status", "")),
-            }
-        )
-        candidates.append((adjusted_distance, distance, document, metadata))
+        if not _near_dup_found:
+            seen_identity_keys.add(identity_key)
+            seen_preview_keys.add(preview_key)
+            seen_near_duplicates.append(
+                {
+                    "community": normalized_community,
+                    "type": normalized_type,
+                    "section": normalized_section,
+                    "document": document,
+                    "status": str(metadata.get("status", "")),
+                }
+            )
+            candidates.append((adjusted_distance, distance, document, metadata))
 
     if hints.get("scope_hint"):
         scope_hint = str(hints.get("scope_hint", ""))
