@@ -6,7 +6,7 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.13.0-stable |
+| Current | 4.13.1 |
 | Last Stable | 4.13.0-stable (Phase 4.13.0) |
 | Status | stable |
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.13.0-stable archive cleanup, with Phase 4.13.1 pending-rule scoped listing surfacing recommended next:
+Working proof of work through Phase 4.13.1 prompt patch, with Phase 4.14.0 community onboarding recommended next:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -44,6 +44,7 @@ Working proof of work through Phase 4.13.0-stable archive cleanup, with Phase 4.
 - Phase 4.11.0 [4.11.0-stable] - Workflow simplification / remove rc state: passed/validated
 - Phase 4.12.0 [4.12.0-alpha] - Scope filter fix using scope_key: alpha
 - Phase 4.13.0 [4.13.0-stable] - Archive redundant legacy Sierra Ridge K files: stable
+- Phase 4.13.1 [4.13.1] - Surface pending rules in scoped listing answers: stable
 
 Current architecture:
 
@@ -100,6 +101,8 @@ Phase 4.11.0-stable simplifies the documentation workflow by retiring rc as an a
 Phase 4.12.0-alpha fixes scoped post-order filtering by using indexed `scope_key` metadata (`k`, `c`, `kc`) instead of searching for letters in the normalized `scope` string.
 
 Phase 4.13.0-stable archives two redundant Sierra Ridge K-scoped legacy migration post-order files that duplicated the canonical managed physical-ID rule from `/post-orders` ingestion. The files are preserved for audit history with archived lifecycle metadata and supersede references.
+
+Phase 4.13.1 updates the answer prompt so full kiosk or concierge scoped post-order listing answers include pending rules in a separate `Pending — Not Yet Active` section with each pending entry labelled `[PENDING]`.
 
 Dashboard endpoints:
 
