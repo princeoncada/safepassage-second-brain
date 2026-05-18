@@ -833,7 +833,6 @@ def main() -> int:
     if hints.get("scope_hint"):
         print(f"Scope Hint: {hints['scope_hint']}")
     print()
-    print_sources(chunks)
 
     if assessment["confidence"] in {"weak", "none"}:
         print()
