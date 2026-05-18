@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 from datetime import date, datetime, timedelta
 from hashlib import sha256
 from pathlib import Path
@@ -285,6 +286,22 @@ def handle_announcements_command(question: str) -> str:
     return preview
 
 
+def recently_modified_vault_files(kind: str, since_seconds: int = 60) -> list[str]:
+    """Return vault files of the given kind modified within the last N seconds."""
+    if kind == "post_order":
+        vault_dir = REPO_ROOT / "vault" / "03_Post_Orders"
+    elif kind == "announcement":
+        vault_dir = REPO_ROOT / "vault" / "05_Announcements"
+    else:
+        return []
+    cutoff = time.time() - since_seconds
+    return [
+        str(path)
+        for path in sorted(vault_dir.rglob("*.md"))
+        if path.stat().st_mtime >= cutoff
+    ]
+
+
 def run_ingestion(temp_file: Path, kind: str) -> tuple[bool, str]:
     if kind == "post_order":
         command = [sys.executable, "automation/ingestion/refresh_post_orders.py", "--input", str(temp_file)]
@@ -298,8 +315,19 @@ def run_ingestion(temp_file: Path, kind: str) -> tuple[bool, str]:
         error = ingest_result.stderr.strip() or ingest_result.stdout.strip() or "ingestion script failed"
         return False, f"Ingestion failed. Nothing was indexed.\n\n{error}"
 
+    new_files = recently_modified_vault_files(kind)
+    if new_files:
+        index_command = [
+            sys.executable,
+            "rag/scripts/index_vault.py",
+            "--files",
+            *new_files,
+        ]
+    else:
+        index_command = [sys.executable, "rag/scripts/index_vault.py"]
+
     index_result = subprocess.run(
-        [sys.executable, "rag/scripts/index_vault.py"],
+        index_command,
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
