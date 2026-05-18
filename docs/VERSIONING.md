@@ -111,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.13.1-stable |
+| Version | 4.13.2 |
 | Phase | Patch |
 | State | stable |
 | Date | 2026-05-17 |
-| Commit | master |
-| Summary | surface pending rules in scoped listing |
+| Commit | pending |
+| Summary | fix pending detection + reverse rule order |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.13.2 | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order |
 | 4.13.1-stable | Patch | stable | 2026-05-17 | surface pending rules in scoped listing - VALIDATED |
 | 4.13.0-stable | Phase 4.13.0 | stable | 2026-05-17 | archive redundant legacy SR K files - VALIDATED |
 | 4.12.1 | Patch | stable | 2026-05-17 | lock X.Y.Z versioning convention |
@@ -176,9 +177,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.13.1-stable
-Current working phase: Surface Pending Rules in Scoped Listing Answers
-Validation status: stable.
-Next phase: 4.14.0 — Community Onboarding: ingest post orders for remaining unindexed communities.
+Current working version: 4.13.2
+Current working phase: Fix Pending Detection + Reverse Rule Order
+Validation status: stable; manual validation pending.
+Next after stable: Phase 4.13.3 - fix emergency code vault data.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-17-session-04.md` records the workflow documentation update clarifying when to use the 3-section prompt format. No version change was made for that documentation-only update.
