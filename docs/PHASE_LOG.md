@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.14.0-alpha | Phase 4.14.0 | alpha | 2026-05-18 | incremental indexing with --files flag |
+| 4.14.0-stable | Phase 4.14.0 | stable | 2026-05-18 | incremental indexing with --files flag - VALIDATED |
 | 4.13.4-stable | Patch | stable | 2026-05-18 | fix double sources display in CLI output - VALIDATED |
 | 4.13.3-stable | Patch | stable | 2026-05-18 | emergency code vault fix + ingestion/indexing/dedup fixes - VALIDATED |
 | 4.13.2-stable | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order - VALIDATED |
@@ -41,9 +41,9 @@
 
 ## Phase 4.14.0 Incremental Indexing With --files Flag
 
-Status: alpha
+Status: PASSED — stable
 
-Version: 4.14.0-alpha
+Version: 4.14.0-stable
 
 Date: 2026-05-18
 
@@ -67,6 +67,16 @@ Validation checklist:
 - [ ] After incremental index, retrieval still returns correct answers.
 - [ ] Fallback to full rebuild when no recently modified files found.
 - [ ] No rag/config, vault, api/schemas, or automation/ files changed except rag/scripts/index_vault.py and api/ingest.py.
+
+### Validation Record — 4.14.0-stable
+Date: 2026-05-18
+All checks passed. Committed to master.
+- [x] Full rebuild unchanged: 210 chunks from 113 files (full rebuild)
+- [x] Incremental mode: 3 chunks from 1 file (incremental), collection not deleted
+- [x] Non-existent file: warning printed, no crash
+- [x] Retrieval correct after incremental index
+- [x] Only index_vault.py and api/ingest.py changed (plus docs)
+Non-blocking: none
 
 ## Phase 4.13.4 Fix Double Sources Display in CLI Output
 
