@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.14.0-alpha | Phase 4.14.0 | alpha | 2026-05-18 | incremental indexing with --files flag |
 | 4.13.4-stable | Patch | stable | 2026-05-18 | fix double sources display in CLI output - VALIDATED |
 | 4.13.3-stable | Patch | stable | 2026-05-18 | emergency code vault fix + ingestion/indexing/dedup fixes - VALIDATED |
 | 4.13.2-stable | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order - VALIDATED |
@@ -37,6 +38,35 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.14.0 Incremental Indexing With --files Flag
+
+Status: alpha
+
+Version: 4.14.0-alpha
+
+Date: 2026-05-18
+
+Purpose:
+
+Incremental indexing - reduce post-ingestion index rebuild time by only embedding and upserting newly written vault files.
+
+Implementation scope:
+
+- `rag/scripts/index_vault.py`: add `--files` flag; when provided, skip `delete_collection` and only process the specified files.
+- `api/ingest.py`: add `recently_modified_vault_files()`; pass `--files` to `index_vault.py` after ingestion; fall back to full rebuild if no recently modified files found.
+
+Validation checklist:
+
+- [ ] `python rag/scripts/index_vault.py` runs full rebuild unchanged.
+- [ ] `python rag/scripts/index_vault.py --files [path]` indexes only that file and prints "incremental" in output.
+- [ ] `--files` with a non-existent path prints a warning and skips it.
+- [ ] Full rebuild still deletes and recreates the collection.
+- [ ] Incremental run does NOT delete the collection.
+- [ ] After `/post-orders` ingestion via Open WebUI, ChromaDB updated with only new files (confirm via "incremental" in index output).
+- [ ] After incremental index, retrieval still returns correct answers.
+- [ ] Fallback to full rebuild when no recently modified files found.
+- [ ] No rag/config, vault, api/schemas, or automation/ files changed except rag/scripts/index_vault.py and api/ingest.py.
 
 ## Phase 4.13.4 Fix Double Sources Display in CLI Output
 
