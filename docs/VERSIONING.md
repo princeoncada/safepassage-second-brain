@@ -6,13 +6,46 @@ This file is the authoritative versioning reference for all AI agents and human 
 
 ## Version Format
 
-PHASE-[MAJOR].[MINOR].[PATCH]-[STATE]
+Versions follow X.Y.Z semantic versioning:
 
-Components:
-- MAJOR: increments when a phase adds a new capability layer
-- MINOR: increments when a fix or improvement is applied within a phase
-- PATCH: increments for targeted bug fixes within a minor version
-- STATE: one of alpha, beta, or stable
+**Z — Patch** (increment Z)
+A targeted fix to existing behavior. No new capability added.
+Use when: fixing a bug in one function, correcting config data, fixing a regex,
+updating a single-file logic error, retiring a doc convention.
+Examples: scope filter regex fix, alias token cap fix, source dedup fix,
+doc convention update (like this one).
+
+**Y — Minor** (increment Y, reset Z to 0)
+A new feature or capability added to the system. Meaningful behavior change
+that operators or agents would notice.
+Use when: new API field, new retrieval behavior, new slash command, new
+workflow phase that adds a capability, new ingestion feature.
+Examples: conversation history (4.10.0), scope-aware retrieval (4.9.0),
+ambiguity clarification (part of 4.9.x).
+
+**X — Major** (increment X, reset Y and Z to 0)
+Architectural shift or production milestone.
+Use when: new ingestion pipeline, new data model, v2 of the system,
+production deployment, breaking API change.
+Examples: (none yet - system is pre-1.0)
+
+**Decision table — which number to increment:**
+| Change type                              | Bump |
+|------------------------------------------|------|
+| Bug fix, single function or file         | Z    |
+| Config data fix (aliases, rules)         | Z    |
+| Doc convention or workflow fix           | Z    |
+| New API field or schema addition         | Y    |
+| New retrieval behavior or capability     | Y    |
+| New slash command or ingestion feature   | Y    |
+| New phase that adds operator capability  | Y    |
+| Architectural redesign or v2             | X    |
+| Production deployment milestone          | X    |
+
+**Historical note:**
+Versions 4.9.0 through 4.12.0 used inflated Y numbers for what should have
+been Z patches. This history is preserved as-is. The correct convention
+applies from 4.12.1 onward.
 
 ## State Definitions
 
@@ -78,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.12.0-alpha |
-| Phase | Phase 4.12.0 |
-| State | alpha |
+| Version | 4.12.1 |
+| Phase | Patch |
+| State | stable |
 | Date | 2026-05-17 |
 | Commit | pending |
-| Summary | scope filter fix - scope_key |
+| Summary | lock X.Y.Z versioning convention |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.12.1 | Patch | stable | 2026-05-17 | lock X.Y.Z versioning convention |
 | 4.12.0-alpha | Phase 4.12.0 | alpha | 2026-05-17 | scope filter fix - scope_key |
 | 4.11.0-stable | Phase 4.11.0 | stable | 2026-05-17 | workflow simplification - remove rc state - VALIDATED |
 | 4.10.0-stable | Phase 4.10.0 | stable | 2026-05-17 | conversation context resolution - VALIDATED |
