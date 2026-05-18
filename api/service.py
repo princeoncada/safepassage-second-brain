@@ -7,10 +7,16 @@ from textwrap import shorten
 from typing import Any
 
 from api.ingest import (
+    get_wizard_step,
     handle_announcements_command,
     handle_confirm_no,
     handle_confirm_yes,
+    handle_keep_new,
+    handle_keep_old,
     handle_post_orders_command,
+    handle_wizard_community,
+    handle_wizard_text,
+    has_pending_wizard,
 )
 from api.schemas import AskRequest, AskResponse, Source
 from rag.query_intent import parse_query_intent
@@ -135,6 +141,22 @@ def _ingest_response(request: AskRequest, answer_text: str) -> AskResponse:
     )
 
 
+def _ingest_stream_events(answer_text: str, confidence_reason: str = "slash command"):
+    payload = json.dumps(
+        {
+            "answer": answer_text,
+            "retrieval_confidence": "1.0",
+            "confidence_reason": confidence_reason,
+            "sources": [],
+            "answer_citations": [],
+            "warnings": [],
+            "used_ai": False,
+        }
+    )
+    yield f"data: [CITATIONS]{payload}\n\n"
+    yield "data: [DONE]\n\n"
+
+
 def load_ambiguous_aliases() -> dict:
     if not AMBIGUOUS_ALIASES_PATH.exists():
         return {}
@@ -168,6 +190,23 @@ def resolve_community_from_history(history: list[str]) -> tuple[str, str]:
 def answer_question(request: AskRequest) -> AskResponse:
     question_stripped = request.question.strip()
     question_upper = question_stripped.upper()
+
+    if has_pending_wizard():
+        wizard_step = get_wizard_step()
+        if wizard_step == "awaiting_community":
+            answer_text = handle_wizard_community(question_stripped)
+            return _ingest_response(request, answer_text)
+        if wizard_step == "awaiting_text":
+            answer_text = handle_wizard_text(question_stripped)
+            return _ingest_response(request, answer_text)
+
+    if question_upper == "KEEP NEW":
+        answer_text = handle_keep_new()
+        return _ingest_response(request, answer_text)
+
+    if question_upper == "KEEP OLD":
+        answer_text = handle_keep_old()
+        return _ingest_response(request, answer_text)
 
     if question_stripped.lower().startswith("/post-orders"):
         answer_text = handle_post_orders_command(question_stripped)
@@ -329,7 +368,17 @@ def stream_answer_question(request: AskRequest):
     question_upper = question_stripped.upper()
 
     ingest_answer: str | None = None
-    if question_stripped.lower().startswith("/post-orders"):
+    if has_pending_wizard():
+        wizard_step = get_wizard_step()
+        if wizard_step == "awaiting_community":
+            ingest_answer = handle_wizard_community(question_stripped)
+        elif wizard_step == "awaiting_text":
+            ingest_answer = handle_wizard_text(question_stripped)
+    elif question_upper == "KEEP NEW":
+        ingest_answer = handle_keep_new()
+    elif question_upper == "KEEP OLD":
+        ingest_answer = handle_keep_old()
+    elif question_stripped.lower().startswith("/post-orders"):
         ingest_answer = handle_post_orders_command(question_stripped)
     elif question_stripped.lower().startswith("/announcements"):
         ingest_answer = handle_announcements_command(question_stripped)
@@ -339,19 +388,7 @@ def stream_answer_question(request: AskRequest):
         ingest_answer = handle_confirm_no()
 
     if ingest_answer is not None:
-        payload = json.dumps(
-            {
-                "answer": ingest_answer,
-                "retrieval_confidence": "1.0",
-                "confidence_reason": "slash command",
-                "sources": [],
-                "answer_citations": [],
-                "warnings": [],
-                "used_ai": False,
-            }
-        )
-        yield f"data: [CITATIONS]{payload}\n\n"
-        yield "data: [DONE]\n\n"
+        yield from _ingest_stream_events(ingest_answer)
         return
 
     _intent_check = parse_query_intent(question_stripped)
