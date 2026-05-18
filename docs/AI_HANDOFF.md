@@ -1,10 +1,29 @@
 # AI Handoff
 
-## Current Version: 4.15.0-stable
+## Current Version: 4.16.0-alpha
 
 ## Current Phase
 
-PHASE 4.15.0 [4.15.0-stable] - Streaming response /ask/stream SSE endpoint + Open WebUI pipe - validated and stable. Next phase is 4.16.0: conflict detection + multi-turn wizard UX for /post-orders.
+PHASE 4.16.0 [4.16.0-alpha] - Conflict detection during ingestion preview + multi-turn wizard UX for /post-orders. Implemented but pending manual validation.
+
+## Phase 4.16.0
+
+Phase 4.16.0 adds two /post-orders ingestion usability features. First,
+typing `/post-orders` with no payload now starts a two-step guided wizard:
+the operator is asked for a community alias, then asked to paste post order
+text for that resolved community. The existing one-liner
+`/post-orders [alias] [text]` shortcut remains available and skips the
+wizard when payload is present.
+
+Second, post-order preview now scans existing active vault post_order
+frontmatter for the same community before any temp file or vault write.
+`scan_topic_conflicts()` reads active post-order metadata, computes the
+incoming topic key with local helper logic, and flags an overlap when the
+topic_key matches exactly or token similarity is at least 0.55. If conflicts
+are found, the preview shows the incoming rule beside the existing active
+rule and asks the operator to reply KEEP NEW or KEEP OLD. KEEP NEW converts
+the conflict state into the normal YES/NO pending state; KEEP OLD cancels
+without writing.
 
 ## Phase 4.15.0
 
@@ -131,6 +150,7 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase 4I-lite operator guide at `openwebui/INGEST_COMMANDS.md`.
 - Phase 4.14.0-stable incremental indexing in `rag/scripts/index_vault.py` with `--files`, and slash-command ingestion uses recently modified vault files for incremental post-ingestion indexing.
 - Phase 4.15.0-stable streaming response support through `/ask/stream`, `call_deepseek_stream()`, `stream_answer_question()`, and `openwebui/pipe.py`.
+- Phase 4.16.0-alpha /post-orders wizard and conflict preview support in `api/ingest.py` and `api/service.py`.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -195,7 +215,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.16.0 — conflict detection + multi-turn wizard UX for /post-orders.
+Next: Phase 4.17.0 — Open WebUI button UX
 
 ## Phase 4I-lite Implementation Added
 
