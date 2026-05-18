@@ -6,8 +6,8 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.13.2 |
-| Last Stable | 4.13.1-stable (Patch) |
+| Current | 4.13.2-stable |
+| Last Stable | 4.13.2-stable (Patch) |
 | Status | stable |
 
 ## Source Of Truth
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.13.2 ingestion parser patch, with Phase 4.13.3 emergency code vault data fix recommended next:
+Working proof of work through Phase 4.13.2-stable ingestion parser patch, with Phase 4.13.3 emergency code vault data fix recommended next:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -45,7 +45,7 @@ Working proof of work through Phase 4.13.2 ingestion parser patch, with Phase 4.
 - Phase 4.12.0 [4.12.0-alpha] - Scope filter fix using scope_key: alpha
 - Phase 4.13.0 [4.13.0-stable] - Archive redundant legacy Sierra Ridge K files: stable
 - Phase 4.13.1 [4.13.1-stable] - Surface pending rules in scoped listing answers: stable
-- Phase 4.13.2 [4.13.2] - Fix pending detection + reverse rule order: stable
+- Phase 4.13.2 [4.13.2-stable] - Fix pending detection + reverse rule order: stable
 
 Current architecture:
 
@@ -105,7 +105,7 @@ Phase 4.13.0-stable archives two redundant Sierra Ridge K-scoped legacy migratio
 
 Phase 4.13.1-stable updates the answer prompt so full kiosk or concierge scoped post-order listing answers include pending rules in a separate `Pending — Not Yet Active` section with each pending entry labelled `[PENDING]`.
 
-Phase 4.13.2 fixes post-order ingestion pending detection so only a trailing `(Pending)` marker sets pending status, and reverses parsed rule order so the operator's first pasted rule is written and indexed first.
+Phase 4.13.2-stable fixes post-order ingestion pending detection so only a trailing `(Pending)` marker sets pending status, and reverses parsed rule order so the operator's first pasted rule is written and indexed first.
 
 Dashboard endpoints:
 
