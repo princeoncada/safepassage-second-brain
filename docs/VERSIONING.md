@@ -111,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.14.0-stable |
-| Phase | Phase 4.14.0 |
-| State | stable |
+| Version | 4.15.0-alpha |
+| Phase | Phase 4.15.0 |
+| State | alpha |
 | Date | 2026-05-18 |
 | Commit | master |
-| Summary | incremental indexing with --files flag - VALIDATED |
+| Summary | streaming response - /ask/stream SSE endpoint + Open WebUI pipe |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.15.0-alpha | Phase 4.15.0 | alpha | 2026-05-18 | streaming response - /ask/stream SSE endpoint + Open WebUI pipe |
 | 4.14.0-stable | Phase 4.14.0 | stable | 2026-05-18 | incremental indexing with --files flag - VALIDATED |
 | 4.13.4-stable | Patch | stable | 2026-05-18 | fix double sources display in CLI output - VALIDATED |
 | 4.13.3-stable | Patch | stable | 2026-05-18 | emergency code vault fix + ingestion/indexing/dedup fixes - VALIDATED |
@@ -180,9 +181,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.14.0-stable
-Current working phase: Incremental indexing with --files flag
-Validation status: stable; validated and committed to master.
-Next phase: 4.15.0 — streaming response (/ask/stream SSE endpoint + Open WebUI pipe update).
+Current working version: 4.15.0-alpha
+Current working phase: Streaming response (/ask/stream SSE endpoint + Open WebUI pipe)
+Validation status: alpha; implementation complete, pending manual validation.
+Next phase: 4.16.0 - conflict detection + multi-turn wizard UX for /post-orders.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md` records the 4.12.1 through 4.13.3-stable session handoff and next action. No version change was made for that checkpoint documentation-only update.
