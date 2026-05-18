@@ -31,6 +31,8 @@ Phase 4.13.1 updates `rag/prompts/answer_from_context.md` so full scoped post-or
 
 Phase 4.13.3 fixes Sierra Ridge emergency-code vault metadata directly. The active concierge emergency code rule without a `(Pending)` marker is restored to `status: active` with no `superseded_by` reference, and the pending emergency-code variant keeps `status: pending` but no longer supersedes the active rule. This is a vault data fix only; no code, config, ingestion, or indexing scripts are changed or run in this phase.
 
+Patch 2: near-duplicate deduplicator updated to preserve active rules over pending near-duplicates. Ensures active emergency codes are never dropped in favour of their pending variants during scoped listing retrieval.
+
 ## Phase 4.13.2 [4.13.2-stable]
 
 Status: VALIDATED and STABLE — committed to master 2026-05-17.
