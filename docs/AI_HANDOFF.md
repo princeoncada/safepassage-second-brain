@@ -1,10 +1,10 @@
 # AI Handoff
 
-## Current Version: 4.13.4-stable
+## Current Version: 4.14.0-alpha
 
 ## Current Phase
 
-PHASE 4.13.4 [4.13.4-stable] - Fix double sources display in CLI output - validated and stable. Next phase is 4.14.0: conflict detection during ingestion preview.
+PHASE 4.14.0 [4.14.0-alpha] - Incremental indexing with --files flag. Implemented but not yet manually validated. Next phase is 4.15.0: streaming response (/ask/stream SSE endpoint + Open WebUI pipe update).
 
 ## Phase 4.12.0 In Progress
 
@@ -40,6 +40,12 @@ Patch 2: near-duplicate deduplicator updated to preserve active rules over pendi
 Status: VALIDATED and STABLE — committed to master 2026-05-18.
 
 Phase 4.13.4 gates the early print_sources call in answer_vault.py so it is suppressed in the normal AI answer path. Sources now print exactly once per CLI query. The --no-ai and refusal paths retain their existing source output. This is a single-line code change with no retrieval, scoring, or behavior changes.
+
+## Phase 4.14.0 [4.14.0-alpha]
+
+Status: alpha - implemented but not yet manually validated.
+
+Phase 4.14.0 adds incremental indexing with a `--files` flag. `rag/scripts/index_vault.py` now accepts `--files` to upsert only specified files without clearing the collection. `api/ingest.py` detects recently modified vault files after ingestion and passes them via `--files`, reducing post-ingestion index time from full-vault to new-files-only. If no recently modified vault files are detected, ingestion falls back to the existing full rebuild path.
 
 ## Phase 4.13.2 [4.13.2-stable]
 
@@ -108,6 +114,7 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase 4I-lite Open WebUI ingest command guide at `openwebui/INGEST_COMMANDS.md`.
 - Phase 4I-lite slash command ingestion in `api/ingest.py` with /post-orders and /announcements commands routed through `api/service.py`.
 - Phase 4I-lite operator guide at `openwebui/INGEST_COMMANDS.md`.
+- Phase 4.14.0-alpha incremental indexing in `rag/scripts/index_vault.py` with `--files`, and slash-command ingestion uses recently modified vault files for incremental post-ingestion indexing.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -172,7 +179,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.14.0 — conflict detection during ingestion preview.
+Next: Phase 4.15.0 - streaming response (/ask/stream SSE endpoint + Open WebUI pipe update).
 
 ## Phase 4I-lite Implementation Added
 
