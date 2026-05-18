@@ -2,8 +2,8 @@
 title: For Sierra Ridge, All Overnight Visitors Must Present Physical Id Before Access Is Granted
 type: post_order
 authority_level: post_order
-lifecycle_generation: managed
-status: active
+lifecycle_generation: archived
+status: archived
 community: Sierra Ridge
 community_code: SR
 scope:
@@ -16,8 +16,10 @@ source_legacy_file: vault/03_Post_Orders/2026-05-15-sierra-ridge-for-sierra-ridg
 source_migration: legacy_post_order
 migration_date: '2026-05-16'
 effective_date: '2026-05-15'
+superseded_by: sierra-ridge-post-order-k-physical-id-required-at-all-times-83654ab9db.md
+archive_reason: 'Redundant legacy migration file. Superseded by canonical managed post order from /post-orders ingestion batch.'
 created_at: '2026-05-16T13:49:59+00:00'
-last_updated: '2026-05-16T13:49:59+00:00'
+last_updated: '2026-05-17'
 tags:
 - post_order
 - sierra-ridge
