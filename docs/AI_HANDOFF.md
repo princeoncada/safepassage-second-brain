@@ -1,6 +1,6 @@
 # AI Handoff
 
-## Current Version: 4.13.1
+## Current Version: 4.13.1-stable
 
 ## Current Phase
 
@@ -22,6 +22,8 @@ Phase 4.13.0 archives two redundant Sierra Ridge K-scoped legacy migration post-
 Both files are preserved for audit history with `status: archived`, `lifecycle_generation: archived`, `superseded_by: sierra-ridge-post-order-k-physical-id-required-at-all-times-83654ab9db.md`, and an archive reason. They were archived because the canonical active SR K rule is `sierra-ridge-post-order-k-physical-id-required-at-all-times-83654ab9db.md`, and the redundant legacy files caused kiosk scoped listings to include extra duplicate physical-ID rules.
 
 ## Phase 4.13.1 [4.13.1]
+
+Status: VALIDATED and STABLE — committed to master 2026-05-17.
 
 Phase 4.13.1 updates `rag/prompts/answer_from_context.md` so full scoped post-order listing answers include pending rules instead of only footnoting them. For full kiosk or concierge listing queries, pending rules must be shown in a separate `Pending — Not Yet Active` section and each pending entry must start with `[PENDING]`. Non-listing operational questions keep the existing behavior: answer from active sources and warn about pending sources.
 
@@ -149,7 +151,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.14.0 — Community Onboarding: ingest post orders for remaining unindexed communities.
+Next: Phase 4.14.0 — Community Onboarding: ingest post orders for remaining unindexed communities via /post-orders [ALIAS] [text] in Open WebUI. Currently indexed with post orders: CBK, HPS, GLEN, SR. All other aliases in community_aliases.json have no post orders in vault.
 
 ## Phase 4I-lite Implementation Added
 
