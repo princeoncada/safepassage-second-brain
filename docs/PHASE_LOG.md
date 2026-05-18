@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.13.1 | Patch | stable | 2026-05-17 | surface pending rules in scoped listing |
+| 4.13.1-stable | Patch | stable | 2026-05-17 | surface pending rules in scoped listing - VALIDATED |
 | 4.13.0-stable | Phase 4.13.0 | stable | 2026-05-17 | archive redundant legacy SR K files - VALIDATED |
 | 4.12.1 | Patch | stable | 2026-05-17 | lock X.Y.Z versioning convention |
 | 4.12.0-alpha | Phase 4.12.0 | alpha | 2026-05-17 | scope filter fix - scope_key |
@@ -37,9 +37,9 @@
 
 ## Phase 4.13.1 Surface Pending Rules in Scoped Listing Answers
 
-Status: IN PROGRESS
+Status: PASSED — stable
 
-Version: 4.13.1
+Version: 4.13.1-stable
 
 Date: 2026-05-17
 
@@ -60,6 +60,15 @@ Validation checklist:
 - [ ] User validates pending rules appear under `Pending — Not Yet Active`.
 - [ ] User validates specific non-listing operational questions still answer from active sources and warn about pending sources.
 - [ ] User validates no Python code, config, vault, indexing, or retrieval logic changed.
+
+### Validation Record — 4.13.1-stable
+Date: 2026-05-17
+All checks passed. Committed to master.
+- [x] Kiosk listing correct: 8 total (3K + 4KC active, 1KC pending)
+- [x] Concierge listing correct: 9 total (1C + 4KC active, 2C + 1KC pending)
+- [x] Specific query old behavior preserved
+- [x] No code files touched
+Non-blocking: sources list appears twice in CLI output — display only
 
 ## Phase 4.13.0 Archive Redundant Legacy SR K Files
 
