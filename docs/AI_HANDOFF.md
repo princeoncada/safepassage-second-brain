@@ -1,6 +1,6 @@
 # AI Handoff
 
-## Current Version: 4.12.1
+## Current Version: 4.13.0-stable
 
 ## Current Phase
 
@@ -9,6 +9,17 @@ PHASE 4.12.0 [4.12.0-alpha] - Scope Filter Fix - in progress. Current stable rem
 ## Phase 4.12.0 In Progress
 
 Phase 4.12.0-alpha fixes scoped post-order retrieval filtering in `rag/scripts/answer_vault.py`. Phase 4.9.0 filtered scoped candidates by checking whether uppercase letters `K` or `C` appeared in the indexed `scope` string, but ChromaDB stores scope as values such as `kiosk` and `kiosk, concierge`. The fix uses indexed `scope_key` metadata instead: kiosk keeps `k` and `kc`, concierge keeps `c` and `kc`. If scope filtering produces no matches, retrieval still falls back to the unfiltered candidate list.
+
+## Phase 4.13.0 [4.13.0-stable]
+
+Status: VALIDATED and STABLE — committed to master 2026-05-17.
+
+Phase 4.13.0 archives two redundant Sierra Ridge K-scoped legacy migration post-order files that duplicated the canonical `/post-orders` ingestion batch rule for physical ID requirements:
+
+- `vault/03_Post_Orders/sierra-ridge-managed-post-order-k-sierra-ridge-visitors-present-physical-id-32e4f9f24f.md`
+- `vault/03_Post_Orders/sierra-ridge-managed-post-order-k-sierra-ridge-all-overnight-visitors-present-b89b46db47.md`
+
+Both files are preserved for audit history with `status: archived`, `lifecycle_generation: archived`, `superseded_by: sierra-ridge-post-order-k-physical-id-required-at-all-times-83654ab9db.md`, and an archive reason. They were archived because the canonical active SR K rule is `sierra-ridge-post-order-k-physical-id-required-at-all-times-83654ab9db.md`, and the redundant legacy files caused kiosk scoped listings to include extra duplicate physical-ID rules.
 
 ## Phase 4.11.0 [4.11.0-stable]
 
@@ -134,9 +145,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Note: versioning convention locked at 4.12.1. All future phases use X.Y.Z table in VERSIONING.md.
-
-Validate Phase 4.12.0-alpha scope filtering. Confirm kiosk scoped listings use `scope_key` values `k` and `kc`, concierge scoped listings use `c` and `kc`, fallback to unfiltered candidates remains intact when no scoped matches exist, and no unrelated retrieval logic changed.
+Next: Phase 4.13.1 — pending rules currently suppressed from scoped listing answers. Fix: surface pending rules with clear [PENDING] label in kiosk and concierge scoped listing responses.
 
 ## Phase 4I-lite Implementation Added
 
