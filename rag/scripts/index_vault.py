@@ -130,6 +130,7 @@ def is_near_duplicate(
     section: str,
     content: str,
     threshold: float,
+    status: str = "",
 ) -> bool:
     normalized_type = normalize_key(doc_type)
     normalized_community = normalize_key(community)
@@ -142,6 +143,11 @@ def is_near_duplicate(
         if existing["normalized_section"] != normalized_section:
             continue
         if jaccard_similarity(existing["content"], content) >= threshold:
+            existing_status = existing.get("status", "")
+            if existing_status == "pending" and status == "active":
+                continue
+            if existing_status == "active" and status == "pending":
+                continue
             return True
     return False
 
@@ -228,7 +234,15 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
             if fingerprint in seen_fingerprints:
                 skipped_duplicates += 1
                 continue
-            if is_near_duplicate(seen_semantic_chunks, doc_type, community, section, content, near_duplicate_threshold):
+            if is_near_duplicate(
+                seen_semantic_chunks,
+                doc_type,
+                community,
+                section,
+                content,
+                near_duplicate_threshold,
+                status=status,
+            ):
                 skipped_duplicates += 1
                 continue
             seen_fingerprints.add(fingerprint)
@@ -238,6 +252,7 @@ def build_chunks(include_archive: bool, include_low_value_sections: bool) -> tup
                     "normalized_community": normalize_key(community),
                     "normalized_section": normalize_key(section),
                     "content": content,
+                    "status": status,
                 }
             )
 
