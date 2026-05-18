@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import re
+import requests
 import sys
 import urllib.error
 import urllib.request
@@ -797,6 +798,65 @@ def call_deepseek(api_key: str, question: str, context_packet: str, prompt: str,
 
     parsed = json.loads(response_body)
     return str(parsed["choices"][0]["message"]["content"]).strip()
+
+
+def call_deepseek_stream(
+    api_key: str,
+    question: str,
+    context_packet: str,
+    prompt: str,
+    retrieval_note: str = "",
+):
+    """Call DeepSeek with stream=True. Yields token strings as they arrive."""
+    user_parts = [f"Question:\n{question}"]
+    if retrieval_note:
+        user_parts.append(f"Retrieval note:\n{retrieval_note}")
+    user_parts.extend(
+        [
+            f"Retrieved context:\n{context_packet}",
+            "Return a concise grounded answer with Sources.",
+        ]
+    )
+    payload = {
+        "model": DEEPSEEK_MODEL,
+        "temperature": 0.1,
+        "stream": True,
+        "messages": [
+            {"role": "system", "content": prompt},
+            {
+                "role": "user",
+                "content": "\n\n".join(user_parts),
+            },
+        ],
+    }
+    with requests.post(
+        DEEPSEEK_URL,
+        json=payload,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        stream=True,
+        timeout=60,
+    ) as response:
+        response.raise_for_status()
+        for line in response.iter_lines():
+            if not line:
+                continue
+            decoded = line.decode("utf-8") if isinstance(line, bytes) else line
+            if not decoded.startswith("data:"):
+                continue
+            data_str = decoded[len("data:"):].strip()
+            if data_str == "[DONE]":
+                break
+            try:
+                chunk = json.loads(data_str)
+                delta = chunk["choices"][0].get("delta", {})
+                token = delta.get("content", "")
+                if token:
+                    yield token
+            except (json.JSONDecodeError, KeyError, IndexError):
+                continue
 
 
 def main() -> int:
