@@ -111,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.13.2-stable |
+| Version | 4.13.3 |
 | Phase | Patch |
 | State | stable |
 | Date | 2026-05-17 |
-| Commit | master |
-| Summary | fix pending detection + reverse rule order |
+| Commit | pending |
+| Summary | fix emergency code vault data |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.13.3 | Patch | stable | 2026-05-17 | fix emergency code vault data |
 | 4.13.2-stable | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order - VALIDATED |
 | 4.13.1-stable | Patch | stable | 2026-05-17 | surface pending rules in scoped listing - VALIDATED |
 | 4.13.0-stable | Phase 4.13.0 | stable | 2026-05-17 | archive redundant legacy SR K files - VALIDATED |
@@ -177,9 +178,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.13.2-stable
-Current working phase: Fix Pending Detection + Reverse Rule Order
-Validation status: stable; validated and committed to master.
-Next phase: 4.13.3 — fix emergency code vault data + ChromaDB rebuild.
+Current working version: 4.13.3
+Current working phase: Fix Emergency Code Vault Data
+Validation status: stable; commit pending.
+Next phase: After committing 4.13.3, reingest SR post orders, rebuild ChromaDB, then Phase 4.13.4 - fix strip_sources_section() double sources display.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-17-session-04.md` records the workflow documentation update clarifying when to use the 3-section prompt format. No version change was made for that documentation-only update.
