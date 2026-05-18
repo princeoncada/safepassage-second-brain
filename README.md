@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.14.0-stable |
+| Current | 4.15.0-alpha |
 | Last Stable | 4.14.0-stable (Phase 4.14.0) |
-| Status | stable |
+| Status | alpha |
 
 ## Source Of Truth
 
@@ -16,7 +16,8 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.14.0-stable incremental indexing with `--files`:
+Working proof of work through Phase 4.14.0-stable incremental indexing with `--files`.
+Phase 4.15.0-alpha streaming response support is implemented and pending manual validation:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -49,12 +50,13 @@ Working proof of work through Phase 4.14.0-stable incremental indexing with `--f
 - Phase 4.13.3 [4.13.3-stable] - Fix emergency code vault data: stable
 - Phase 4.13.4 [4.13.4-stable] - Fix double sources display in CLI output: stable
 - Phase 4.14.0 [4.14.0-stable] - Incremental indexing with --files flag: stable
+- Phase 4.15.0 [4.15.0-alpha] - Streaming response with /ask/stream SSE endpoint + Open WebUI pipe: alpha
 
 Current architecture:
 
 ```text
 Open WebUI
--> FastAPI /ask
+-> FastAPI /ask or /ask/stream
 -> local retrieval
 -> grounded answer generation
 -> citations/refusal/confidence
@@ -115,6 +117,8 @@ Phase 4.13.3-stable fixes Sierra Ridge emergency-code vault metadata, ingestion 
 Phase 4.13.4-stable fixes the CLI double sources display issue by suppressing the early source print in the normal AI answer path. The --no-ai and refusal paths keep their existing source output.
 
 Phase 4.14.0-stable adds incremental vault indexing. `rag/scripts/index_vault.py --files [path ...]` embeds and upserts only the specified Markdown files without clearing the ChromaDB collection, while the default no-flag path remains a full rebuild. Slash-command ingestion now indexes recently modified post-order or announcement vault files after confirmed ingestion, with a fallback to full rebuild when no recent files are detected.
+
+Phase 4.15.0-alpha adds live streaming for Open WebUI. `/ask/stream` returns Server-Sent Events, forwarding DeepSeek tokens as they arrive and ending with structured citations, confidence, and warnings. `openwebui/pipe.py` is a ready-to-install Open WebUI pipe that calls the streaming endpoint and falls back to `/ask` if streaming fails. The original `/ask` endpoint remains unchanged.
 
 Dashboard endpoints:
 
