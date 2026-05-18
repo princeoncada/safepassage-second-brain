@@ -25,3 +25,18 @@ services:
       - ./vault:/data/vault
       - ./exports:/data/exports
       - ./workflows:/data/workflows
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "3032:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - open-webui:/app/backend/data
+
+volumes:
+  open-webui:
+    external: true
