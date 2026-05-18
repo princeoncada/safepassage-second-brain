@@ -244,6 +244,16 @@ Version state during the phase cycle:
   after all checks pass AND user commits: stable version assigned
   after DOCUMENT prompt runs:              stable version recorded
 
+VERSION NUMBER RULE:
+Before assigning a version number to any phase or fix, consult the X.Y.Z
+decision table in docs/VERSIONING.md.
+- Bug fixes and doc-only changes: increment Z only
+- New capabilities or features: increment Y, reset Z to 0
+- Architectural changes: increment X, reset Y and Z to 0
+Never increment Y for a bug fix. Never increment Y for a doc-only change.
+When in doubt, ask: does this add a new capability an operator would notice?
+If yes: Y. If no: Z.
+
 Every Codex prompt header must include the current version:
   PROJECT: SafePassage Second Brain
   TASK: [description]
