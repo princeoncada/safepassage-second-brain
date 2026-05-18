@@ -1,10 +1,23 @@
 # AI Handoff
 
-## Current Version: 4.14.0-stable
+## Current Version: 4.15.0-alpha
 
 ## Current Phase
 
-PHASE 4.14.0 [4.14.0-stable] - Incremental indexing with --files flag - validated and stable. Next phase is 4.15.0: streaming response (/ask/stream SSE endpoint + Open WebUI pipe update).
+PHASE 4.15.0 [4.15.0-alpha] - Streaming response (/ask/stream SSE endpoint + Open WebUI pipe). Implemented but pending manual validation.
+
+## Phase 4.15.0
+
+Phase 4.15.0 adds a /ask/stream SSE endpoint and an Open WebUI pipe.
+call_deepseek_stream() in answer_vault.py calls DeepSeek with stream=True
+and yields tokens. stream_answer_question() in service.py is a generator
+that runs retrieval synchronously then streams tokens as SSE data events,
+followed by a [CITATIONS] event containing citations, confidence, and
+warnings. The /ask/stream FastAPI endpoint wraps the generator in a
+StreamingResponse. openwebui/pipe.py is a ready-to-install Open WebUI pipe
+that calls /ask/stream and yields tokens live, appending formatted citations
+at the end.
+The original /ask endpoint is unchanged.
 
 ## Phase 4.12.0 In Progress
 
@@ -115,6 +128,7 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase 4I-lite slash command ingestion in `api/ingest.py` with /post-orders and /announcements commands routed through `api/service.py`.
 - Phase 4I-lite operator guide at `openwebui/INGEST_COMMANDS.md`.
 - Phase 4.14.0-stable incremental indexing in `rag/scripts/index_vault.py` with `--files`, and slash-command ingestion uses recently modified vault files for incremental post-ingestion indexing.
+- Phase 4.15.0-alpha streaming response support through `/ask/stream`, `call_deepseek_stream()`, `stream_answer_question()`, and `openwebui/pipe.py`.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -179,7 +193,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.15.0 — streaming response (/ask/stream SSE endpoint + Open WebUI pipe update).
+Next: Phase 4.16.0 - conflict detection + multi-turn wizard UX for /post-orders.
 
 ## Phase 4I-lite Implementation Added
 
