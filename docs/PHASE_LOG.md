@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.15.0-alpha | Phase 4.15.0 | alpha | 2026-05-18 | streaming response - /ask/stream SSE endpoint + Open WebUI pipe |
 | 4.14.0-stable | Phase 4.14.0 | stable | 2026-05-18 | incremental indexing with --files flag - VALIDATED |
 | 4.13.4-stable | Patch | stable | 2026-05-18 | fix double sources display in CLI output - VALIDATED |
 | 4.13.3-stable | Patch | stable | 2026-05-18 | emergency code vault fix + ingestion/indexing/dedup fixes - VALIDATED |
@@ -38,6 +39,40 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.15.0 Streaming Response - /ask/stream SSE Endpoint + Open WebUI Pipe
+
+Status: alpha
+
+Version: 4.15.0-alpha
+
+Date: 2026-05-18
+
+Purpose:
+
+Streaming response - /ask/stream SSE endpoint + Open WebUI pipe.
+
+Implementation scope:
+
+- `rag/scripts/answer_vault.py`: add `call_deepseek_stream()`, add `requests` import
+- `api/service.py`: add `stream_answer_question()` generator, import `call_deepseek_stream`
+- `api/main.py`: add `/ask/stream` `StreamingResponse` endpoint
+- `openwebui/pipe.py`: new file - ready-to-install Open WebUI pipe
+- `rag/requirements.txt`: add `requests`
+- `openwebui/examples/openwebui_connection_example.md`: add streaming pipe install section
+
+Validation checklist:
+
+- [ ] Syntax OK: answer_vault.py, service.py, main.py, pipe.py
+- [ ] /ask endpoint unchanged - existing validation queries still work
+- [ ] curl /ask/stream returns SSE data lines with tokens
+- [ ] curl /ask/stream final event is data: [CITATIONS]{...}
+- [ ] data: [DONE] terminates the stream
+- [ ] Open WebUI pipe installed and streaming tokens live in chat
+- [ ] Citations, confidence, and warnings appear at end of response
+- [ ] /post-orders via pipe: returns single synthetic response, no crash
+- [ ] --no-ai and refuse paths return immediately via [CITATIONS] event
+- [ ] No rag/config, vault, automation/ files changed
 
 ## Phase 4.14.0 Incremental Indexing With --files Flag
 
@@ -422,7 +457,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.12.0 [4.12.0-alpha] SCOPE FILTER FIX
+PHASE 4.15.0 [4.15.0-alpha] STREAMING RESPONSE - /ask/stream SSE ENDPOINT + OPEN WEBUI PIPE
 
 ## Overall System Status
 
