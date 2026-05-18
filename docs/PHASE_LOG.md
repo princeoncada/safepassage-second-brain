@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.13.3 | Patch | stable | 2026-05-17 | fix emergency code vault data |
 | 4.13.2-stable | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order - VALIDATED |
 | 4.13.1-stable | Patch | stable | 2026-05-17 | surface pending rules in scoped listing - VALIDATED |
 | 4.13.0-stable | Phase 4.13.0 | stable | 2026-05-17 | archive redundant legacy SR K files - VALIDATED |
@@ -35,6 +36,35 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.13.3 Fix Emergency Code Vault Data
+
+Status: IN PROGRESS
+
+Version: 4.13.3
+
+Date: 2026-05-17
+
+Purpose:
+
+Fix Sierra Ridge emergency-code vault metadata created before the 4.13.2 pending-marker parser correction.
+
+Implementation scope:
+
+- `vault/03_Post_Orders/sierra-ridge-post-order-c-emergency-code-as-april-3-2026-efb8cf3049.md`: restore the non-pending emergency-code rule to `status: active`, clear `superseded_by`, and update `last_updated`.
+- `vault/03_Post_Orders/sierra-ridge-post-order-c-emergency-code-as-april-3-2026-6d3afb83e9.md`: keep `status: pending`, clear the incorrect `supersedes` reference, and update `last_updated`.
+- `docs/VERSIONING.md`, `docs/AI_HANDOFF.md`, `docs/PHASE_LOG.md`, and `README.md`: record 4.13.3 as the current vault data patch.
+
+Validation checklist:
+
+- [ ] User validates the active emergency-code file has `status: active`.
+- [ ] User validates the active emergency-code file has `superseded_by: ''`.
+- [ ] User validates the pending emergency-code file still has `status: pending`.
+- [ ] User validates the pending emergency-code file has `supersedes: ''`.
+- [ ] User validates both vault file bodies are unchanged.
+- [ ] User reingests SR post orders in Open WebUI to apply 4.13.2 pending detection fix.
+- [ ] User rebuilds ChromaDB with reset_chroma.py and index_vault.py.
+- [ ] User validates no Python code or config files changed.
 
 ## Phase 4.13.2 Fix Pending Detection + Reverse Rule Order
 
