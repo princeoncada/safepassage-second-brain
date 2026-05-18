@@ -1,6 +1,6 @@
 # AI Handoff
 
-## Current Version: 4.11.0-stable
+## Current Version: 4.12.1
 
 ## Current Phase
 
@@ -133,6 +133,8 @@ Future AI work should:
 - Do not commit secrets, real API keys, `.env`, `n8n_data`, or generated credential files.
 
 ## Recommended Next Step
+
+Note: versioning convention locked at 4.12.1. All future phases use X.Y.Z table in VERSIONING.md.
 
 Validate Phase 4.12.0-alpha scope filtering. Confirm kiosk scoped listings use `scope_key` values `k` and `kc`, concierge scoped listings use `c` and `kc`, fallback to unfiltered candidates remains intact when no scoped matches exist, and no unrelated retrieval logic changed.
 
