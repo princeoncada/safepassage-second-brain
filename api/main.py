@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 
 from api.dashboard import router as dashboard_router
 from api.schemas import AskRequest, AskResponse
-from api.service import answer_question
+from api.service import answer_question, stream_answer_question
 
 
 app = FastAPI(
@@ -43,3 +44,15 @@ def health() -> dict[str, str]:
 @app.post("/ask", response_model=AskResponse)
 def ask(request: AskRequest) -> AskResponse:
     return answer_question(request)
+
+
+@app.post("/ask/stream")
+def ask_stream(request: AskRequest) -> StreamingResponse:
+    return StreamingResponse(
+        stream_answer_question(request),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
