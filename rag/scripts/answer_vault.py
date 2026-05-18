@@ -482,13 +482,40 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         )
         if identity_key in seen_identity_keys or preview_key in seen_preview_keys:
             continue
-        if any(
-            existing["community"] == normalized_community
-            and existing["type"] == normalized_type
-            and existing["section"] == normalized_section
-            and jaccard_similarity(existing["document"], document) >= near_duplicate_threshold
-            for existing in seen_near_duplicates
-        ):
+        _near_dup_found = False
+        for _i, _existing in enumerate(seen_near_duplicates):
+            if (
+                _existing["community"] == normalized_community
+                and _existing["type"] == normalized_type
+                and _existing["section"] == normalized_section
+                and jaccard_similarity(_existing["document"], document) >= near_duplicate_threshold
+            ):
+                _near_dup_found = True
+                _incoming_status = str(metadata.get("status", ""))
+                _existing_status = _existing.get("status", "")
+                if _incoming_status == "active" and _existing_status == "pending":
+                    _existing_document = _existing["document"]
+                    seen_near_duplicates[_i] = {
+                        "community": normalized_community,
+                        "type": normalized_type,
+                        "section": normalized_section,
+                        "document": document,
+                        "status": _incoming_status,
+                    }
+                    candidates = [
+                        c for c in candidates
+                        if not (
+                            normalize_key(str(c[3].get("community", ""))) == normalized_community
+                            and normalize_key(str(c[3].get("type", ""))) == normalized_type
+                            and normalize_section_name(str(c[3].get("section", ""))) == normalized_section
+                            and jaccard_similarity(str(c[2]), _existing_document) >= near_duplicate_threshold
+                        )
+                    ]
+                    candidates.append((adjusted_distance, distance, document, metadata))
+                    seen_identity_keys.add(identity_key)
+                    seen_preview_keys.add(preview_key)
+                break
+        if _near_dup_found:
             continue
 
         seen_identity_keys.add(identity_key)
@@ -499,6 +526,7 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
                 "type": normalized_type,
                 "section": normalized_section,
                 "document": document,
+                "status": str(metadata.get("status", "")),
             }
         )
         candidates.append((adjusted_distance, distance, document, metadata))
