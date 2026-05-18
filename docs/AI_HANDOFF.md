@@ -1,10 +1,10 @@
 # AI Handoff
 
-## Current Version: 4.13.3-stable
+## Current Version: 4.13.4-alpha
 
 ## Current Phase
 
-PHASE 4.13.3 [4.13.3-stable] - Emergency Code Vault Fix + Ingestion/Indexing/Dedup Fixes - validated and stable. Next phase is 4.13.4: fix `strip_sources_section()` double sources display in CLI output. Then proceed to Phase 4.14.0: conflict detection during ingestion preview.
+PHASE 4.13.4 [4.13.4-alpha] - Fix Double Sources Display in CLI Output - alpha. This patch gates the early CLI source display so normal AI answers print sources exactly once while preserving --no-ai and refusal source output.
 
 ## Phase 4.12.0 In Progress
 
@@ -34,6 +34,12 @@ Status: VALIDATED and STABLE — committed to master 2026-05-18.
 Phase 4.13.3 fixes Sierra Ridge emergency-code vault metadata directly. The active concierge emergency code rule without a `(Pending)` marker is restored to `status: active` with no `superseded_by` reference, and the pending emergency-code variant keeps `status: pending` but no longer supersedes the active rule. This is a vault data fix only; no code, config, ingestion, or indexing scripts are changed or run in this phase.
 
 Patch 2: near-duplicate deduplicator updated to preserve active rules over pending near-duplicates. Ensures active emergency codes are never dropped in favour of their pending variants during scoped listing retrieval.
+
+## Phase 4.13.4 [4.13.4-alpha]
+
+Status: alpha.
+
+Phase 4.13.4 fixes the CLI double sources display issue in `rag/scripts/answer_vault.py`. The unconditional early `print_sources(chunks)` call before AI answer generation is suppressed for the normal AI path, leaving final citations or review sources as the single source display. The --no-ai path still uses `print_citations(chunks, title="Retrieved Context Citations")`, and the refusal path still uses `print_sources(chunks, title="Closest Retrieved Sources")`. No retrieval, scoring, deduplication, lifecycle, authority, prompt, vault, or API behavior is changed.
 
 ## Phase 4.13.2 [4.13.2-stable]
 
@@ -166,7 +172,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.13.4 — fix strip_sources_section() double sources display in CLI output without changing retrieval behavior. Then Phase 4.14.0 — conflict detection during ingestion preview.
+Next: Phase 4.14.0 — conflict detection during ingestion preview.
 
 ## Phase 4I-lite Implementation Added
 
