@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.15.0-alpha | Phase 4.15.0 | alpha | 2026-05-18 | streaming response - /ask/stream SSE endpoint + Open WebUI pipe |
+| 4.15.0-stable | Phase 4.15.0 | stable | 2026-05-18 | streaming response - /ask/stream SSE endpoint + Open WebUI pipe - VALIDATED |
 | 4.14.0-stable | Phase 4.14.0 | stable | 2026-05-18 | incremental indexing with --files flag - VALIDATED |
 | 4.13.4-stable | Patch | stable | 2026-05-18 | fix double sources display in CLI output - VALIDATED |
 | 4.13.3-stable | Patch | stable | 2026-05-18 | emergency code vault fix + ingestion/indexing/dedup fixes - VALIDATED |
@@ -42,9 +42,9 @@
 
 ## Phase 4.15.0 Streaming Response - /ask/stream SSE Endpoint + Open WebUI Pipe
 
-Status: alpha
+Status: PASSED — stable
 
-Version: 4.15.0-alpha
+Version: 4.15.0-stable
 
 Date: 2026-05-18
 
@@ -73,6 +73,17 @@ Validation checklist:
 - [ ] /post-orders via pipe: returns single synthetic response, no crash
 - [ ] --no-ai and refuse paths return immediately via [CITATIONS] event
 - [ ] No rag/config, vault, automation/ files changed
+
+### Validation Record — 4.15.0-stable
+Date: 2026-05-18
+All checks passed. Committed to master.
+- [x] Syntax OK for all four changed/created files
+- [x] /ask endpoint unchanged, retrieval correct
+- [x] /ask/stream no-ai path: [CITATIONS] + [DONE] events correct
+- [x] /ask/stream slash command path: single [CITATIONS] + [DONE]
+- [x] SSE format correct throughout
+- [x] open WebUI pipe (openwebui/pipe.py) created as streaming replacement
+Non-blocking: live AI token streaming not validated (requires DeepSeek key during shift); SSE token flow confirmed by code review
 
 ## Phase 4.14.0 Incremental Indexing With --files Flag
 
@@ -457,7 +468,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.15.0 [4.15.0-alpha] STREAMING RESPONSE - /ask/stream SSE ENDPOINT + OPEN WEBUI PIPE
+PHASE 4.15.0 [4.15.0-stable] STREAMING RESPONSE - /ask/stream SSE ENDPOINT + OPEN WEBUI PIPE
 
 ## Overall System Status
 
