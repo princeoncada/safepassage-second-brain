@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.13.0-stable | Phase 4.13.0 | stable | 2026-05-17 | archive redundant legacy SR K files - VALIDATED |
 | 4.12.1 | Patch | stable | 2026-05-17 | lock X.Y.Z versioning convention |
 | 4.12.0-alpha | Phase 4.12.0 | alpha | 2026-05-17 | scope filter fix - scope_key |
 | 4.11.0-stable | Phase 4.11.0 | stable | 2026-05-17 | workflow simplification - remove rc state - VALIDATED |
@@ -32,6 +33,36 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.13.0 Archive Redundant Legacy SR K Files
+
+Status: PASSED — stable
+
+Version: 4.13.0-stable
+
+Date: 2026-05-17
+
+Purpose:
+
+Archive two redundant Sierra Ridge K-scoped legacy migration post-order files that duplicate the canonical managed post order from the `/post-orders` ingestion batch.
+
+Files archived:
+
+- `vault/03_Post_Orders/sierra-ridge-managed-post-order-k-sierra-ridge-visitors-present-physical-id-32e4f9f24f.md`
+- `vault/03_Post_Orders/sierra-ridge-managed-post-order-k-sierra-ridge-all-overnight-visitors-present-b89b46db47.md`
+
+Reason:
+
+The files were Phase 4C2 legacy migration artifacts and are operationally superseded by `vault/03_Post_Orders/sierra-ridge-post-order-k-physical-id-required-at-all-times-83654ab9db.md`. Keeping them active caused Sierra Ridge kiosk scoped listings to include redundant physical-ID rules. The files were not deleted; their frontmatter was changed to `status: archived` and `lifecycle_generation: archived` with `superseded_by` and `archive_reason` metadata for audit history.
+
+### Validation Record — 4.13.0-stable
+Date: 2026-05-17
+All checks passed. Committed to master.
+- [x] Both legacy files archived correctly
+- [x] ChromaDB rebuilt successfully (206 chunks, 111 files)
+- [x] Kiosk returns 8 rules — correct count
+- [x] No legacy bleed
+- [x] No code files touched
 
 ## Phase 4.12.0 Scope Filter Fix - scope_key
 
