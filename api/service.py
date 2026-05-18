@@ -18,6 +18,7 @@ from rag.scripts.answer_vault import (
     PROMPT_PATH,
     build_context_packet,
     call_deepseek,
+    call_deepseek_stream,
     chunks_by_ids,
     cited_source_ids,
     insufficient_context_answer,
@@ -79,6 +80,12 @@ def chunk_to_source(chunk: dict[str, Any], show_context: bool) -> Source:
         preview=shorten(" ".join(content.split()), width=240, placeholder="..."),
         content=content if show_context else None,
     )
+
+
+def source_to_dict(source: Source) -> dict[str, Any]:
+    if hasattr(source, "model_dump"):
+        return source.model_dump()
+    return source.dict()
 
 
 def build_response(
@@ -303,3 +310,227 @@ def answer_question(request: AskRequest) -> AskResponse:
         used_ai=True,
         warnings=warnings,
     )
+
+
+def stream_answer_question(request: AskRequest):
+    """
+    Generator for /ask/stream. Yields SSE-formatted strings.
+
+    SSE event format used:
+      data: <token>\n\n          - one token at a time during answer generation
+      data: [CITATIONS]<json>\n\n - final event with citations, sources, warnings
+      data: [DONE]\n\n           - stream terminator
+
+    Slash command and ingest flows (YES/NO, /post-orders, /announcements)
+    are not streamed. They return a single synthetic SSE response and
+    terminate immediately, since they have no AI generation to stream.
+    """
+    question_stripped = request.question.strip()
+    question_upper = question_stripped.upper()
+
+    ingest_answer: str | None = None
+    if question_stripped.lower().startswith("/post-orders"):
+        ingest_answer = handle_post_orders_command(question_stripped)
+    elif question_stripped.lower().startswith("/announcements"):
+        ingest_answer = handle_announcements_command(question_stripped)
+    elif question_upper == "YES":
+        ingest_answer = handle_confirm_yes()
+    elif question_upper == "NO":
+        ingest_answer = handle_confirm_no()
+
+    if ingest_answer is not None:
+        payload = json.dumps(
+            {
+                "answer": ingest_answer,
+                "retrieval_confidence": "1.0",
+                "confidence_reason": "slash command",
+                "sources": [],
+                "answer_citations": [],
+                "warnings": [],
+                "used_ai": False,
+            }
+        )
+        yield f"data: [CITATIONS]{payload}\n\n"
+        yield "data: [DONE]\n\n"
+        return
+
+    _intent_check = parse_query_intent(question_stripped)
+    _clarification = check_ambiguous_community(_intent_check.community)
+    if _clarification:
+        payload = json.dumps(
+            {
+                "answer": _clarification,
+                "retrieval_confidence": "1.0",
+                "confidence_reason": "ambiguous community",
+                "sources": [],
+                "answer_citations": [],
+                "warnings": [],
+                "used_ai": False,
+            }
+        )
+        yield f"data: [CITATIONS]{payload}\n\n"
+        yield "data: [DONE]\n\n"
+        return
+
+    retrieval_question = question_stripped
+    _current_intent = parse_query_intent(question_stripped)
+    if not _current_intent.community and request.history:
+        _hist_community, _ = resolve_community_from_history(request.history)
+        if _hist_community:
+            retrieval_question = f"{question_stripped} {_hist_community}"
+
+    warnings: list[str] = []
+    try:
+        chunks, hints, assessment = retrieve_chunks(
+            retrieval_question,
+            request.top_k,
+            request.include_low_value_sections,
+        )
+    except SystemExit as error:
+        payload = json.dumps(
+            {
+                "answer": str(error),
+                "retrieval_confidence": "none",
+                "confidence_reason": str(error),
+                "sources": [],
+                "answer_citations": [],
+                "warnings": [str(error)],
+                "used_ai": False,
+            }
+        )
+        yield f"data: [CITATIONS]{payload}\n\n"
+        yield "data: [DONE]\n\n"
+        return
+
+    context_packet = build_context_packet(chunks)
+
+    if assessment.get("confidence") in {"weak", "none"}:
+        warnings.append("retrieved context is weak")
+    advisory_note = lifecycle_advisory_note(chunks)
+    if advisory_note:
+        warnings.append(
+            "non-current or uncertain temporal lifecycle context is present; "
+            "active rules remain authoritative"
+        )
+    for chunk in chunks:
+        if chunk.get("temporal_warning"):
+            warnings.append(
+                f"source {chunk.get('source_id')} temporal warning: "
+                f"{chunk.get('temporal_warning')}"
+            )
+
+    if request.no_ai:
+        payload = json.dumps(
+            {
+                "answer": "AI skipped because no_ai=true. Retrieved context returned in sources.",
+                "retrieval_confidence": assessment.get("confidence", ""),
+                "confidence_reason": assessment.get("reason", ""),
+                "sources": [source_to_dict(chunk_to_source(c, request.show_context)) for c in chunks],
+                "answer_citations": [],
+                "warnings": warnings,
+                "used_ai": False,
+            }
+        )
+        yield f"data: [CITATIONS]{payload}\n\n"
+        yield "data: [DONE]\n\n"
+        return
+
+    if assessment.get("refuse"):
+        answer = insufficient_context_answer(str(assessment.get("reason", "")))
+        payload = json.dumps(
+            {
+                "answer": answer,
+                "retrieval_confidence": assessment.get("confidence", ""),
+                "confidence_reason": assessment.get("reason", ""),
+                "sources": [source_to_dict(chunk_to_source(c, False)) for c in chunks],
+                "answer_citations": [],
+                "warnings": warnings,
+                "used_ai": False,
+            }
+        )
+        yield f"data: [CITATIONS]{payload}\n\n"
+        yield "data: [DONE]\n\n"
+        return
+
+    api_key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
+    if not api_key:
+        message = (
+            "DEEPSEEK_API_KEY is not set. "
+            "Set it in the environment or send no_ai=true to validate retrieval only."
+        )
+        payload = json.dumps(
+            {
+                "answer": message,
+                "retrieval_confidence": assessment.get("confidence", ""),
+                "confidence_reason": assessment.get("reason", ""),
+                "sources": [],
+                "answer_citations": [],
+                "warnings": [message],
+                "used_ai": False,
+            }
+        )
+        yield f"data: [CITATIONS]{payload}\n\n"
+        yield "data: [DONE]\n\n"
+        return
+
+    prompt = PROMPT_PATH.read_text(encoding="utf-8")
+    retrieval_notes = [str(assessment.get("reason", ""))]
+    if advisory_note:
+        retrieval_notes.append(advisory_note)
+
+    full_answer_parts: list[str] = []
+    try:
+        for token in call_deepseek_stream(
+            api_key,
+            request.question,
+            context_packet,
+            prompt,
+            "\n\n".join(retrieval_notes),
+        ):
+            full_answer_parts.append(token)
+            yield f"data: {json.dumps(token)}\n\n"
+    except Exception as error:
+        message = f"DeepSeek streaming error: {error}"
+        payload = json.dumps(
+            {
+                "answer": message,
+                "retrieval_confidence": assessment.get("confidence", ""),
+                "confidence_reason": assessment.get("reason", ""),
+                "sources": [],
+                "answer_citations": [],
+                "warnings": [message],
+                "used_ai": False,
+            }
+        )
+        yield f"data: [CITATIONS]{payload}\n\n"
+        yield "data: [DONE]\n\n"
+        return
+
+    full_answer = "".join(full_answer_parts)
+    full_answer = strip_sources_section(full_answer)
+    source_ids = cited_source_ids(full_answer, chunks)
+    cited_chunks = chunks_by_ids(chunks, source_ids)
+    if not cited_chunks:
+        warnings.append("generated answer did not include explicit source IDs")
+
+    seen_files: set[str] = set()
+    deduped_cited: list[dict[str, Any]] = []
+    for chunk in cited_chunks:
+        src = chunk_to_source(chunk, False)
+        if src.source_file not in seen_files:
+            seen_files.add(src.source_file)
+            deduped_cited.append(source_to_dict(src))
+
+    payload = json.dumps(
+        {
+            "answer": full_answer,
+            "retrieval_confidence": assessment.get("confidence", ""),
+            "confidence_reason": assessment.get("reason", ""),
+            "sources": [source_to_dict(chunk_to_source(c, request.show_context)) for c in chunks],
+            "answer_citations": deduped_cited,
+            "warnings": warnings,
+            "used_ai": True,
+        }
+    )
+    yield f"data: [CITATIONS]{payload}\n\n"
+    yield "data: [DONE]\n\n"
