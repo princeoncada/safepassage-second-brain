@@ -17,10 +17,10 @@ batch_date: '2026-05-17'
 update_type: partial
 supersede_mode: conservative
 effective_date: '2026-05-17'
-supersedes: sierra-ridge-c-emergency-code-as-april-3-2026-efb8cf3049
+supersedes: ''
 superseded_by: ''
 created_at: '2026-05-17T22:45:57+00:00'
-last_updated: '2026-05-17T22:45:57+00:00'
+last_updated: '2026-05-17'
 tags:
 - post_order
 - sierra-ridge
