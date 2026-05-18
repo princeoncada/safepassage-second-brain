@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.13.4-alpha | Patch | alpha | 2026-05-18 | fix double sources display in CLI output |
+| 4.13.4-stable | Patch | stable | 2026-05-18 | fix double sources display in CLI output - VALIDATED |
 | 4.13.3-stable | Patch | stable | 2026-05-18 | emergency code vault fix + ingestion/indexing/dedup fixes - VALIDATED |
 | 4.13.2-stable | Patch | stable | 2026-05-17 | fix pending detection + reverse rule order - VALIDATED |
 | 4.13.1-stable | Patch | stable | 2026-05-17 | surface pending rules in scoped listing - VALIDATED |
@@ -40,9 +40,9 @@
 
 ## Phase 4.13.4 Fix Double Sources Display in CLI Output
 
-Status: alpha
+Status: PASSED — stable
 
-Version: 4.13.4-alpha
+Version: 4.13.4-stable
 
 Date: 2026-05-18
 
@@ -61,6 +61,15 @@ Validation checklist:
 - [ ] Refuse path: "Closest Retrieved Sources" still appears.
 - [ ] No retrieval behavior changes.
 - [ ] No other files changed except answer_vault.py and docs/.
+
+### Validation Record — 4.13.4-stable
+Date: 2026-05-18
+All checks passed. Committed to master.
+- [x] Normal AI query: sources appear exactly once in CLI output
+- [x] --no-ai query: Retrieved Context Citations still appear
+- [x] No retrieval, scoring, or behavior changes
+- [x] Only answer_vault.py and docs/ files changed
+Non-blocking: none
 
 ## Phase 4.13.3 Fix Emergency Code Vault Data
 
