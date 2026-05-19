@@ -377,6 +377,31 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         except Exception:
             pass
 
+    if hints.get("is_call_flow_query"):
+        try:
+            global_sop_results = collection.get(
+                where={"community": "global"},
+                include=["documents", "metadatas"],
+            )
+            seen_call_flow = {
+                (str(metadata.get("source_file", "")), str(metadata.get("section", "")))
+                for metadata in metadatas
+                if metadata
+            }
+            for document, metadata in zip(
+                global_sop_results.get("documents", []),
+                global_sop_results.get("metadatas", []),
+            ):
+                key = (str(metadata.get("source_file", "")), str(metadata.get("section", "")))
+                if key in seen_call_flow:
+                    continue
+                documents.append(document)
+                metadatas.append(metadata)
+                distances.append(0.85)
+                seen_call_flow.add(key)
+        except Exception:
+            pass
+
     raw_candidates: list[tuple[float, float, str, dict[str, Any]]] = []
 
     for index, document in enumerate(documents):
@@ -449,6 +474,11 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
             candidate
             for candidate in raw_candidates
             if normalize_key(str(candidate[3].get("community", ""))) == normalize_key(hints["community"])
+            or (
+                hints.get("is_call_flow_query")
+                and normalize_key(str(candidate[3].get("community", ""))) == "global"
+                and authority_level(candidate[3]) == "primary_workflow"
+            )
         ]
         if community_matched:
             raw_candidates = community_matched
@@ -457,9 +487,20 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         scope_matched = []
         for candidate in raw_candidates:
             scope_key = str(candidate[3].get("scope_key", "")).lower()
+            candidate_authority = authority_level(candidate[3])
+            candidate_community = normalize_key(str(candidate[3].get("community", "")))
+            candidate_scope = normalize_key(str(candidate[3].get("scope", "")))
             if scope_hint == "kiosk" and scope_key in ("k", "kc"):
                 scope_matched.append(candidate)
             elif scope_hint == "concierge" and scope_key in ("c", "kc"):
+                scope_matched.append(candidate)
+            elif (
+                hints.get("is_call_flow_query")
+                and scope_hint == "kiosk"
+                and candidate_authority == "primary_workflow"
+                and candidate_community == "global"
+                and "kiosk" in candidate_scope
+            ):
                 scope_matched.append(candidate)
         if scope_matched:
             raw_candidates = scope_matched
@@ -547,6 +588,8 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     ):
         effective_top_k = len(candidates)
     elif hints.get("requested_all"):
+        effective_top_k = 25
+    elif hints.get("is_call_flow_query"):
         effective_top_k = 25
 
     chunks: list[dict[str, Any]] = []
