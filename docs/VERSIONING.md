@@ -111,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.18.1-stable |
+| Version | 4.18.2-alpha |
 | Phase | Patch |
-| State | stable |
+| State | alpha |
 | Date | 2026-05-19 |
-| Commit | master |
-| Summary | fix GLEN QA tip wording — SP Guard active access framing - VALIDATED |
+| Commit | uncommitted |
+| Summary | prevent DeepSeek inline Sources block in answers |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.18.2-alpha | Patch | alpha | 2026-05-19 | prevent DeepSeek inline Sources block in answers |
 | 4.18.1-stable | Patch | stable | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing - VALIDATED |
 | 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
 | 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
@@ -186,9 +187,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.18.1-stable
-Current working phase: Patch 4.18.1 — GLEN QA tip wording fix
-Validation status: stable; validated and committed to master.
-Next phase: Patch 4.18.2 — prevent DeepSeek inline Sources block in answers.
+Current working version: 4.18.2-alpha
+Current working phase: Patch 4.18.2 — prevent DeepSeek inline Sources block in answers
+Validation status: alpha; not yet validated.
+Next phase: validate Patch 4.18.2.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md` records the 4.12.1 through 4.13.3-stable session handoff and next action. No version change was made for that checkpoint documentation-only update.
