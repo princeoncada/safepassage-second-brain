@@ -6,12 +6,13 @@ cross off completed items and add new ideas as they arise.
 
 Last updated: 2026-05-20
 Current stable version: 4.20.0-stable
-Current working version: 4.21.0-alpha
+Current working version: 4.21.0-stable
 
 ---
 
 ## Completed
 
+- ~~Phase 4.21.0 - Handoff Readiness~~
 - ~~Phase 4.20.0 — model preloading + audit log source deduplication~~
 - ~~Phase 4.19.0 — operational trust query/answer audit log~~
 - ~~Patch 4.18.3 — restore clean CLI citation display ([Source N] regex fix)~~
@@ -26,31 +27,7 @@ Current working version: 4.21.0-alpha
 
 ## In Progress
 
-### Phase 4.21.0 - Handoff Readiness
-
-Priority: Handoff readiness (P3)
-
-Make the repository understandable and operable by someone other
-than the original developer.
-
-Scope:
-- Architecture diagram (Mermaid) in docs/ showing the full data
-  flow: vault → indexer → ChromaDB → answer_vault → service → pipe
-- Formal vault schema documentation: every frontmatter field defined
-  with type, required/optional, valid values, and authority hierarchy
-- Onboarding guide: setup steps, environment variables, how to
-  ingest new post orders, how to validate, how to deploy
-- Session log automation: Python script that reads PHASE_LOG.md phase
-  entries between a start and end version, then generates a
-  SESSION_LOG draft file - reduces manual session checkpoint effort
-
-Files to change:
-- docs/ARCHITECTURE.md (new)
-- docs/VAULT_SCHEMA.md (new)
-- docs/ONBOARDING.md (new)
-- automation/generate_session_log.py (new)
-- docs (all four versioning locations + FUTURE_PLANS.md)
-- api/version.py
+- None
 
 ---
 
