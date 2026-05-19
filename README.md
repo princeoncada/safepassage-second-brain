@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.20.0-stable |
+| Current | 4.21.0-alpha |
 | Last Stable | 4.20.0-stable (Phase 4.20.0) |
-| Status | stable |
+| Status | alpha |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through 4.20.0-stable model preloading + audit log source deduplication:
+Working proof of work through 4.21.0-alpha handoff readiness:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -59,6 +59,7 @@ Working proof of work through 4.20.0-stable model preloading + audit log source 
 - Patch 4.18.3 [4.18.3-stable] - Restore clean CLI citation display: stable
 - Phase 4.19.0 [4.19.0-stable] - Operational trust query/answer audit log: stable
 - Phase 4.20.0 [4.20.0-stable] - Model preloading + audit log source deduplication: stable
+- Phase 4.21.0 [4.21.0-alpha] - Handoff readiness documentation and session log automation: alpha
 
 Current architecture:
 
@@ -135,6 +136,10 @@ Phase 4.17.0-stable adds quick reply hints in `openwebui/pipe.py` for prompt-for
 Patch 4.17.1-stable suppresses duplicate Open WebUI Sources footers when answers already include inline `[N]` citations, and prevents prior community history from bleeding into general queries such as default, global, standard, or regardless-of-community workflow questions.
 
 Phase 4.18.0-stable enriches primary kiosk call flow SOPs with full script dialogue, adds a GLEN registered-tag QA tip, marks call flow queries in deterministic intent parsing, retrieves global SOPs alongside community-specific post orders for call flow questions, and adds prompt rules for synthesizing one integrated community-aware kiosk call flow.
+
+Phase 4.21.0-alpha adds handoff readiness documentation and tooling:
+`docs/ARCHITECTURE.md`, `docs/VAULT_SCHEMA.md`,
+`docs/ONBOARDING.md`, and `automation/generate_session_log.py`.
 
 Dashboard endpoints:
 
