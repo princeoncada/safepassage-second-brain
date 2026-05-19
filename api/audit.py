@@ -47,11 +47,11 @@ def write_audit_entry(
             "scope": hints.get("scope", ""),
             "retrieval_confidence": assessment.get("confidence", ""),
             "confidence_reason": assessment.get("reason", ""),
-            "sources_cited": [
+            "sources_cited": list(dict.fromkeys(
                 str(chunk.get("source_file", ""))
                 for chunk in cited_chunks
                 if chunk.get("source_file")
-            ],
+            )),
             "answer": answer,
             "used_ai": used_ai,
             "warnings": warnings,
