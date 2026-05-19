@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.21.0-alpha | Phase 4.21.0 | alpha | 2026-05-20 | handoff readiness - architecture diagram, vault schema, onboarding guide, session log automation |
+| 4.21.0-stable | Phase 4.21.0 | stable | 2026-05-20 | handoff readiness - architecture diagram, vault schema, onboarding guide, session log automation - VALIDATED |
 | 4.20.0-stable | Phase 4.20.0 | stable | 2026-05-19 | model preloading + audit log source deduplication - VALIDATED |
 | 4.19.0-stable | Phase 4.19.0 | stable | 2026-05-19 | operational trust — query/answer audit log - VALIDATED |
 | 4.18.3-stable | Patch | stable | 2026-05-19 | restore clean CLI citation display — match [Source N] format - VALIDATED |
@@ -52,9 +52,9 @@
 
 ## Phase 4.21.0 - Handoff Readiness
 
-Status: alpha
+Status: PASSED — stable
 
-Version: 4.21.0-alpha
+Version: 4.21.0-stable
 
 Date: 2026-05-20
 
@@ -105,6 +105,22 @@ Validation checklist:
 - [ ] Confirm no files under rag/, automation/ingestion/,
       automation/ocr/, openwebui/, vault/, or workflows/ were changed
 - [ ] Confirm docs/WORKFLOW.md was not changed
+
+### Validation Record — 4.21.0-stable
+
+Date: 2026-05-20
+
+All checks passed. Committed to master.
+
+- [x] docs/ARCHITECTURE.md — Mermaid block confirmed present
+- [x] docs/VAULT_SCHEMA.md — authority_level, lifecycle_generation,
+      scope_key all confirmed present
+- [x] docs/ONBOARDING.md — Prerequisites, First-Time Indexing,
+      Audit Log sections confirmed present
+- [x] automation/generate_session_log.py — syntax OK; script ran and
+      produced docs/SESSION_LOG/2026-05-20-session-02.md correctly
+- [x] All four versioning locations updated
+- [x] api/version.py updated
 
 ## Phase 4.20.0 — Model Preloading + Audit Log Source Deduplication
 
