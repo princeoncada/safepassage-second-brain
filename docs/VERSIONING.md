@@ -111,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.17.1-stable |
-| Phase | Patch |
+| Version | 4.18.0-stable |
+| Phase | Phase 4.18.0 |
 | State | stable |
 | Date | 2026-05-19 |
 | Commit | master |
-| Summary | fix duplicate sources in pipe + community context bleed - VALIDATED |
+| Summary | community-aware kiosk call flow synthesis - VALIDATED |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
 | 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
 | 4.17.0-stable | Phase 4.17.0 | stable | 2026-05-19 | quick reply hints in pipe + FUTURE_PLANS.md - VALIDATED |
 | 4.16.0-stable | Phase 4.16.0 | stable | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
@@ -184,9 +185,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.17.1-stable
-Current working phase: Quick reply hints in pipe + FUTURE_PLANS.md
+Current working version: 4.18.0-stable
+Current working phase: Phase 4.18.0 — community-aware kiosk call flow synthesis
 Validation status: stable; validated and committed to master.
-Next phase: see docs/FUTURE_PLANS.md for current backlog.
+Next phase: 4.18.1 patch — GLEN QA tip wording fix + CLI duplicate Sources block fix.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md` records the 4.12.1 through 4.13.3-stable session handoff and next action. No version change was made for that checkpoint documentation-only update.
