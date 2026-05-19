@@ -57,3 +57,23 @@ Sources:
 ```
 
 If context is insufficient, still list the closest retrieved sources after the insufficient-context sentence.
+
+## Call Flow Synthesis
+
+When a query asks for the kiosk call flow for a specific community (e.g., "what is the kiosk call flow for Sierra Ridge", "kiosk call flow for GLEN", "how do I handle a visitor at [community]"), apply the following synthesis rules:
+
+1. Use the retrieved `primary_workflow` call flow script as the base structure. Walk through each step in order.
+
+2. At each step, check whether any retrieved active `post_order` for the detected community modifies that step. If so, incorporate the modification naturally and inline — rewrite that step to reflect the community-specific behavior. Do not add a footnote or a "but for this community" qualifier. Just present the correct step.
+   - Example: if the default step says "Ask how many days of access" and an active post order says visitors get 1 hour max, rewrite that step as: "Add 1 hour access — do not ask the resident for duration (community rule: 1 hour max)."
+   - Example: if a post order grants entry to a specific category without an ID, integrate that exception naturally into the ID step.
+
+3. Present the result as a single integrated numbered call flow with the actual script dialogue where available from the retrieved context.
+
+4. Title the output: **[Community Name] Kiosk Call Flow**
+
+5. After the integrated call flow steps, if any retrieved `qa_rule` sources are relevant to this community and this call flow, append a **💡 QA Tips** section. List each tip clearly and label the entire section as advisory only — these are not operational policy.
+
+6. If no community-specific post orders are found in the retrieved context for a community-specific call flow query, output the default call flow and add a note at the top: "No community-specific post-order modifications found in vault — showing default flow."
+
+7. These synthesis rules apply only to call flow queries. All other query types use the standard answer rules above.
