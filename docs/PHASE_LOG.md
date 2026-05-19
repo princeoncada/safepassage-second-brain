@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.18.1-alpha | Patch | alpha | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing |
 | 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
 | 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
 | 4.17.0-stable | Phase 4.17.0 | stable | 2026-05-19 | quick reply hints in Open WebUI pipe + FUTURE_PLANS.md - VALIDATED |
@@ -43,6 +44,26 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Patch 4.18.1 — GLEN QA Tip Wording Fix
+
+Status: IN PROGRESS — alpha
+
+Version: 4.18.1-alpha
+
+Date: 2026-05-19
+
+Fixes:
+
+- `vault/04_QA_Rules/the-glen-tamiment-qa-tip-k-registered-tag-access-fullname-only.md`:
+  corrected wording from "license plate or RFID tag registered in system"
+  to "visitor already confirmed in SP Guard with active access".
+
+Validation checklist:
+
+- [ ] Re-index succeeds
+- [ ] GLEN call flow query — Step 3 exception and QA Tip use SP Guard framing
+- [ ] GLEN post order listing — QA Tip uses SP Guard framing
 
 ## Phase 4.18.0 — Community-Aware Kiosk Call Flow Synthesis
 
