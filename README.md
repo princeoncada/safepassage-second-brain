@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.18.3-alpha |
-| Last Stable | 4.18.2-stable (Patch) |
-| Status | alpha |
+| Current | 4.18.3-stable |
+| Last Stable | 4.18.3-stable (Patch) |
+| Status | stable |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through 4.18.2-stable prevent DeepSeek inline Sources block in answers; current patch is 4.18.3-alpha to restore clean CLI citation display:
+Working proof of work through 4.18.3-stable restore clean CLI citation display:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -56,7 +56,7 @@ Working proof of work through 4.18.2-stable prevent DeepSeek inline Sources bloc
 - Phase 4.18.0 [4.18.0-stable] - Community-aware kiosk call flow synthesis: stable
 - Patch 4.18.1 [4.18.1-stable] - GLEN QA tip wording fix: stable
 - Patch 4.18.2 [4.18.2-stable] - Prevent DeepSeek inline Sources block in answers: stable
-- Patch 4.18.3 [4.18.3-alpha] - Restore clean CLI citation display: alpha
+- Patch 4.18.3 [4.18.3-stable] - Restore clean CLI citation display: stable
 
 Current architecture:
 
