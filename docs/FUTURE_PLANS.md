@@ -5,12 +5,13 @@ Completed items are struck through. Every phase should update this file —
 cross off completed items and add new ideas as they arise.
 
 Last updated: 2026-05-19
-Current stable version: 4.19.0-alpha
+Current stable version: 4.19.0-stable
 
 ---
 
 ## Completed
 
+- ~~Phase 4.19.0 — operational trust query/answer audit log~~
 - ~~Patch 4.18.3 — restore clean CLI citation display ([Source N] regex fix)~~
 - ~~Phase 4.18.0 — Community-aware kiosk call flow synthesis (SOP enrichment + call flow routing + merged output)~~
 - ~~Phase 4.13.4 — Fix double sources display in CLI output~~
@@ -23,7 +24,7 @@ Current stable version: 4.19.0-alpha
 
 ## In Progress
 
-- Phase 4.19.0 — operational trust audit log
+- None
 
 ---
 
@@ -31,7 +32,9 @@ Current stable version: 4.19.0-alpha
 
 ### Near-term (next 1–3 phases)
 
-- Phase 4.20.0 — Model preloading (eliminate per-query SentenceTransformer weight load)
+- Phase 4.20.0 — model preloading (move SentenceTransformer init to
+  module level in answer_vault.py and query_vault.py; eliminates
+  per-query weight load at the API layer)
 
 ### UX / Open WebUI
 
