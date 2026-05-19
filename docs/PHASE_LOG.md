@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.18.2-alpha | Patch | alpha | 2026-05-19 | prevent DeepSeek inline Sources block in answers |
 | 4.18.1-stable | Patch | stable | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing - VALIDATED |
 | 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
 | 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
@@ -44,6 +45,27 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Patch 4.18.2 — Prevent DeepSeek Inline Sources Block
+
+Status: IN PROGRESS — alpha
+
+Version: 4.18.2-alpha
+
+Date: 2026-05-19
+
+Fixes:
+
+- `rag/prompts/answer_from_context.md`: added rule prohibiting DeepSeek
+  from generating any Sources: or **Sources:** block in its answer body.
+  Fixes duplicate sources output in CLI for call flow and listing responses.
+
+Validation checklist:
+
+- [ ] GLEN call flow — single Sources block only, no **Sources:** embedded in answer
+- [ ] SR call flow — single Sources block only (regression check)
+- [ ] GLEN post order listing — single Sources block only
+- [ ] Default call flow — single Sources block only (regression check)
 
 ## Patch 4.18.1 — GLEN QA Tip Wording Fix
 
