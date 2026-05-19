@@ -1,12 +1,14 @@
 # AI Handoff
 
-## Current Version: 4.16.0-alpha
+## Current Version: 4.16.0-stable
 
 ## Current Phase
 
-PHASE 4.16.0 [4.16.0-alpha] - Conflict detection during ingestion preview + multi-turn wizard UX for /post-orders. Implemented but pending manual validation.
+PHASE 4.16.0 [4.16.0-stable] - Conflict detection + multi-turn wizard UX for /post-orders - validated and stable. Next phase is 4.17.0: Open WebUI button UX.
 
-## Phase 4.16.0
+## Phase 4.16.0 [4.16.0-stable]
+
+Status: VALIDATED and STABLE — committed to master 2026-05-18.
 
 Phase 4.16.0 adds two /post-orders ingestion usability features. First,
 typing `/post-orders` with no payload now starts a two-step guided wizard:
@@ -17,13 +19,19 @@ wizard when payload is present.
 
 Second, post-order preview now scans existing active vault post_order
 frontmatter for the same community before any temp file or vault write.
-`scan_topic_conflicts()` reads active post-order metadata, computes the
-incoming topic key with local helper logic, and flags an overlap when the
-topic_key matches exactly or token similarity is at least 0.55. If conflicts
-are found, the preview shows the incoming rule beside the existing active
-rule and asks the operator to reply KEEP NEW or KEEP OLD. KEEP NEW converts
-the conflict state into the normal YES/NO pending state; KEEP OLD cancels
+`scan_topic_conflicts()` reads active post-order metadata and uses
+`_anchor_conflict()` to check meaningful tokens from existing vault
+`topic_key` values against incoming rule text directly. If conflicts are
+found, the preview shows the incoming rule beside the existing active rule
+and asks the operator to reply KEEP NEW or KEEP OLD. KEEP NEW converts the
+conflict state into the normal YES/NO pending state; KEEP OLD cancels
 without writing.
+
+Bug fix applied during alpha: initial conflict detection used token
+similarity on computed topic keys, which failed due to sentence structure
+differences. It was replaced with `_anchor_conflict()`, which checks
+meaningful tokens from existing vault `topic_key` values against incoming
+rule text directly.
 
 ## Phase 4.15.0
 
@@ -150,7 +158,7 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase 4I-lite operator guide at `openwebui/INGEST_COMMANDS.md`.
 - Phase 4.14.0-stable incremental indexing in `rag/scripts/index_vault.py` with `--files`, and slash-command ingestion uses recently modified vault files for incremental post-ingestion indexing.
 - Phase 4.15.0-stable streaming response support through `/ask/stream`, `call_deepseek_stream()`, `stream_answer_question()`, and `openwebui/pipe.py`.
-- Phase 4.16.0-alpha /post-orders wizard and conflict preview support in `api/ingest.py` and `api/service.py`.
+- Phase 4.16.0-stable /post-orders wizard and conflict preview support in `api/ingest.py` and `api/service.py`.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -215,7 +223,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.17.0 — Open WebUI button UX
+Next: Phase 4.17.0 — Open WebUI button UX (KEEP NEW/OLD, YES/NO, community alias tappable buttons in Open WebUI pipe).
 
 ## Phase 4I-lite Implementation Added
 
