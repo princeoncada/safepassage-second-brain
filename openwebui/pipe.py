@@ -5,6 +5,7 @@ Install: Open WebUI > Workspace > Pipes > New Pipe > paste this file.
 """
 
 import json
+import re
 
 import requests
 from pydantic import BaseModel, Field
@@ -145,10 +146,12 @@ class Pipe:
             warnings = citations_data.get("warnings", [])
             confidence = citations_data.get("retrieval_confidence", "")
             reason = citations_data.get("confidence_reason", "")
+            answer_text = citations_data.get("answer", "")
+            has_inline_citations = bool(re.search(r"\[\d+\]", answer_text))
 
             footer_parts: list[str] = []
 
-            if citations:
+            if citations and not has_inline_citations:
                 footer_parts.append("\n\n**Sources:**")
                 for c in citations:
                     src = c.get("source_file", "")
