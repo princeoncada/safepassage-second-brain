@@ -1,10 +1,19 @@
 # AI Handoff
 
-## Current Version: 4.18.1-stable
+## Current Version: 4.18.2-alpha
 
 ## Current Phase
 
-Patch 4.18.1 [4.18.1-stable] — GLEN QA tip wording fix — validated and stable.
+Patch 4.18.2 [4.18.2-alpha] — prevent DeepSeek inline Sources block — in progress.
+
+## Patch 4.18.2
+
+Z patch on 4.18.1-stable. One fix:
+
+`rag/prompts/answer_from_context.md`: added explicit rule instructing
+DeepSeek not to generate a Sources section anywhere in its answer.
+answer_vault.py handles all source output. Fixes duplicate Sources blocks
+that appeared in CLI output for call flow and listing responses.
 
 ## Patch 4.18.1
 
@@ -257,9 +266,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Patch 4.18.2 — add explicit rule to rag/prompts/answer_from_context.md
-instructing DeepSeek not to generate any Sources block in its answer body.
-Fixes duplicate Sources output in CLI for call flow and listing responses.
+Current: Patch 4.18.2-alpha in progress. Run validation after Codex completes.
 
 ## Phase 4I-lite Implementation Added
 
