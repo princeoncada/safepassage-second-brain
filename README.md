@@ -6,8 +6,8 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.17.0-stable |
-| Last Stable | 4.17.0-stable (Phase 4.17.0) |
+| Current | 4.17.1-stable |
+| Last Stable | 4.17.1-stable (Patch 4.17.1) |
 | Status | stable |
 
 ## Source Of Truth
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.17.0-stable quick reply hints in Open WebUI pipe plus `docs/FUTURE_PLANS.md`:
+Working proof of work through 4.17.1-stable duplicate sources and community context bleed fixes:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -52,6 +52,7 @@ Working proof of work through Phase 4.17.0-stable quick reply hints in Open WebU
 - Phase 4.15.0 [4.15.0-stable] - Streaming response with /ask/stream SSE endpoint + Open WebUI pipe: stable
 - Phase 4.16.0 [4.16.0-stable] - Conflict detection + multi-turn wizard UX for /post-orders: stable
 - Phase 4.17.0 [4.17.0-stable] - Quick reply hints in Open WebUI pipe + FUTURE_PLANS.md: stable
+- Patch 4.17.1 [4.17.1-stable] - Duplicate sources footer + community context bleed fixes: stable
 
 Current architecture:
 
@@ -124,6 +125,8 @@ Phase 4.15.0-stable adds live streaming for Open WebUI. `/ask/stream` returns Se
 Phase 4.16.0-stable adds a guided `/post-orders` wizard and conflict preview. Typing `/post-orders` alone starts a two-step community/text flow, while the existing one-line `/post-orders [alias] [text]` shortcut remains available. Post-order previews now scan active vault post-order metadata for near-topic conflicts and ask KEEP NEW or KEEP OLD before allowing the normal YES/NO ingestion confirmation.
 
 Phase 4.17.0-stable adds quick reply hints in `openwebui/pipe.py` for prompt-for-input responses. The pipe appends bold reply options for community alias prompts, YES/NO confirmations, and KEEP NEW/KEEP OLD conflict prompts. It also introduces `docs/FUTURE_PLANS.md` as the living backlog for future phases and unimplemented ideas.
+
+Patch 4.17.1-stable suppresses duplicate Open WebUI Sources footers when answers already include inline `[N]` citations, and prevents prior community history from bleeding into general queries such as default, global, standard, or regardless-of-community workflow questions.
 
 Dashboard endpoints:
 
