@@ -6,8 +6,8 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.17.1-stable |
-| Last Stable | 4.17.1-stable (Patch 4.17.1) |
+| Current | 4.18.0-stable |
+| Last Stable | 4.18.0-stable (Phase 4.18.0) |
 | Status | stable |
 
 ## Source Of Truth
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through 4.17.1-stable duplicate sources and community context bleed fixes:
+Working proof of work through 4.18.0-stable community-aware kiosk call flow synthesis:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -53,6 +53,7 @@ Working proof of work through 4.17.1-stable duplicate sources and community cont
 - Phase 4.16.0 [4.16.0-stable] - Conflict detection + multi-turn wizard UX for /post-orders: stable
 - Phase 4.17.0 [4.17.0-stable] - Quick reply hints in Open WebUI pipe + FUTURE_PLANS.md: stable
 - Patch 4.17.1 [4.17.1-stable] - Duplicate sources footer + community context bleed fixes: stable
+- Phase 4.18.0 [4.18.0-stable] - Community-aware kiosk call flow synthesis: stable
 
 Current architecture:
 
@@ -127,6 +128,8 @@ Phase 4.16.0-stable adds a guided `/post-orders` wizard and conflict preview. Ty
 Phase 4.17.0-stable adds quick reply hints in `openwebui/pipe.py` for prompt-for-input responses. The pipe appends bold reply options for community alias prompts, YES/NO confirmations, and KEEP NEW/KEEP OLD conflict prompts. It also introduces `docs/FUTURE_PLANS.md` as the living backlog for future phases and unimplemented ideas.
 
 Patch 4.17.1-stable suppresses duplicate Open WebUI Sources footers when answers already include inline `[N]` citations, and prevents prior community history from bleeding into general queries such as default, global, standard, or regardless-of-community workflow questions.
+
+Phase 4.18.0-stable enriches primary kiosk call flow SOPs with full script dialogue, adds a GLEN registered-tag QA tip, marks call flow queries in deterministic intent parsing, retrieves global SOPs alongside community-specific post orders for call flow questions, and adds prompt rules for synthesizing one integrated community-aware kiosk call flow.
 
 Dashboard endpoints:
 
