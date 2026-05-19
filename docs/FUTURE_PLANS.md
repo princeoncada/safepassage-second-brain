@@ -5,12 +5,13 @@ Completed items are struck through. Every phase should update this file —
 cross off completed items and add new ideas as they arise.
 
 Last updated: 2026-05-19
-Current stable version: 4.17.1-stable
+Current stable version: 4.18.0-stable
 
 ---
 
 ## Completed
 
+- ~~Phase 4.18.0 — Community-aware kiosk call flow synthesis (SOP enrichment + call flow routing + merged output)~~
 - ~~Phase 4.13.4 — Fix double sources display in CLI output~~
 - ~~Phase 4.14.0 — Incremental indexing (`--files` flag on index_vault.py)~~
 - ~~Phase 4.15.0 — Streaming response (`/ask/stream` SSE endpoint + Open WebUI pipe)~~
@@ -21,7 +22,7 @@ Current stable version: 4.17.1-stable
 
 ## In Progress
 
-- None
+- Patch 4.18.1 — GLEN QA tip wording fix + CLI duplicate Sources block fix
 
 ---
 
@@ -29,9 +30,7 @@ Current stable version: 4.17.1-stable
 
 ### Near-term (next 1–3 phases)
 
-- Phase 4.18.0 — Session log automation
-  Auto-generate SESSION_LOG entries from git commit history + validation
-  results. Currently written manually each session.
+- Phase 4.19.0 — Session log automation (auto-generate SESSION_LOG entries from git commit history + validation results)
 
 ### UX / Open WebUI
 
