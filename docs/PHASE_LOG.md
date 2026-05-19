@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.18.3-alpha | Patch | alpha | 2026-05-19 | restore clean CLI citation display — match [Source N] format |
+| 4.18.3-stable | Patch | stable | 2026-05-19 | restore clean CLI citation display — match [Source N] format - VALIDATED |
 | 4.18.2-stable | Patch | stable | 2026-05-19 | prevent DeepSeek inline Sources block in answers - VALIDATED |
 | 4.18.1-stable | Patch | stable | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing - VALIDATED |
 | 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
@@ -49,9 +49,9 @@
 
 ## Patch 4.18.3 — Restore Clean CLI Citation Display
 
-Status: IN PROGRESS — alpha
+Status: PASSED — stable
 
-Version: 4.18.3-alpha
+Version: 4.18.3-stable
 
 Date: 2026-05-19
 
@@ -69,6 +69,23 @@ Validation checklist:
 - [ ] SR call flow — clean formatted Sources list (regression check)
 - [ ] GLEN post order listing — clean formatted Sources list
 - [ ] Default call flow — clean formatted Sources list (regression check)
+
+### Validation Record — 4.18.3-stable
+
+Date: 2026-05-19
+
+Primary checks passed. Committed to master.
+
+- [x] GLEN call flow: clean formatted Sources list, 11 entries, no verbose dump
+- [x] SR call flow: clean formatted Sources list, 14 entries, answer content correct
+- [x] GLEN post order listing: clean formatted Sources list, 6 entries
+
+Non-blocking observation:
+- Default call flow (test 4): still shows verbose "Retrieved Sources For
+  Review" fallback. Cause: DeepSeek wrote the answer with zero inline
+  [Source N] citations — no citations to parse, so fallback is correct
+  behavior. Answer content fully correct. Unrelated to the regex fix.
+  Not worth a follow-up patch.
 
 ## Patch 4.18.2 — Prevent DeepSeek Inline Sources Block
 
