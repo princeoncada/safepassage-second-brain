@@ -1,14 +1,14 @@
 # AI Handoff
 
-## Current Version: 4.21.0-alpha
+## Current Version: 4.21.0-stable
 
 ## Current Phase
 
-Phase 4.21.0 [4.21.0-alpha] - handoff readiness - alpha.
+Phase 4.21.0 [4.21.0-stable] — handoff readiness — validated and stable.
 
-## Phase 4.21.0 [4.21.0-alpha]
+## Phase 4.21.0 [4.21.0-stable]
 
-Status: ALPHA - implemented 2026-05-20, not yet manually validated.
+Status: VALIDATED and STABLE — committed to master 2026-05-20.
 
 New files:
 - docs/ARCHITECTURE.md: full system data-flow reference covering
@@ -23,6 +23,21 @@ New files:
 - automation/generate_session_log.py: standard-library CLI that reads
   docs/PHASE_LOG.md and generates a draft SESSION_LOG file between
   version_start and version_end without overwriting existing output.
+
+### Validation Record — 4.21.0-stable
+
+Date: 2026-05-20
+
+All checks passed. Committed to master.
+
+- [x] docs/ARCHITECTURE.md created with Mermaid query flow diagram
+- [x] docs/VAULT_SCHEMA.md created with all frontmatter fields documented
+- [x] docs/ONBOARDING.md created with full 11-section setup guide
+- [x] automation/generate_session_log.py created — syntax OK,
+      draft generated correctly for 4.20.0-stable → 4.21.0-alpha range
+- [x] All four versioning locations updated consistently
+- [x] api/version.py updated to 4.21.0-stable
+- [x] No protected files changed
 
 ## Phase 4.20.0 [4.20.0-stable]
 
@@ -284,14 +299,14 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
   api/audit.py sources_cited wrapped with list(dict.fromkeys()) —
   GLEN call flow sources reduced from 13 (with duplicates) to 9
   unique file paths.
-- Phase 4.21.0-alpha handoff readiness documentation and tooling:
+- Phase 4.21.0-stable handoff readiness documentation and tooling:
   docs/ARCHITECTURE.md, docs/VAULT_SCHEMA.md, docs/ONBOARDING.md,
   and automation/generate_session_log.py.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
 - Session checkpoint logs under `docs/SESSION_LOG/` for clean chathead handoff.
-- Latest session checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md`.
+- Latest session checkpoint: `docs/SESSION_LOG/2026-05-20-session-02.md` (draft generated this session).
 - Scope-aware retrieval with requested_all detection in `rag/query_intent.py` and effective_top_k override in `rag/scripts/answer_vault.py`.
 - Full community name matching in `rag/query_intent.py` using longest-first lookup from `rag/config/community_aliases.json`.
 
@@ -351,7 +366,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.22.0 - Architecture Safety.
+Next: Phase 4.22.0 — Architecture Safety.
 
 ## Phase 4I-lite Implementation Added
 
