@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.19.0-alpha | Phase 4.19.0 | alpha | 2026-05-19 | operational trust — query/answer audit log |
+| 4.19.0-stable | Phase 4.19.0 | stable | 2026-05-19 | operational trust — query/answer audit log - VALIDATED |
 | 4.18.3-stable | Patch | stable | 2026-05-19 | restore clean CLI citation display — match [Source N] format - VALIDATED |
 | 4.18.2-stable | Patch | stable | 2026-05-19 | prevent DeepSeek inline Sources block in answers - VALIDATED |
 | 4.18.1-stable | Patch | stable | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing - VALIDATED |
@@ -50,9 +50,9 @@
 
 ## Phase 4.19.0 — Operational Trust: Query/Answer Audit Log
 
-Status: IN PROGRESS — alpha
+Status: PASSED — stable
 
-Version: 4.19.0-alpha
+Version: 4.19.0-stable
 
 Date: 2026-05-19
 
@@ -87,6 +87,34 @@ Validation checklist:
 - [ ] audit_review.py --entry 0 shows full answer text
 - [ ] audit_review.py --warnings shows refuse-path entry
 - [ ] Normal API behavior unchanged (answer quality, streaming)
+
+### Validation Record — 4.19.0-stable
+
+Date: 2026-05-19
+
+All checks passed. Committed to master.
+
+- [x] Log file created: logs/query_audit.jsonl — 3 entries after 3 queries
+- [x] GLEN call flow logged: community=The Glen (Tamiment),
+      intent=call_flow, confidence=strong, warning flag correct
+- [x] SR post orders logged: community=Sierra Ridge, intent=policy,
+      confidence=strong, no warnings
+- [x] Unknown query logged: community=(none), intent=unknown
+- [x] --community "Sierra Ridge" filter: returned 1 entry correctly
+- [x] --warnings filter: returned only GLEN entry with lifecycle warning
+- [x] --entry 0: full answer text visible, 13 sources listed
+- [x] API answer quality: GLEN call flow answer correct, all 7 steps,
+      community rules and QA tip present
+
+Non-blocking:
+- Duplicate source paths in audit log: cited_chunks contains multiple
+  chunks per file (different sections). More information not less.
+  Acceptable for compliance purposes.
+- xyzzy nonsense query returned AI answer at strong confidence instead
+  of refusing. Pre-existing retrieval correctness behavior. Candidate
+  for Phase 4.23.0 retrieval tests.
+- PowerShell terminal encoding artifacts (â, ð¡) in step 7 output.
+  Actual API response is correct Unicode.
 
 ## Patch 4.18.3 — Restore Clean CLI Citation Display
 
