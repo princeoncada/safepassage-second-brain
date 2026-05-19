@@ -6,6 +6,7 @@ from pathlib import Path
 from textwrap import shorten
 from typing import Any
 
+from api.audit import write_audit_entry
 from api.ingest import (
     get_wizard_step,
     handle_announcements_command,
@@ -307,6 +308,15 @@ def answer_question(request: AskRequest) -> AskResponse:
 
     if assessment.get("refuse"):
         answer = insufficient_context_answer(str(assessment.get("reason", "")))
+        write_audit_entry(
+            query=request.question,
+            hints=hints,
+            assessment=assessment,
+            cited_chunks=[],
+            answer=answer,
+            used_ai=False,
+            warnings=warnings,
+        )
         return build_response(
             status="ok",
             request=request,
@@ -359,7 +369,7 @@ def answer_question(request: AskRequest) -> AskResponse:
     if not cited_chunks:
         warnings.append("generated answer did not include explicit source IDs")
 
-    return build_response(
+    response = build_response(
         status="ok",
         request=request,
         answer=answer,
@@ -370,6 +380,16 @@ def answer_question(request: AskRequest) -> AskResponse:
         used_ai=True,
         warnings=warnings,
     )
+    write_audit_entry(
+        query=request.question,
+        hints=hints,
+        assessment=assessment,
+        cited_chunks=cited_chunks,
+        answer=answer,
+        used_ai=True,
+        warnings=warnings,
+    )
+    return response
 
 
 def stream_answer_question(request: AskRequest):
@@ -499,6 +519,15 @@ def stream_answer_question(request: AskRequest):
 
     if assessment.get("refuse"):
         answer = insufficient_context_answer(str(assessment.get("reason", "")))
+        write_audit_entry(
+            query=request.question,
+            hints=hints,
+            assessment=assessment,
+            cited_chunks=[],
+            answer=answer,
+            used_ai=False,
+            warnings=warnings,
+        )
         payload = json.dumps(
             {
                 "answer": answer,
@@ -574,6 +603,16 @@ def stream_answer_question(request: AskRequest):
     cited_chunks = chunks_by_ids(chunks, source_ids)
     if not cited_chunks:
         warnings.append("generated answer did not include explicit source IDs")
+
+    write_audit_entry(
+        query=request.question,
+        hints=hints,
+        assessment=assessment,
+        cited_chunks=cited_chunks,
+        answer=full_answer,
+        used_ai=True,
+        warnings=warnings,
+    )
 
     seen_files: set[str] = set()
     deduped_cited: list[dict[str, Any]] = []
