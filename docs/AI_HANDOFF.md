@@ -1,14 +1,14 @@
 # AI Handoff
 
-## Current Version: 4.23.0-alpha
+## Current Version: 4.23.0-stable
 
 ## Current Phase
 
-Phase 4.23.0 [4.23.0-alpha] - developer scalability: retrieval correctness tests - alpha.
+Phase 4.23.0 [4.23.0-stable] - retrieval correctness tests + xyzzy floor fix - validated and stable.
 
-## Phase 4.23.0 [4.23.0-alpha]
+## Phase 4.23.0 [4.23.0-stable]
 
-Status: ALPHA - implemented 2026-05-20, not yet manually validated.
+Status: VALIDATED and STABLE - committed to master 2026-05-20.
 
 Bug fix:
 - `rag/retrieval.py` now applies `minimum_raw_distance_floor` inside
@@ -18,7 +18,7 @@ Bug fix:
   protocol" to `strong` confidence when the best raw vector distance is
   not semantically relevant.
 - `rag/config/retrieval_config.json` defines
-  `minimum_raw_distance_floor: 0.65`.
+  `minimum_raw_distance_floor: 1.20`.
 
 New files:
 - tests/__init__.py
@@ -32,6 +32,27 @@ CI:
 - GitHub Actions runs Python syntax checks on the extracted runtime
   modules and runs unit-only tests that do not require a ChromaDB index
   or DeepSeek API key.
+
+### Validation Record - 4.23.0-stable
+
+Date: 2026-05-20
+
+All checks passed. Committed to master.
+
+- [x] minimum_raw_distance_floor: 1.20 in retrieval_config.json
+      (adjusted from 0.65 during alpha - 0.65 over-refused real queries)
+- [x] xyzzy nonsense query: confidence=none, raw distance 1.4655,
+      correctly refused by floor
+- [x] SR kiosk post orders: confidence=strong, floor does not
+      over-refuse real operational queries
+- [x] pytest tests/ -v: 21 passed, 0 failed (14.63s)
+      10 community resolution unit tests (no ChromaDB)
+      5 confidence threshold tests (4 live + 1 unit)
+      6 retrieval correctness tests (live ChromaDB)
+- [x] test_no_unknown_community_retrieval assertion corrected:
+      unrecognized text treated as global query (no false-positive refuse)
+- [x] .github/workflows/ci.yml created - runs unit tests + syntax
+      checks on push to master
 
 ## Phase 4.22.0 [4.22.0-stable]
 
@@ -388,10 +409,14 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
   api/ingest_service.py, api/query_service.py, rag/vault_schema.py;
   api/service.py and rag/scripts/answer_vault.py reduced while
   preserving public imports.
-- Phase 4.23.0-alpha retrieval correctness tests and CI:
+- Phase 4.23.0-stable retrieval correctness tests and CI:
   tests/test_retrieval_correctness.py,
   tests/test_community_resolution.py,
   tests/test_confidence_thresholds.py, and .github/workflows/ci.yml.
+- tests/ directory with retrieval correctness, confidence threshold,
+  and community resolution pytest coverage.
+- .github/ GitHub Actions CI workflow for syntax checks and unit-only
+  tests on push to master.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -456,7 +481,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Validate Phase 4.23.0 - Retrieval Correctness Tests, then promote to stable if all checks pass.
+Next: TBD - define next phase.
 
 ## Phase 4I-lite Implementation Added
 
