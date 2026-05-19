@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.23.0-alpha | Phase 4.23.0 | alpha | 2026-05-20 | retrieval correctness tests + xyzzy raw distance floor fix |
+| 4.23.0-stable | Phase 4.23.0 | stable | 2026-05-20 | retrieval correctness tests + xyzzy raw distance floor fix - VALIDATED |
 | 4.22.0-stable | Phase 4.22.0 | stable | 2026-05-20 | architecture safety - separation of concerns - VALIDATED |
 | 4.21.0-stable | Phase 4.21.0 | stable | 2026-05-20 | handoff readiness - architecture diagram, vault schema, onboarding guide, session log automation - VALIDATED |
 | 4.20.0-stable | Phase 4.20.0 | stable | 2026-05-19 | model preloading + audit log source deduplication - VALIDATED |
@@ -54,9 +54,9 @@
 
 ## Phase 4.23.0 - Developer Scalability: Retrieval Correctness Tests
 
-Status: alpha
+Status: PASSED - stable
 
-Version: 4.23.0-alpha
+Version: 4.23.0-stable
 
 Date: 2026-05-20
 
@@ -72,7 +72,7 @@ Bug fix:
   raw distance exceeds `minimum_raw_distance_floor`, the assessment
   refuses with confidence `none`.
 - `rag/config/retrieval_config.json`: adds
-  `minimum_raw_distance_floor: 0.65`.
+  `minimum_raw_distance_floor: 1.20`.
 
 New files:
 - tests/__init__.py
@@ -89,7 +89,7 @@ Validation checklist:
       tests/test_confidence_thresholds.py
 - [ ] retrieval_assessment() remains backward-compatible when config is
       omitted
-- [ ] retrieval_config.json includes minimum_raw_distance_floor = 0.65
+- [ ] retrieval_config.json includes minimum_raw_distance_floor = 1.20
       and weak_context_distance_threshold remains 0.95
 - [ ] Community resolution unit tests pass without ChromaDB
 - [ ] Confidence threshold no-chunks unit test passes without ChromaDB
@@ -99,6 +99,19 @@ Validation checklist:
 - [ ] Real operational SR kiosk query does not over-refuse
 - [ ] GitHub Actions CI syntax check and unit-only test subset pass
 - [ ] No vault files or protected runtime files changed
+
+### Validation Record - 4.23.0-stable
+
+Date: 2026-05-20
+
+All checks passed. Committed to master.
+
+- [x] minimum_raw_distance_floor corrected to 1.20
+- [x] xyzzy: confidence=none (floor correctly refuses)
+- [x] SR kiosk: confidence=strong (floor does not over-refuse)
+- [x] 21/21 tests pass: community resolution (10), confidence
+      thresholds (5), retrieval correctness (6)
+- [x] CI workflow created (.github/workflows/ci.yml)
 
 ## Phase 4.22.0 - Architecture Safety: Separation of Concerns
 
