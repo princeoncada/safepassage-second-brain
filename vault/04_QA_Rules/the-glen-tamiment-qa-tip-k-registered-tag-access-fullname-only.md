@@ -26,9 +26,14 @@ last_updated: "2026-05-19"
 
 ## QA Tip
 
-At The Glen, if a vehicle's license plate or RFID tag is already registered in the system under the driver's name but the driver is unable to auto-enter through the gate, access can be granted using only the driver's full name. Physical ID verification is not required in this specific case.
+At The Glen, if a visitor is already confirmed in SP Guard with active
+access but is unable to auto-enter and ends up at the kiosk, access can
+be granted using only the visitor's full name. Physical ID verification
+is not required — the visitor's identity was already confirmed when
+access was originally granted.
 
-This aligns with the global kiosk basics registered-tag exception. At GLEN, use this tip to avoid unnecessary ID denial denials for drivers with known registered tags who arrive at the kiosk.
+Use this tip to avoid unnecessary ID denial for visitors who are already
+in the system with confirmed access.
 
 ## Scope
 
@@ -36,8 +41,8 @@ This aligns with the global kiosk basics registered-tag exception. At GLEN, use 
 
 ## When This Applies
 
-- Vehicle's tag or license plate is confirmed registered in the system
-- Driver is at the kiosk and cannot auto-enter through the gate
+- Visitor is already confirmed in SP Guard with active access
+- Visitor is at the kiosk and cannot auto-enter through the gate
 - Physical ID is not available or not presented
 
 ## Advisory Note
