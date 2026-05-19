@@ -5,14 +5,15 @@ Completed items are struck through. Every phase should update this file -
 cross off completed items and add new ideas as they arise.
 
 Last updated: 2026-05-20
-Current stable version: 4.22.0-stable
-Current working version: 4.23.0-alpha
+Current stable version: 4.23.0-stable
+Current working version: 4.23.0-stable
 
 ---
 
 ## Completed
 
 - ~~Phase 4.22.0 - Architecture Safety: Separation of Concerns~~
+- ~~Phase 4.23.0 - Developer Scalability: Retrieval Correctness Tests~~
 - ~~Phase 4.21.0 - Handoff Readiness~~
 - ~~Phase 4.20.0 - model preloading + audit log source deduplication~~
 - ~~Phase 4.19.0 - operational trust query/answer audit log~~
@@ -27,6 +28,12 @@ Current working version: 4.23.0-alpha
 ---
 
 ## In Progress
+
+TBD after Phase 4.23.0 validation.
+
+---
+
+## Completed Details
 
 ### Phase 4.23.0 - Developer Scalability: Retrieval Correctness Tests
 
@@ -51,9 +58,9 @@ Scope:
 
 Tracked from 4.19.0 validation:
 - xyzzy nonsense query returned [AI] at strong confidence instead of
-  refusing. Resolved in 4.23.0-alpha with
+  refusing. Resolved in 4.23.0-stable with
   `minimum_raw_distance_floor` in `rag/retrieval.py` and
-  `rag/config/retrieval_config.json`.
+  `rag/config/retrieval_config.json`. Final validated floor: 1.20.
 
 Files to change:
 - rag/retrieval.py
