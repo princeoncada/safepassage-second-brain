@@ -1,14 +1,14 @@
 # AI Handoff
 
-## Current Version: 4.17.0-alpha
+## Current Version: 4.17.0-stable
 
 ## Current Phase
 
-PHASE 4.17.0 [4.17.0-alpha] - Quick reply hints in Open WebUI pipe + FUTURE_PLANS.md. Implemented but not yet manually validated. Next phase is 4.18.0 or see docs/FUTURE_PLANS.md for the current backlog.
+PHASE 4.17.0 [4.17.0-stable] - Quick reply hints in Open WebUI pipe + FUTURE_PLANS.md introduced - validated and stable.
 
-## Phase 4.17.0 [4.17.0-alpha]
+## Phase 4.17.0 [4.17.0-stable]
 
-Status: alpha - implemented but not yet manually validated.
+Status: VALIDATED and STABLE — committed to master 2026-05-19.
 
 Phase 4.17.0 adds quick reply hints in `openwebui/pipe.py`. `_detect_quick_replies()` scans the answer text for known sentinel phrases and appends a formatted hint line with bold quick-reply options for prompt-for-input responses. The hint is pipe-only; there are no backend changes. This phase also introduces `docs/FUTURE_PLANS.md` as the living project backlog, with completed items struck through and future ideas kept in one durable document.
 
@@ -165,7 +165,7 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase 4.14.0-stable incremental indexing in `rag/scripts/index_vault.py` with `--files`, and slash-command ingestion uses recently modified vault files for incremental post-ingestion indexing.
 - Phase 4.15.0-stable streaming response support through `/ask/stream`, `call_deepseek_stream()`, `stream_answer_question()`, and `openwebui/pipe.py`.
 - Phase 4.16.0-stable /post-orders wizard and conflict preview support in `api/ingest.py` and `api/service.py`.
-- Phase 4.17.0-alpha quick reply hints in `openwebui/pipe.py` and living backlog at `docs/FUTURE_PLANS.md`.
+- Phase 4.17.0-stable quick reply hints in `openwebui/pipe.py` and living backlog at `docs/FUTURE_PLANS.md`.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -230,7 +230,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.18.0 or see docs/FUTURE_PLANS.md for the current backlog.
+See docs/FUTURE_PLANS.md for the current backlog. Next planned: Phase 4.18.0 — session log automation, or Action Function button UX.
 
 ## Phase 4I-lite Implementation Added
 
