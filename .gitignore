@@ -20,6 +20,8 @@ Thumbs.db
 
 # Logs
 *.log
+logs/*.jsonl
+!logs/.gitkeep
 
 # Temporary files
 tmp/
