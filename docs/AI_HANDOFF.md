@@ -1,10 +1,31 @@
 # AI Handoff
 
-## Current Version: 4.18.3-stable
+## Current Version: 4.19.0-alpha
 
 ## Current Phase
 
-Patch 4.18.3 [4.18.3-stable] — restore clean CLI citation display — validated and stable.
+Phase 4.19.0 [4.19.0-alpha] — operational trust audit log — in progress.
+
+## Phase 4.19.0 [4.19.0-alpha]
+
+Status: IN PROGRESS — not yet validated.
+
+New files:
+- api/audit.py: write_audit_entry() appends JSON Lines records to
+  logs/query_audit.jsonl. Silently fails on any error — audit must
+  never break VA queries.
+- api/version.py: VAULT_VERSION constant. Updated by post-validation
+  Codex prompts on each version promotion going forward.
+- automation/audit_review.py: CLI filter/review tool for audit log.
+  Supports --tail, --community, --date, --confidence, --warnings,
+  --entry, --full.
+- logs/.gitkeep: tracks logs/ directory without committing data.
+
+Modified files:
+- api/service.py: imports write_audit_entry; calls it at end of
+  answer_question() (AI success + refuse paths) and inside
+  stream_answer_question() (AI success + refuse paths).
+- .gitignore: logs/*.jsonl excluded; logs/.gitkeep tracked.
 
 ## Patch 4.18.3
 
@@ -279,9 +300,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.19.0 — session log automation. Auto-generate SESSION_LOG
-entries from git commit history and validation results rather than
-writing them manually.
+Current: Phase 4.19.0-alpha in progress. Run validation after Codex completes.
 
 ## Phase 4I-lite Implementation Added
 
