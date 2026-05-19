@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.18.3-alpha | Patch | alpha | 2026-05-19 | restore clean CLI citation display — match [Source N] format |
 | 4.18.2-stable | Patch | stable | 2026-05-19 | prevent DeepSeek inline Sources block in answers - VALIDATED |
 | 4.18.1-stable | Patch | stable | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing - VALIDATED |
 | 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
@@ -45,6 +46,29 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Patch 4.18.3 — Restore Clean CLI Citation Display
+
+Status: IN PROGRESS — alpha
+
+Version: 4.18.3-alpha
+
+Date: 2026-05-19
+
+Fixes:
+
+- `rag/scripts/answer_vault.py` — `cited_source_ids()`: regex updated
+  from `r"\[(\d+)\]"` to `r"\[(?:Source )?(\d+)\]"`. Matches both [N]
+  and [Source N] citation formats. Restores clean formatted Sources list
+  in CLI output after 4.18.2 caused DeepSeek to switch to [Source N]
+  inline citation format.
+
+Validation checklist:
+
+- [ ] GLEN call flow — clean formatted Sources list, no verbose debug dump
+- [ ] SR call flow — clean formatted Sources list (regression check)
+- [ ] GLEN post order listing — clean formatted Sources list
+- [ ] Default call flow — clean formatted Sources list (regression check)
 
 ## Patch 4.18.2 — Prevent DeepSeek Inline Sources Block
 
