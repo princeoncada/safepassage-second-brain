@@ -717,7 +717,7 @@ def print_citations(chunks: list[dict[str, Any]], title: str = "Citations") -> N
 def cited_source_ids(answer: str, chunks: list[dict[str, Any]]) -> list[int]:
     valid_ids = {int(chunk["source_id"]) for chunk in chunks}
     found = []
-    for raw_id in re.findall(r"\[(\d+)\]", answer):
+    for raw_id in re.findall(r"\[(?:Source )?(\d+)\]", answer):
         source_id = int(raw_id)
         if source_id in valid_ids and source_id not in found:
             found.append(source_id)
