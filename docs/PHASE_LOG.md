@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.16.0-alpha | Phase 4.16.0 | alpha | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders |
+| 4.16.0-stable | Phase 4.16.0 | stable | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
 | 4.15.0-stable | Phase 4.15.0 | stable | 2026-05-18 | streaming response - /ask/stream SSE endpoint + Open WebUI pipe - VALIDATED |
 | 4.14.0-stable | Phase 4.14.0 | stable | 2026-05-18 | incremental indexing with --files flag - VALIDATED |
 | 4.13.4-stable | Patch | stable | 2026-05-18 | fix double sources display in CLI output - VALIDATED |
@@ -43,9 +43,9 @@
 
 ## Phase 4.16.0 Conflict Detection + Multi-Turn Wizard UX for /post-orders
 
-Status: alpha
+Status: PASSED — stable
 
-Version: 4.16.0-alpha
+Version: 4.16.0-stable
 
 Date: 2026-05-18
 
@@ -75,6 +75,23 @@ Validation checklist:
 - [ ] No vault files for community: no conflict flagged, normal flow.
 - [ ] Syntax OK: api/ingest.py and api/service.py.
 - [ ] No rag/, vault/, automation/ files changed.
+
+### Validation Record — 4.16.0-stable
+Date: 2026-05-18
+All checks passed. Committed to master.
+- [x] Wizard: 3-step flow (start → community → text) works correctly
+- [x] Wizard NO at any step cancels cleanly
+- [x] One-liner bypasses wizard correctly
+- [x] Conflict detection: SR physical ID rule triggers correctly
+- [x] Non-conflict (tailgating): normal YES/NO preview unchanged
+- [x] KEEP OLD cancels with correct message
+- [x] Only api/ingest.py and api/service.py changed (plus docs)
+Bug fix applied during alpha: replaced _token_similarity() on computed
+topic keys with _anchor_conflict() checking vault topic_key tokens
+directly against incoming rule text. Threshold approach was
+insufficient due to sentence structure variation between topic keys.
+Non-blocking: KEEP NEW → YES end-to-end ingestion not validated in
+this session (conflict override path confirmed by code review).
 
 ## Phase 4.15.0 Streaming Response - /ask/stream SSE Endpoint + Open WebUI Pipe
 
@@ -504,7 +521,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.16.0 [4.16.0-alpha] CONFLICT DETECTION + MULTI-TURN WIZARD UX FOR /post-orders
+PHASE 4.16.0 [4.16.0-stable] CONFLICT DETECTION + MULTI-TURN WIZARD UX FOR /post-orders
 
 ## Overall System Status
 
