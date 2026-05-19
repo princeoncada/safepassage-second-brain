@@ -1,15 +1,15 @@
 # AI Handoff
 
-## Current Version: 4.20.0-alpha
+## Current Version: 4.20.0-stable
 
 ## Current Phase
 
-Phase 4.20.0 [4.20.0-alpha] — model preloading + audit source
-deduplication — in progress.
+Phase 4.20.0 [4.20.0-stable] — model preloading + audit source
+deduplication — validated and stable.
 
-## Phase 4.20.0 [4.20.0-alpha]
+## Phase 4.20.0 [4.20.0-stable]
 
-Status: IN PROGRESS — not yet validated.
+Status: VALIDATED and STABLE — committed to master 2026-05-19.
 
 Performance fix: SentenceTransformer(MODEL_NAME) moved from inside
 retrieve_chunks() to module level in rag/scripts/answer_vault.py and
@@ -259,6 +259,14 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
   --community, --date, --confidence, --warnings, --entry, --full
   filters for compliance review. Audit log silently fails on errors
   and never interrupts VA queries.
+- Phase 4.20.0-stable model preloading + audit deduplication:
+  SentenceTransformer(MODEL_NAME) moved to module level in
+  answer_vault.py and query_vault.py as _EMBEDDING_MODEL. Model loads
+  once at API server startup, confirmed by uvicorn log showing
+  "Loading weights" once at startup and not on subsequent requests.
+  api/audit.py sources_cited wrapped with list(dict.fromkeys()) —
+  GLEN call flow sources reduced from 13 (with duplicates) to 9
+  unique file paths.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -323,21 +331,9 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Current: Phase 4.20.0-alpha in progress. Run validation after Codex completes.
-
-Full roadmap (in priority order):
-- 4.20.0: Speed — model preloading + audit source dedup
-- 4.21.0: Handoff readiness — architecture diagram, vault schema docs,
-  onboarding guide, session log automation
-- 4.22.0: Architecture safety — separation of concerns (service.py,
-  answer_vault.py), Pydantic metadata models
-- 4.23.0: Developer scalability — retrieval correctness tests, CI pipeline
-
-Two tracked observations from 4.19.0 validation:
-- Duplicate source paths in audit log → fixed in 4.20.0
-  (deduplicate sources_cited at file level in api/audit.py)
-- xyzzy nonsense query returned strong confidence + AI answer →
-  addressed in 4.23.0 (retrieval correctness threshold tests)
+Next: Phase 4.21.0 — handoff readiness. Architecture diagram,
+formal vault schema documentation, onboarding guide, session log
+automation script.
 
 ## Phase 4I-lite Implementation Added
 
