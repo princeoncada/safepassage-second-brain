@@ -4,8 +4,8 @@ This file is the living backlog for SafePassage Second Brain.
 Completed items are struck through. Every phase should update this file —
 cross off completed items and add new ideas as they arise.
 
-Last updated: 2026-05-18
-Current stable version: 4.16.0-stable
+Last updated: 2026-05-19
+Current stable version: 4.17.0-stable
 
 ---
 
@@ -15,22 +15,19 @@ Current stable version: 4.16.0-stable
 - ~~Phase 4.14.0 — Incremental indexing (`--files` flag on index_vault.py)~~
 - ~~Phase 4.15.0 — Streaming response (`/ask/stream` SSE endpoint + Open WebUI pipe)~~
 - ~~Phase 4.16.0 — Conflict detection + multi-turn wizard UX for `/post-orders`~~
+- ~~Phase 4.17.0 — Quick reply hints in Open WebUI pipe + FUTURE_PLANS.md introduced~~
 
 ---
 
 ## In Progress
 
-- Phase 4.17.0 — Quick reply hints in Open WebUI pipe (in progress)
+- None
 
 ---
 
 ## Planned
 
 ### Near-term (next 1–3 phases)
-
-- Phase 4.17.0 — Quick reply hints in Open WebUI pipe
-  Show bold quick-reply options at the bottom of prompt-for-input responses
-  (YES/NO, KEEP NEW/KEEP OLD, community alias list). Pure pipe change, no backend.
 
 - Phase 4.18.0 — Session log automation
   Auto-generate SESSION_LOG entries from git commit history + validation
