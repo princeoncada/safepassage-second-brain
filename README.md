@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.18.0-stable |
+| Current | 4.18.1-alpha |
 | Last Stable | 4.18.0-stable (Phase 4.18.0) |
-| Status | stable |
+| Status | alpha |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through 4.18.0-stable community-aware kiosk call flow synthesis:
+Working proof of work through 4.18.0-stable community-aware kiosk call flow synthesis; current patch is 4.18.1-alpha for GLEN QA tip wording:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -54,6 +54,7 @@ Working proof of work through 4.18.0-stable community-aware kiosk call flow synt
 - Phase 4.17.0 [4.17.0-stable] - Quick reply hints in Open WebUI pipe + FUTURE_PLANS.md: stable
 - Patch 4.17.1 [4.17.1-stable] - Duplicate sources footer + community context bleed fixes: stable
 - Phase 4.18.0 [4.18.0-stable] - Community-aware kiosk call flow synthesis: stable
+- Patch 4.18.1 [4.18.1-alpha] - GLEN QA tip wording fix: alpha
 
 Current architecture:
 
