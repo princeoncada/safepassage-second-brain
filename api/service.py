@@ -187,6 +187,23 @@ def resolve_community_from_history(history: list[str]) -> tuple[str, str]:
     return "", ""
 
 
+GENERAL_QUERY_SIGNALS = {
+    "default",
+    "general",
+    "regardless",
+    "any community",
+    "all communities",
+    "standard",
+    "global",
+    "baseline",
+}
+
+
+def _is_general_query(text: str) -> bool:
+    lowered = text.lower()
+    return any(signal in lowered for signal in GENERAL_QUERY_SIGNALS)
+
+
 def answer_question(request: AskRequest) -> AskResponse:
     question_stripped = request.question.strip()
     question_upper = question_stripped.upper()
@@ -233,7 +250,11 @@ def answer_question(request: AskRequest) -> AskResponse:
     retrieval_question = question_stripped
     # Resolve community from history if current query has none.
     _current_intent = parse_query_intent(question_stripped)
-    if not _current_intent.community and request.history:
+    if (
+        not _current_intent.community
+        and request.history
+        and not _is_general_query(question_stripped)
+    ):
         _hist_community, _hist_alias = resolve_community_from_history(request.history)
         if _hist_community:
             retrieval_question = f"{question_stripped} {_hist_community}"
@@ -411,7 +432,11 @@ def stream_answer_question(request: AskRequest):
 
     retrieval_question = question_stripped
     _current_intent = parse_query_intent(question_stripped)
-    if not _current_intent.community and request.history:
+    if (
+        not _current_intent.community
+        and request.history
+        and not _is_general_query(question_stripped)
+    ):
         _hist_community, _ = resolve_community_from_history(request.history)
         if _hist_community:
             retrieval_question = f"{question_stripped} {_hist_community}"
