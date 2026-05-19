@@ -111,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.16.0-stable |
-| Phase | Phase 4.16.0 |
-| State | stable |
-| Date | 2026-05-18 |
-| Commit | master |
-| Summary | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
+| Version | 4.17.0-alpha |
+| Phase | Phase 4.17.0 |
+| State | alpha |
+| Date | 2026-05-19 |
+| Commit | uncommitted |
+| Summary | quick reply hints in pipe + FUTURE_PLANS.md |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.17.0-alpha | Phase 4.17.0 | alpha | 2026-05-19 | quick reply hints in pipe + FUTURE_PLANS.md |
 | 4.16.0-stable | Phase 4.16.0 | stable | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
 | 4.15.0-stable | Phase 4.15.0 | stable | 2026-05-18 | streaming response /ask/stream SSE + Open WebUI pipe - VALIDATED |
 | 4.14.0-stable | Phase 4.14.0 | stable | 2026-05-18 | incremental indexing with --files flag - VALIDATED |
@@ -182,9 +183,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.16.0-stable
-Current working phase: Conflict detection + multi-turn wizard UX for /post-orders
-Validation status: stable; validated and committed to master.
-Next phase: 4.17.0 — Open WebUI button UX (KEEP NEW/OLD, YES/NO, community alias buttons).
+Current working version: 4.17.0-alpha
+Current working phase: Quick reply hints in pipe + FUTURE_PLANS.md
+Validation status: alpha; implemented but not yet manually validated.
+Next phase: 4.18.0 — session log automation (or as determined during next session).
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md` records the 4.12.1 through 4.13.3-stable session handoff and next action. No version change was made for that checkpoint documentation-only update.
