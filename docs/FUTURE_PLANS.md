@@ -5,7 +5,7 @@ Completed items are struck through. Every phase should update this file —
 cross off completed items and add new ideas as they arise.
 
 Last updated: 2026-05-19
-Current stable version: 4.18.0-stable
+Current stable version: 4.18.2-stable
 
 ---
 
@@ -22,13 +22,17 @@ Current stable version: 4.18.0-stable
 
 ## In Progress
 
-- Patch 4.18.1 — GLEN QA tip wording fix + CLI duplicate Sources block fix
+- None
 
 ---
 
 ## Planned
 
 ### Near-term (next 1–3 phases)
+
+- Patch 4.18.3 (optional) — restore clean CLI citation display: update
+  answer_vault.py citation parser to match both [N] and [Source N] formats.
+  Pipe output unaffected — this is a CLI-only cosmetic fix.
 
 - Phase 4.19.0 — Session log automation (auto-generate SESSION_LOG entries from git commit history + validation results)
 
