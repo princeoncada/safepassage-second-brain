@@ -22,6 +22,9 @@ from rag.retrieval_rerank import rerank_adjustment
 
 COLLECTION_NAME = "safepassage_vault_chunks"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+# Initialized once at module level for consistent behavior with
+# the API layer.
+_EMBEDDING_MODEL = SentenceTransformer(MODEL_NAME)
 CHROMA_DIR = REPO_ROOT / "rag" / "chroma"
 CONFIG_PATH = REPO_ROOT / "rag" / "config" / "retrieval_config.json"
 ALIASES_PATH = REPO_ROOT / "rag" / "config" / "community_aliases.json"
@@ -220,7 +223,7 @@ def main() -> int:
     config = load_retrieval_config()
     initial_intent = parse_query_intent(args.query, set(config.get("known_communities", [])))
     expanded_query = expand_query_with_intent(initial_intent)
-    model = SentenceTransformer(MODEL_NAME)
+    model = _EMBEDDING_MODEL
     query_embedding = model.encode([expanded_query], normalize_embeddings=True).tolist()[0]
 
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
