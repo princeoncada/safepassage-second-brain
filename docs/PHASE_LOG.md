@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.22.0-alpha | Phase 4.22.0 | alpha | 2026-05-20 | architecture safety - separation of concerns |
 | 4.21.0-stable | Phase 4.21.0 | stable | 2026-05-20 | handoff readiness - architecture diagram, vault schema, onboarding guide, session log automation - VALIDATED |
 | 4.20.0-stable | Phase 4.20.0 | stable | 2026-05-19 | model preloading + audit log source deduplication - VALIDATED |
 | 4.19.0-stable | Phase 4.19.0 | stable | 2026-05-19 | operational trust — query/answer audit log - VALIDATED |
@@ -49,6 +50,58 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.22.0 - Architecture Safety: Separation of Concerns
+
+Status: alpha
+
+Version: 4.22.0-alpha
+
+Date: 2026-05-20
+
+Purpose:
+
+Extract tangled responsibilities from the two monolithic runtime files
+without changing public imports, API endpoints, retrieval behavior,
+confidence scoring, prompt behavior, citation behavior, or ingestion
+confirmation rules.
+
+New files:
+- rag/retrieval.py
+- rag/context.py
+- rag/answer.py
+- rag/vault_schema.py
+- api/ingest_service.py
+- api/query_service.py
+
+Modified runtime files:
+- rag/scripts/answer_vault.py: reduced to CLI/orchestration and
+  re-exports from rag.retrieval, rag.context, and rag.answer.
+- api/service.py: reduced to a thin router that delegates ingest turns
+  and normal RAG queries.
+- api/ingest.py: adds soft validate_frontmatter() warnings while
+  building slash-command temp batch inputs.
+
+Validation checklist:
+- [ ] Syntax OK: rag/retrieval.py, rag/context.py, rag/answer.py,
+      rag/vault_schema.py, api/ingest_service.py, api/query_service.py,
+      rag/scripts/answer_vault.py, api/service.py, api/ingest.py
+- [ ] answer_vault.py CLI still works for normal AI query path
+- [ ] answer_vault.py --no-ai --show-context still works
+- [ ] Existing imports from rag.scripts.answer_vault still resolve:
+      retrieve_chunks, build_context_packet, call_deepseek,
+      call_deepseek_stream, chunks_by_ids, cited_source_ids,
+      insufficient_context_answer, lifecycle_advisory_note,
+      strip_sources_section
+- [ ] POST /ask still routes through api/service.answer_question()
+- [ ] POST /ask/stream still routes through api/service.stream_answer_question()
+- [ ] /post-orders wizard, YES/NO, KEEP NEW/KEEP OLD routing unchanged
+- [ ] /announcements preview and YES/NO routing unchanged
+- [ ] Retrieval confidence, authority scoring, lifecycle scoring,
+      rerank behavior, and citation behavior unchanged
+- [ ] validate_frontmatter() warnings are stderr-only and never abort
+      ingestion
+- [ ] No protected files changed
 
 ## Phase 4.21.0 - Handoff Readiness
 
