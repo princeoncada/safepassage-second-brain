@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.18.2-alpha | Patch | alpha | 2026-05-19 | prevent DeepSeek inline Sources block in answers |
+| 4.18.2-stable | Patch | stable | 2026-05-19 | prevent DeepSeek inline Sources block in answers - VALIDATED |
 | 4.18.1-stable | Patch | stable | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing - VALIDATED |
 | 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
 | 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
@@ -48,9 +48,9 @@
 
 ## Patch 4.18.2 — Prevent DeepSeek Inline Sources Block
 
-Status: IN PROGRESS — alpha
+Status: PASSED — stable
 
-Version: 4.18.2-alpha
+Version: 4.18.2-stable
 
 Date: 2026-05-19
 
@@ -66,6 +66,24 @@ Validation checklist:
 - [ ] SR call flow — single Sources block only (regression check)
 - [ ] GLEN post order listing — single Sources block only
 - [ ] Default call flow — single Sources block only (regression check)
+
+### Validation Record — 4.18.2-stable
+
+Date: 2026-05-19
+
+All primary checks passed. Committed to master.
+
+- [x] GLEN call flow: no **Sources:** block embedded in answer body
+- [x] SR call flow: no **Sources:** block embedded, answer content correct
+- [x] GLEN post order listing: no **Sources:** block embedded, QA tip surfacing correctly
+- [x] Default call flow: no **Sources:** block embedded, answer content correct
+
+Non-blocking (optional Patch 4.18.3):
+- CLI citation display changed: DeepSeek now uses [Source N] format instead
+  of [N] after the Sources-suppression instruction was added. The CLI
+  citation parser only matches [N], so it falls back to verbose
+  "Retrieved Sources For Review" debug output. Pipe output is unaffected.
+  Fix: update CLI citation parser to match both [N] and [Source N].
 
 ## Patch 4.18.1 — GLEN QA Tip Wording Fix
 
