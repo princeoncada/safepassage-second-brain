@@ -3,4 +3,4 @@ Updated by post-validation documentation Codex prompts on each version
 promotion. Never read by the retrieval pipeline.
 """
 
-VAULT_VERSION = "4.21.0-alpha"
+VAULT_VERSION = "4.21.0-stable"
