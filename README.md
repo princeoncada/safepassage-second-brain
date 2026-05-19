@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.18.2-alpha |
-| Last Stable | 4.18.1-stable (Patch) |
-| Status | alpha |
+| Current | 4.18.2-stable |
+| Last Stable | 4.18.2-stable (Patch) |
+| Status | stable |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through 4.18.1-stable GLEN QA tip wording fix; current patch is 4.18.2-alpha to prevent DeepSeek inline Sources blocks:
+Working proof of work through 4.18.2-stable prevent DeepSeek inline Sources block in answers:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -55,7 +55,7 @@ Working proof of work through 4.18.1-stable GLEN QA tip wording fix; current pat
 - Patch 4.17.1 [4.17.1-stable] - Duplicate sources footer + community context bleed fixes: stable
 - Phase 4.18.0 [4.18.0-stable] - Community-aware kiosk call flow synthesis: stable
 - Patch 4.18.1 [4.18.1-stable] - GLEN QA tip wording fix: stable
-- Patch 4.18.2 [4.18.2-alpha] - Prevent DeepSeek inline Sources block in answers: alpha
+- Patch 4.18.2 [4.18.2-stable] - Prevent DeepSeek inline Sources block in answers: stable
 
 Current architecture:
 
