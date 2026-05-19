@@ -1,11 +1,28 @@
 # AI Handoff
 
-## Current Version: 4.20.0-stable
+## Current Version: 4.21.0-alpha
 
 ## Current Phase
 
-Phase 4.20.0 [4.20.0-stable] — model preloading + audit source
-deduplication — validated and stable.
+Phase 4.21.0 [4.21.0-alpha] - handoff readiness - alpha.
+
+## Phase 4.21.0 [4.21.0-alpha]
+
+Status: ALPHA - implemented 2026-05-20, not yet manually validated.
+
+New files:
+- docs/ARCHITECTURE.md: full system data-flow reference covering
+  ingestion, query, dashboard, OCR, authority hierarchy, lifecycle
+  priority, key config files, and operational invariants.
+- docs/VAULT_SCHEMA.md: frontmatter field reference for vault
+  Markdown and OCR review artifacts, including document types,
+  authority levels, status values, and retrieval/ingestion effects.
+- docs/ONBOARDING.md: setup and operator guide for cloning,
+  dependencies, indexing, API startup, CLI queries, slash-command
+  ingestion, audit review, Open WebUI pipe setup, and rollback.
+- automation/generate_session_log.py: standard-library CLI that reads
+  docs/PHASE_LOG.md and generates a draft SESSION_LOG file between
+  version_start and version_end without overwriting existing output.
 
 ## Phase 4.20.0 [4.20.0-stable]
 
@@ -267,6 +284,9 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
   api/audit.py sources_cited wrapped with list(dict.fromkeys()) —
   GLEN call flow sources reduced from 13 (with duplicates) to 9
   unique file paths.
+- Phase 4.21.0-alpha handoff readiness documentation and tooling:
+  docs/ARCHITECTURE.md, docs/VAULT_SCHEMA.md, docs/ONBOARDING.md,
+  and automation/generate_session_log.py.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -331,9 +351,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.21.0 — handoff readiness. Architecture diagram,
-formal vault schema documentation, onboarding guide, session log
-automation script.
+Next: Phase 4.22.0 - Architecture Safety.
 
 ## Phase 4I-lite Implementation Added
 
