@@ -1,10 +1,39 @@
 # AI Handoff
 
-## Current Version: 4.21.0-stable
+## Current Version: 4.22.0-alpha
 
 ## Current Phase
 
-Phase 4.21.0 [4.21.0-stable] — handoff readiness — validated and stable.
+Phase 4.22.0 [4.22.0-alpha] - architecture safety: separation of concerns - alpha.
+
+## Phase 4.22.0 [4.22.0-alpha]
+
+Status: ALPHA - implemented 2026-05-20, not yet manually validated.
+
+NEW files:
+- rag/retrieval.py: extracted retrieval constants, metadata helpers,
+  authority/lifecycle helpers, retrieval assessment, and retrieve_chunks().
+- rag/context.py: extracted build_context_packet().
+- rag/answer.py: extracted DeepSeek calls, citation parsing, source
+  formatting, source stripping, refusal text, and lifecycle advisory notes.
+- api/ingest_service.py: extracted slash-command, wizard, and
+  confirmation turn routing from api/service.py.
+- api/query_service.py: extracted non-ingest RAG query orchestration,
+  streaming orchestration, response building, source conversion,
+  ambiguous alias handling, and history community resolution.
+- rag/vault_schema.py: added Pydantic soft-validation reference model
+  for vault frontmatter.
+
+REDUCED:
+- api/service.py is now a thin router that checks ingest turns first,
+  then delegates to api/query_service.py for normal RAG requests.
+- rag/scripts/answer_vault.py is now orchestration + CLI + re-exports
+  only. Existing imports from rag.scripts.answer_vault continue to work.
+
+SOFT VALIDATION:
+- api/ingest.py calls validate_frontmatter() while building new
+  slash-command temp batch inputs. Warnings print to stderr only and
+  do not abort ingestion.
 
 ## Phase 4.21.0 [4.21.0-stable]
 
@@ -302,6 +331,11 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase 4.21.0-stable handoff readiness documentation and tooling:
   docs/ARCHITECTURE.md, docs/VAULT_SCHEMA.md, docs/ONBOARDING.md,
   and automation/generate_session_log.py.
+- Phase 4.22.0-alpha architecture safety extraction:
+  rag/retrieval.py, rag/context.py, rag/answer.py,
+  api/ingest_service.py, api/query_service.py, rag/vault_schema.py;
+  api/service.py and rag/scripts/answer_vault.py reduced while
+  preserving public imports.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -366,7 +400,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.22.0 — Architecture Safety.
+Next: Phase 4.23.0 - Developer Scalability: Retrieval Correctness Tests.
 
 ## Phase 4I-lite Implementation Added
 
