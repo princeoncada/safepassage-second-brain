@@ -4,8 +4,9 @@ This file is the living backlog for SafePassage Second Brain.
 Completed items are struck through. Every phase should update this file —
 cross off completed items and add new ideas as they arise.
 
-Last updated: 2026-05-19
+Last updated: 2026-05-20
 Current stable version: 4.20.0-stable
+Current working version: 4.21.0-alpha
 
 ---
 
@@ -25,13 +26,7 @@ Current stable version: 4.20.0-stable
 
 ## In Progress
 
-- None
-
----
-
-## Planned
-
-### Phase 4.21.0 — Handoff Readiness
+### Phase 4.21.0 - Handoff Readiness
 
 Priority: Handoff readiness (P3)
 
@@ -45,9 +40,9 @@ Scope:
   with type, required/optional, valid values, and authority hierarchy
 - Onboarding guide: setup steps, environment variables, how to
   ingest new post orders, how to validate, how to deploy
-- Session log automation: Python script that reads git log for the
-  current day and PHASE_LOG.md validation records, then generates a
-  SESSION_LOG draft file — reduces manual session checkpoint effort
+- Session log automation: Python script that reads PHASE_LOG.md phase
+  entries between a start and end version, then generates a
+  SESSION_LOG draft file - reduces manual session checkpoint effort
 
 Files to change:
 - docs/ARCHITECTURE.md (new)
@@ -58,6 +53,8 @@ Files to change:
 - api/version.py
 
 ---
+
+## Planned
 
 ### Phase 4.22.0 — Architecture Safety: Separation of Concerns
 
