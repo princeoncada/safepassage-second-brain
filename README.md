@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.19.0-alpha |
-| Last Stable | 4.18.3-stable (Patch) |
-| Status | alpha |
+| Current | 4.19.0-stable |
+| Last Stable | 4.19.0-stable (Phase 4.19.0) |
+| Status | stable |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through 4.18.3-stable restore clean CLI citation display; current phase is 4.19.0-alpha operational trust query/answer audit log:
+Working proof of work through 4.19.0-stable operational trust query/answer audit log:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -57,7 +57,7 @@ Working proof of work through 4.18.3-stable restore clean CLI citation display; 
 - Patch 4.18.1 [4.18.1-stable] - GLEN QA tip wording fix: stable
 - Patch 4.18.2 [4.18.2-stable] - Prevent DeepSeek inline Sources block in answers: stable
 - Patch 4.18.3 [4.18.3-stable] - Restore clean CLI citation display: stable
-- Phase 4.19.0 [4.19.0-alpha] - Operational trust query/answer audit log: alpha
+- Phase 4.19.0 [4.19.0-stable] - Operational trust query/answer audit log: stable
 
 Current architecture:
 
