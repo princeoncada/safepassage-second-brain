@@ -93,6 +93,7 @@
     "pending"
   ],
   "weak_context_distance_threshold": 0.95,
+  "minimum_raw_distance_floor": 1.20,
   "near_duplicate_similarity_threshold": 0.82,
   "content_preview_dedupe_words": 32,
   "known_communities": [
