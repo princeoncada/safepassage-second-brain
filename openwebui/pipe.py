@@ -10,6 +10,33 @@ import requests
 from pydantic import BaseModel, Field
 
 
+def _detect_quick_replies(answer: str) -> list[str]:
+    """
+    Detect what quick replies are valid based on the answer text content.
+    Returns a list of reply strings to show as hints, or [] if not a
+    prompt-for-input response.
+    """
+    text = answer.strip()
+
+    # Conflict resolution prompt
+    if "KEEP NEW" in text and "KEEP OLD" in text:
+        return ["KEEP NEW", "KEEP OLD"]
+
+    # YES/NO confirmation prompt (post order or announcement preview)
+    if "Reply YES to write to vault" in text or "Reply YES to confirm" in text:
+        return ["YES", "NO"]
+
+    # Wizard step 1 - community alias prompt
+    if "Reply with your community alias" in text:
+        return ["SR", "CBK", "MON", "GWT", "PBM", "NO"]
+
+    # Wizard step 2 - paste text prompt (free text input, no hint needed)
+    if "Paste the post order text" in text:
+        return []
+
+    return []
+
+
 class Pipe:
     class Valves(BaseModel):
         BASE_URL: str = Field(
@@ -143,3 +170,11 @@ class Pipe:
 
             if footer_parts:
                 yield "\n".join(footer_parts)
+
+        # Quick reply hints - shown when the response is a prompt-for-input
+        quick_replies = _detect_quick_replies(
+            citations_data.get("answer", "") if citations_data else ""
+        )
+        if quick_replies:
+            pills = "  ·  ".join(f"**{r}**" for r in quick_replies)
+            yield f"\n\n---\n💬 Quick reply: {pills}"
