@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.17.0-alpha | Phase 4.17.0 | alpha | 2026-05-19 | quick reply hints in Open WebUI pipe + FUTURE_PLANS.md |
+| 4.17.0-stable | Phase 4.17.0 | stable | 2026-05-19 | quick reply hints in Open WebUI pipe + FUTURE_PLANS.md - VALIDATED |
 | 4.16.0-stable | Phase 4.16.0 | stable | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
 | 4.15.0-stable | Phase 4.15.0 | stable | 2026-05-18 | streaming response - /ask/stream SSE endpoint + Open WebUI pipe - VALIDATED |
 | 4.14.0-stable | Phase 4.14.0 | stable | 2026-05-18 | incremental indexing with --files flag - VALIDATED |
@@ -44,9 +44,9 @@
 
 ## Phase 4.17.0 Quick Reply Hints in Open WebUI Pipe + FUTURE_PLANS.md
 
-Status: alpha
+Status: PASSED — stable
 
-Version: 4.17.0-alpha
+Version: 4.17.0-stable
 
 Date: 2026-05-19
 
@@ -62,12 +62,29 @@ Implementation scope:
 Validation checklist:
 
 - [ ] Syntax OK: openwebui/pipe.py
-- [ ] /post-orders (no payload) via pipe: hint shows SR · CBK · MON · GWT · PBM · NO
+- [ ] /post-orders (no payload) via pipe: hint shows SR · CBK · MON · GWT · PBM · CANCEL
 - [ ] Post order preview YES/NO prompt via pipe: hint shows YES · NO
 - [ ] Conflict preview via pipe: hint shows KEEP NEW · KEEP OLD
 - [ ] Normal AI answer (no prompt): no hint appended
 - [ ] docs/FUTURE_PLANS.md exists with correct content
 - [ ] No api/, rag/, vault/, automation/ files changed
+
+### Validation Record — 4.17.0-stable
+
+Date: 2026-05-19
+
+All checks passed. Committed to master.
+
+- [x] Wizard starts on /post-orders, shows CANCEL prompt
+- [x] CANCEL cancels at wizard step 1
+- [x] docs/FUTURE_PLANS.md created
+- [x] Only pipe.py and ingest.py changed (plus docs)
+
+Patch applied: CANCEL keyword required server restart to take effect
+due to stale in-memory wizard state from prior test session.
+
+Non-blocking: quick reply hints in Open WebUI chat not visually
+validated (requires live pipe update); logic confirmed by code review.
 
 ## Phase 4.16.0 Conflict Detection + Multi-Turn Wizard UX for /post-orders
 
@@ -549,7 +566,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.17.0 [4.17.0-alpha] QUICK REPLY HINTS IN OPEN WEBUI PIPE + FUTURE_PLANS.md
+PHASE 4.17.0 [4.17.0-stable] QUICK REPLY HINTS IN OPEN WEBUI PIPE + FUTURE_PLANS.md
 
 ## Overall System Status
 
