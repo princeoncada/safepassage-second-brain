@@ -113,6 +113,7 @@ class QueryIntent:
     requested_all: bool = False
     is_default_workflow_query: bool = False
     is_global_query: bool = False
+    is_call_flow_query: bool = False
     warnings: list[str] = field(default_factory=list)
 
     def as_hints(self) -> dict[str, Any]:
@@ -127,6 +128,7 @@ class QueryIntent:
             "requested_all": self.requested_all,
             "is_default_workflow_query": self.is_default_workflow_query,
             "is_global_query": self.is_global_query,
+            "is_call_flow_query": self.is_call_flow_query,
             "warnings": self.warnings,
         }
 
@@ -179,6 +181,8 @@ def detect_topic(intent: QueryIntent) -> None:
                 intent.intent_category = str(metadata.get("intent_category", "unknown"))
             if metadata.get("is_global_allowed"):
                 intent.is_global_query = True
+            if metadata.get("call_flow"):
+                intent.is_call_flow_query = True
 
 
 def detect_keyword_intent(intent: QueryIntent) -> None:
