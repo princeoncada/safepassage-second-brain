@@ -111,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.19.0-stable |
-| Phase | Phase 4.19.0 |
-| State | stable |
+| Version | 4.20.0-alpha |
+| Phase | Phase 4.20.0 |
+| State | alpha |
 | Date | 2026-05-19 |
-| Commit | master |
-| Summary | operational trust — query/answer audit log - VALIDATED |
+| Commit | uncommitted |
+| Summary | model preloading + audit log source deduplication |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.20.0-alpha | Phase 4.20.0 | alpha | 2026-05-19 | model preloading + audit log source deduplication |
 | 4.19.0-stable | Phase 4.19.0 | stable | 2026-05-19 | operational trust — query/answer audit log - VALIDATED |
 | 4.18.3-stable | Patch | stable | 2026-05-19 | restore clean CLI citation display — match [Source N] format - VALIDATED |
 | 4.18.2-stable | Patch | stable | 2026-05-19 | prevent DeepSeek inline Sources block in answers - VALIDATED |
@@ -189,10 +190,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.19.0-stable
-Current working phase: Phase 4.19.0 — operational trust query/answer audit log
-Validation status: stable; validated and committed to master.
-Next phase: Phase 4.20.0 — model preloading (eliminate per-query
-SentenceTransformer weight load from answer_vault.py and query_vault.py).
+Current working version: 4.20.0-alpha
+Current working phase: Phase 4.20.0 — model preloading + audit log source deduplication
+Validation status: alpha; not yet validated.
+Next phase: Phase 4.21.0 — handoff readiness.
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md` records the 4.12.1 through 4.13.3-stable session handoff and next action. No version change was made for that checkpoint documentation-only update.
