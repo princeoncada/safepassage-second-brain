@@ -1,12 +1,14 @@
 # AI Handoff
 
-## Current Version: 4.18.2-alpha
+## Current Version: 4.18.2-stable
 
 ## Current Phase
 
-Patch 4.18.2 [4.18.2-alpha] — prevent DeepSeek inline Sources block — in progress.
+Patch 4.18.2 [4.18.2-stable] — prevent DeepSeek inline Sources block — validated and stable.
 
 ## Patch 4.18.2
+
+Status: VALIDATED and STABLE — committed to master 2026-05-19.
 
 Z patch on 4.18.1-stable. One fix:
 
@@ -266,7 +268,13 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Current: Patch 4.18.2-alpha in progress. Run validation after Codex completes.
+Next planned: Phase 4.19.0 — session log automation. Optional Patch
+4.18.3 available: restore clean CLI citation display by updating the
+CLI citation parser in answer_vault.py to match both [N] and [Source N]
+formats. The 4.18.2 prompt change caused DeepSeek to switch from [N] to
+[Source N] inline citations, so the CLI falls back to verbose debug
+output. Pipe output is unaffected. Decide whether to patch or proceed
+to 4.19.0.
 
 ## Phase 4I-lite Implementation Added
 
