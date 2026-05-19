@@ -111,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.17.0-stable |
-| Phase | Phase 4.17.0 |
+| Version | 4.17.1-stable |
+| Phase | Patch |
 | State | stable |
 | Date | 2026-05-19 |
 | Commit | master |
-| Summary | quick reply hints in pipe + FUTURE_PLANS.md - VALIDATED |
+| Summary | fix duplicate sources in pipe + community context bleed - VALIDATED |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
 | 4.17.0-stable | Phase 4.17.0 | stable | 2026-05-19 | quick reply hints in pipe + FUTURE_PLANS.md - VALIDATED |
 | 4.16.0-stable | Phase 4.16.0 | stable | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
 | 4.15.0-stable | Phase 4.15.0 | stable | 2026-05-18 | streaming response /ask/stream SSE + Open WebUI pipe - VALIDATED |
@@ -183,7 +184,7 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.17.0-stable
+Current working version: 4.17.1-stable
 Current working phase: Quick reply hints in pipe + FUTURE_PLANS.md
 Validation status: stable; validated and committed to master.
 Next phase: see docs/FUTURE_PLANS.md for current backlog.
