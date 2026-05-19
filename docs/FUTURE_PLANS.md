@@ -5,7 +5,7 @@ Completed items are struck through. Every phase should update this file —
 cross off completed items and add new ideas as they arise.
 
 Last updated: 2026-05-19
-Current stable version: 4.18.3-stable
+Current stable version: 4.19.0-alpha
 
 ---
 
@@ -23,7 +23,7 @@ Current stable version: 4.18.3-stable
 
 ## In Progress
 
-- None
+- Phase 4.19.0 — operational trust audit log
 
 ---
 
@@ -31,7 +31,7 @@ Current stable version: 4.18.3-stable
 
 ### Near-term (next 1–3 phases)
 
-- Phase 4.19.0 — Session log automation (auto-generate SESSION_LOG entries from git commit history + validation results)
+- Phase 4.20.0 — Model preloading (eliminate per-query SentenceTransformer weight load)
 
 ### UX / Open WebUI
 
