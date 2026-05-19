@@ -111,18 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.16.0-alpha |
+| Version | 4.16.0-stable |
 | Phase | Phase 4.16.0 |
-| State | alpha |
+| State | stable |
 | Date | 2026-05-18 |
 | Commit | master |
-| Summary | conflict detection + multi-turn wizard UX for /post-orders |
+| Summary | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.16.0-alpha | Phase 4.16.0 | alpha | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders |
+| 4.16.0-stable | Phase 4.16.0 | stable | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
 | 4.15.0-stable | Phase 4.15.0 | stable | 2026-05-18 | streaming response /ask/stream SSE + Open WebUI pipe - VALIDATED |
 | 4.14.0-stable | Phase 4.14.0 | stable | 2026-05-18 | incremental indexing with --files flag - VALIDATED |
 | 4.13.4-stable | Patch | stable | 2026-05-18 | fix double sources display in CLI output - VALIDATED |
@@ -182,9 +182,9 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.16.0-alpha
+Current working version: 4.16.0-stable
 Current working phase: Conflict detection + multi-turn wizard UX for /post-orders
-Validation status: alpha; implementation complete, pending manual validation.
-Next phase: 4.17.0 - Open WebUI button UX (KEEP NEW/OLD, YES/NO, community alias buttons).
+Validation status: stable; validated and committed to master.
+Next phase: 4.17.0 — Open WebUI button UX (KEEP NEW/OLD, YES/NO, community alias buttons).
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md` records the 4.12.1 through 4.13.3-stable session handoff and next action. No version change was made for that checkpoint documentation-only update.
