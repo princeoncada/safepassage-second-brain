@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.17.0-alpha | Phase 4.17.0 | alpha | 2026-05-19 | quick reply hints in Open WebUI pipe + FUTURE_PLANS.md |
 | 4.16.0-stable | Phase 4.16.0 | stable | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
 | 4.15.0-stable | Phase 4.15.0 | stable | 2026-05-18 | streaming response - /ask/stream SSE endpoint + Open WebUI pipe - VALIDATED |
 | 4.14.0-stable | Phase 4.14.0 | stable | 2026-05-18 | incremental indexing with --files flag - VALIDATED |
@@ -40,6 +41,33 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.17.0 Quick Reply Hints in Open WebUI Pipe + FUTURE_PLANS.md
+
+Status: alpha
+
+Version: 4.17.0-alpha
+
+Date: 2026-05-19
+
+Purpose:
+
+Quick reply hints in Open WebUI pipe + introduce FUTURE_PLANS.md.
+
+Implementation scope:
+
+- `openwebui/pipe.py`: add `_detect_quick_replies()` helper; append quick reply hint line at end of prompt-for-input responses.
+- `docs/FUTURE_PLANS.md`: new file - living backlog with strikethrough for completed items.
+
+Validation checklist:
+
+- [ ] Syntax OK: openwebui/pipe.py
+- [ ] /post-orders (no payload) via pipe: hint shows SR · CBK · MON · GWT · PBM · NO
+- [ ] Post order preview YES/NO prompt via pipe: hint shows YES · NO
+- [ ] Conflict preview via pipe: hint shows KEEP NEW · KEEP OLD
+- [ ] Normal AI answer (no prompt): no hint appended
+- [ ] docs/FUTURE_PLANS.md exists with correct content
+- [ ] No api/, rag/, vault/, automation/ files changed
 
 ## Phase 4.16.0 Conflict Detection + Multi-Turn Wizard UX for /post-orders
 
@@ -521,7 +549,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.16.0 [4.16.0-stable] CONFLICT DETECTION + MULTI-TURN WIZARD UX FOR /post-orders
+PHASE 4.17.0 [4.17.0-alpha] QUICK REPLY HINTS IN OPEN WEBUI PIPE + FUTURE_PLANS.md
 
 ## Overall System Status
 
