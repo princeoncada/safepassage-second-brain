@@ -44,6 +44,11 @@ TOPIC_STOPWORDS = {
     "if", "in", "is", "must", "of", "or", "the", "to", "when", "with",
 }
 
+ANCHOR_STOPWORDS = {
+    "required", "at", "all", "times", "not", "with", "for", "the",
+    "and", "or", "a", "an", "is", "are", "must", "before", "after",
+}
+
 
 def load_community_aliases() -> dict[str, str]:
     with ALIAS_PATH.open("r", encoding="utf-8") as handle:
@@ -132,6 +137,28 @@ def _token_similarity(a: str, b: str) -> float:
     return len(left & right) / len(left | right)
 
 
+def _anchor_conflict(existing_topic_key: str, incoming_rule_text: str) -> bool:
+    """
+    Check if the incoming rule text matches the existing topic key by anchor tokens.
+    Extracts meaningful tokens from the existing topic_key and checks whether they
+    appear in the incoming rule text.
+    """
+    tokens = {
+        t for t in existing_topic_key.split("-")
+        if t and len(t) > 2 and t not in ANCHOR_STOPWORDS
+    }
+    if not tokens:
+        return False
+    incoming_normalized = re.sub(r"[^a-z0-9]+", " ", incoming_rule_text.lower())
+    incoming_words = set(incoming_normalized.split())
+    matches = tokens & incoming_words
+    if len(tokens) == 1:
+        token = next(iter(tokens))
+        return token in incoming_words and len(token) > 5
+    ratio = len(matches) / len(tokens)
+    return ratio >= 0.5 and len(matches) >= 1
+
+
 def scan_topic_conflicts(community: str, rules: list[dict[str, str]]) -> list[dict]:
     """
     Scan existing active vault post_order files for the community.
@@ -178,7 +205,6 @@ def scan_topic_conflicts(community: str, rules: list[dict[str, str]]) -> list[di
 
     for idx, rule in enumerate(rules):
         incoming_hash = rule.get("rule_hash", "")
-        incoming_topic = _topic_key_from_text(rule.get("rule_text", ""))
         best_match: dict | None = None
         best_score = 0.0
         for ex in existing:
@@ -186,14 +212,10 @@ def scan_topic_conflicts(community: str, rules: list[dict[str, str]]) -> list[di
                 best_match = None
                 best_score = 0.0
                 break
-            if ex["topic_key"] == incoming_topic:
+            if _anchor_conflict(ex["topic_key"], rule.get("rule_text", "")):
                 best_match = ex
                 best_score = 1.0
-                continue
-            score = _token_similarity(ex["topic_key"], incoming_topic)
-            if score >= 0.55 and score > best_score:
-                best_score = score
-                best_match = ex
+                break
         if best_match:
             existing_text = best_match["normalized_rule"] or "(rule text unavailable)"
             conflicts.append(
