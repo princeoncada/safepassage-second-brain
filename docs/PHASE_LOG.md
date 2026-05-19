@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.19.0-alpha | Phase 4.19.0 | alpha | 2026-05-19 | operational trust — query/answer audit log |
 | 4.18.3-stable | Patch | stable | 2026-05-19 | restore clean CLI citation display — match [Source N] format - VALIDATED |
 | 4.18.2-stable | Patch | stable | 2026-05-19 | prevent DeepSeek inline Sources block in answers - VALIDATED |
 | 4.18.1-stable | Patch | stable | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing - VALIDATED |
@@ -46,6 +47,46 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.19.0 — Operational Trust: Query/Answer Audit Log
+
+Status: IN PROGRESS — alpha
+
+Version: 4.19.0-alpha
+
+Date: 2026-05-19
+
+Purpose:
+
+Every retrieval query now writes a complete record to
+logs/query_audit.jsonl: timestamp, community resolved, intent
+category, retrieval confidence, sources cited, full answer text,
+warnings, vault version. Append-only JSON Lines. Never read by the
+retrieval pipeline. For compliance review: if a VA makes a wrong
+access decision, the audit log allows reconstructing exactly what
+query was asked, what the system retrieved, and what answer it gave.
+
+Implementation scope:
+- api/version.py: VAULT_VERSION constant
+- api/audit.py: write_audit_entry() with silent exception handling
+- automation/audit_review.py: filter/query tool
+- logs/.gitkeep: directory tracking
+- .gitignore: logs/*.jsonl excluded
+- api/service.py: audit calls in answer_question() and
+  stream_answer_question(), both AI-success and refuse paths
+
+Validation checklist:
+- [ ] Syntax OK: api/audit.py, api/version.py,
+      automation/audit_review.py, api/service.py
+- [ ] API server starts without errors
+- [ ] Run a GLEN call flow query — log file created with correct entry
+- [ ] Run a SR post order query — second entry appended
+- [ ] Run a query with weak/no confidence — refuse path logged
+- [ ] audit_review.py --tail 5 shows both entries cleanly
+- [ ] audit_review.py --community "Sierra Ridge" filters correctly
+- [ ] audit_review.py --entry 0 shows full answer text
+- [ ] audit_review.py --warnings shows refuse-path entry
+- [ ] Normal API behavior unchanged (answer quality, streaming)
 
 ## Patch 4.18.3 — Restore Clean CLI Citation Display
 
