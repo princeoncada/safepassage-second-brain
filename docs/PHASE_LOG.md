@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.20.0-alpha | Phase 4.20.0 | alpha | 2026-05-19 | model preloading + audit log source deduplication |
 | 4.19.0-stable | Phase 4.19.0 | stable | 2026-05-19 | operational trust — query/answer audit log - VALIDATED |
 | 4.18.3-stable | Patch | stable | 2026-05-19 | restore clean CLI citation display — match [Source N] format - VALIDATED |
 | 4.18.2-stable | Patch | stable | 2026-05-19 | prevent DeepSeek inline Sources block in answers - VALIDATED |
@@ -47,6 +48,34 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.20.0 — Model Preloading + Audit Log Source Deduplication
+
+Status: IN PROGRESS — alpha
+
+Version: 4.20.0-alpha
+
+Date: 2026-05-19
+
+Fixes:
+- rag/scripts/answer_vault.py: SentenceTransformer(MODEL_NAME) moved
+  to module level as _EMBEDDING_MODEL. retrieve_chunks() now uses
+  _EMBEDDING_MODEL instead of reinitializing on every call.
+- rag/scripts/query_vault.py: same fix applied for consistency.
+- api/audit.py: sources_cited wrapped with list(dict.fromkeys()) to
+  deduplicate source file paths. Multiple chunks from same file now
+  appear as one entry.
+
+Validation checklist:
+- [ ] Syntax OK: answer_vault.py, query_vault.py, audit.py
+- [ ] API server starts — "Loading weights" appears once in startup
+      log, not on subsequent requests
+- [ ] GLEN call flow query — answer correct, sources_cited in audit
+      log shows no duplicate file paths
+- [ ] SR post order query — answer correct, no duplicates in audit
+- [ ] Measure-Command shows faster response time vs prior baseline
+- [ ] CLI answer_vault.py still works (model loads once at script start)
+- [ ] audit_review.py --entry N shows deduplicated sources
 
 ## Phase 4.19.0 — Operational Trust: Query/Answer Audit Log
 
