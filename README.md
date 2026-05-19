@@ -6,8 +6,8 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.22.0-alpha |
-| Last Stable | 4.21.0-stable (Phase 4.21.0) |
+| Current | 4.23.0-alpha |
+| Last Stable | 4.22.0-stable (Phase 4.22.0) |
 | Status | alpha |
 
 ## Source Of Truth
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through 4.22.0-alpha architecture safety:
+Working proof of work through 4.23.0-alpha retrieval correctness tests:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -60,7 +60,8 @@ Working proof of work through 4.22.0-alpha architecture safety:
 - Phase 4.19.0 [4.19.0-stable] - Operational trust query/answer audit log: stable
 - Phase 4.20.0 [4.20.0-stable] - Model preloading + audit log source deduplication: stable
 - Phase 4.21.0 [4.21.0-stable] - Handoff readiness documentation and session log automation: stable - VALIDATED
-- Phase 4.22.0 [4.22.0-alpha] - Architecture Safety: Separation of Concerns: alpha
+- Phase 4.22.0 [4.22.0-stable] - Architecture Safety: Separation of Concerns: stable - VALIDATED
+- Phase 4.23.0 [4.23.0-alpha] - Retrieval correctness tests + xyzzy raw distance floor fix: alpha
 
 Current architecture:
 
@@ -142,9 +143,15 @@ Phase 4.21.0-stable adds handoff readiness documentation and tooling:
 `docs/ARCHITECTURE.md`, `docs/VAULT_SCHEMA.md`,
 `docs/ONBOARDING.md`, and `automation/generate_session_log.py`.
 
-Phase 4.22.0-alpha extracts the RAG retrieval, context, and answer
+Phase 4.22.0-stable extracts the RAG retrieval, context, and answer
 helpers from `rag/scripts/answer_vault.py`, splits API ingest routing
 from query orchestration, and adds soft vault frontmatter validation.
+
+Phase 4.23.0-alpha adds retrieval correctness tests, confidence
+threshold tests, community resolution tests, and a GitHub Actions CI
+workflow. It also adds a `minimum_raw_distance_floor` retrieval
+assessment guard so nonsense queries cannot be promoted to strong
+confidence solely by rerank boosts.
 
 Dashboard endpoints:
 
