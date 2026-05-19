@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.20.0-alpha | Phase 4.20.0 | alpha | 2026-05-19 | model preloading + audit log source deduplication |
+| 4.20.0-stable | Phase 4.20.0 | stable | 2026-05-19 | model preloading + audit log source deduplication - VALIDATED |
 | 4.19.0-stable | Phase 4.19.0 | stable | 2026-05-19 | operational trust — query/answer audit log - VALIDATED |
 | 4.18.3-stable | Patch | stable | 2026-05-19 | restore clean CLI citation display — match [Source N] format - VALIDATED |
 | 4.18.2-stable | Patch | stable | 2026-05-19 | prevent DeepSeek inline Sources block in answers - VALIDATED |
@@ -51,9 +51,9 @@
 
 ## Phase 4.20.0 — Model Preloading + Audit Log Source Deduplication
 
-Status: IN PROGRESS — alpha
+Status: PASSED — stable
 
-Version: 4.20.0-alpha
+Version: 4.20.0-stable
 
 Date: 2026-05-19
 
@@ -76,6 +76,28 @@ Validation checklist:
 - [ ] Measure-Command shows faster response time vs prior baseline
 - [ ] CLI answer_vault.py still works (model loads once at script start)
 - [ ] audit_review.py --entry N shows deduplicated sources
+
+### Validation Record — 4.20.0-stable
+
+Date: 2026-05-19
+
+All checks passed. Committed to master.
+
+- [x] Model preloading confirmed: uvicorn startup log shows
+      "Loading weights: 100% | 103/103" once at startup, then
+      three POST /ask requests with no additional model load.
+      Dictionary stays on the desk — not fetched from shelf per query.
+- [x] Audit deduplication confirmed: GLEN call flow entry (new,
+      4.19.0-stable vault ver) shows 9 unique source file paths.
+      Previous entries (4.18.3-stable) showed 13 paths with
+      primary-calling-resident-for-access.md ×2,
+      primary-deny-entry.md ×2, GLEN QA tip ×3.
+- [x] Answer quality: GLEN call flow correct across all 7 steps,
+      community rules and QA tip present.
+- [x] CLI answer_vault.py: works correctly, Loading weights appears
+      once at script startup as expected.
+- [x] Vault version in new audit entries: 4.19.0-stable (correct —
+      updates to 4.20.0-stable after this post-validation prompt).
 
 ## Phase 4.19.0 — Operational Trust: Query/Answer Audit Log
 
