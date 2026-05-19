@@ -1,12 +1,14 @@
 # AI Handoff
 
-## Current Version: 4.18.1-alpha
+## Current Version: 4.18.1-stable
 
 ## Current Phase
 
-Patch 4.18.1 [4.18.1-alpha] — GLEN QA tip wording fix — in progress.
+Patch 4.18.1 [4.18.1-stable] — GLEN QA tip wording fix — validated and stable.
 
 ## Patch 4.18.1
+
+Status: VALIDATED and STABLE — committed to master 2026-05-19.
 
 Z patch on 4.18.0-stable. One fix:
 
@@ -255,7 +257,9 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Patch 4.18.1 — two fixes: (1) GLEN QA tip wording — replace "license plate or RFID tag is already registered in the system" with "visitor already confirmed in SP Guard with active access"; (2) CLI duplicate Sources block — handle bold **Sources:** blocks embedded mid-answer by DeepSeek, in addition to the existing plain Sources: strip logic.
+Next: Patch 4.18.2 — add explicit rule to rag/prompts/answer_from_context.md
+instructing DeepSeek not to generate any Sources block in its answer body.
+Fixes duplicate Sources output in CLI for call flow and listing responses.
 
 ## Phase 4I-lite Implementation Added
 
