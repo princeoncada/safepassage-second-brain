@@ -94,5 +94,19 @@
     "intent_category": "announcement",
     "preferred_sections": ["Rule", "Announcement", "Operational Notes"],
     "is_global_allowed": false
+  },
+  "kiosk call flow": {
+    "expected_types": ["workflow", "post_order", "qa_rule"],
+    "intent_category": "call_flow",
+    "preferred_sections": ["Call Flow Script", "Resident Call Script", "Rule", "Summary", "Agent Action"],
+    "is_global_allowed": true,
+    "call_flow": true
+  },
+  "call flow": {
+    "expected_types": ["workflow", "post_order", "qa_rule"],
+    "intent_category": "call_flow",
+    "preferred_sections": ["Call Flow Script", "Resident Call Script", "Rule", "Summary", "Agent Action"],
+    "is_global_allowed": true,
+    "call_flow": true
   }
 }
