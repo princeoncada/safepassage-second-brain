@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install chromadb sentence-transformers pyyaml fastapi uvicorn requests pytest pydantic
+
+      - name: Syntax check all Python files
+        run: |
+          python -m py_compile rag/retrieval.py
+          python -m py_compile rag/context.py
+          python -m py_compile rag/answer.py
+          python -m py_compile rag/vault_schema.py
+          python -m py_compile rag/query_intent.py
+          python -m py_compile api/service.py
+          python -m py_compile api/ingest_service.py
+          python -m py_compile api/query_service.py
+          python -m py_compile api/ingest.py
+          python -m py_compile api/audit.py
+          python -m py_compile automation/generate_session_log.py
+
+      - name: Run unit tests (no ChromaDB required)
+        run: |
+          pytest tests/test_community_resolution.py -v
+          pytest tests/test_confidence_thresholds.py::test_weak_confidence_for_no_chunks -v
