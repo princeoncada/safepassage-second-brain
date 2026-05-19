@@ -26,6 +26,9 @@ from rag.retrieval_rerank import rerank_adjustment
 
 COLLECTION_NAME = "safepassage_vault_chunks"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+# Initialized once at module level so the API server loads weights
+# once at startup, not on every request.
+_EMBEDDING_MODEL = SentenceTransformer(MODEL_NAME)
 DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
 DEEPSEEK_MODEL = "deepseek-chat"
 CHROMA_DIR = REPO_ROOT / "rag" / "chroma"
@@ -296,7 +299,7 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
     config = load_retrieval_config()
     intent = parse_query_intent(query, set(config.get("known_communities", [])))
     expanded_query = expand_query_with_intent(intent)
-    model = SentenceTransformer(MODEL_NAME)
+    model = _EMBEDDING_MODEL
     query_embedding = model.encode([expanded_query], normalize_embeddings=True).tolist()[0]
 
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
