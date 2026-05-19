@@ -2,7 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.18.1-alpha | Patch | alpha | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing |
+| 4.18.1-stable | Patch | stable | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing - VALIDATED |
 | 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
 | 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
 | 4.17.0-stable | Phase 4.17.0 | stable | 2026-05-19 | quick reply hints in Open WebUI pipe + FUTURE_PLANS.md - VALIDATED |
@@ -47,9 +47,9 @@
 
 ## Patch 4.18.1 — GLEN QA Tip Wording Fix
 
-Status: IN PROGRESS — alpha
+Status: PASSED — stable
 
-Version: 4.18.1-alpha
+Version: 4.18.1-stable
 
 Date: 2026-05-19
 
@@ -64,6 +64,20 @@ Validation checklist:
 - [ ] Re-index succeeds
 - [ ] GLEN call flow query — Step 3 exception and QA Tip use SP Guard framing
 - [ ] GLEN post order listing — QA Tip uses SP Guard framing
+
+### Validation Record — 4.18.1-stable
+
+Date: 2026-05-19
+
+All checks passed. Committed to master.
+
+- [x] Re-index succeeded: 227 chunks from 114 files (count stable — text-only change)
+- [x] GLEN call flow: Step 3 exception uses SP Guard framing ("visitor already confirmed in SP Guard with active access")
+- [x] GLEN call flow: QA Tips section uses SP Guard framing ("visitor's identity was already confirmed when access was originally granted")
+- [x] GLEN post order listing: QA tip uses SP Guard framing
+
+Non-blocking (tracked to Patch 4.18.2):
+- Duplicate Sources block still present in GLEN post order listing CLI output — addressed in 4.18.2.
 
 ## Phase 4.18.0 — Community-Aware Kiosk Call Flow Synthesis
 
