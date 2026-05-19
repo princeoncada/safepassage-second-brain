@@ -337,7 +337,7 @@ def handle_wizard_start() -> str:
     return (
         "Which community? Reply with your community alias.\n"
         "Examples: SR, CBK, MON, GWT, PBM\n\n"
-        "Or cancel anytime by typing NO."
+        "Or cancel anytime by typing CANCEL."
     )
 
 
@@ -438,7 +438,7 @@ def handle_wizard_community(reply: str) -> str:
     if datetime.now() > state["expires_at"]:
         clear_wizard()
         return "Wizard session expired. Type /post-orders to start again."
-    if reply.strip().upper() == "NO":
+    if reply.strip().upper() in {"NO", "CANCEL"}:
         clear_wizard()
         return "Ingestion cancelled. Nothing was written to vault."
     community, code, _ = resolve_community_token(reply.strip())
@@ -446,7 +446,7 @@ def handle_wizard_community(reply: str) -> str:
         return (
             f'Community "{reply.strip().upper()}" not recognized.\n'
             f"Valid aliases include: {valid_alias_text()}\n"
-            "Reply with a valid alias or NO to cancel."
+            "Reply with a valid alias or CANCEL to cancel."
         )
     pending_state[WIZARD_KEY] = {
         "step": "awaiting_text",
@@ -459,7 +459,7 @@ def handle_wizard_community(reply: str) -> str:
         f"Paste the post order text for {community}.\n"
         "Use dated entries, e.g.:\n"
         "5/18/2026 Post Order (K): Residents must present a valid physical ID.\n\n"
-        "Or type NO to cancel."
+        "Or type CANCEL to cancel."
     )
 
 
@@ -471,7 +471,7 @@ def handle_wizard_text(reply: str) -> str:
     if datetime.now() > state["expires_at"]:
         clear_wizard()
         return "Wizard session expired. Type /post-orders to start again."
-    if reply.strip().upper() == "NO":
+    if reply.strip().upper() in {"NO", "CANCEL"}:
         clear_wizard()
         return "Ingestion cancelled. Nothing was written to vault."
     community = str(state.get("community", ""))
