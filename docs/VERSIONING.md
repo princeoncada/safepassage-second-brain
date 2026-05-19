@@ -111,17 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.18.0-stable |
-| Phase | Phase 4.18.0 |
-| State | stable |
+| Version | 4.18.1-alpha |
+| Phase | Patch |
+| State | alpha |
 | Date | 2026-05-19 |
-| Commit | master |
-| Summary | community-aware kiosk call flow synthesis - VALIDATED |
+| Commit | uncommitted |
+| Summary | fix GLEN QA tip wording — SP Guard active access framing |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.18.1-alpha | Patch | alpha | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing |
 | 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
 | 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
 | 4.17.0-stable | Phase 4.17.0 | stable | 2026-05-19 | quick reply hints in pipe + FUTURE_PLANS.md - VALIDATED |
