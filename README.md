@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.17.0-alpha |
-| Last Stable | 4.16.0-stable (Phase 4.16.0) |
-| Status | alpha |
+| Current | 4.17.0-stable |
+| Last Stable | 4.17.0-stable (Phase 4.17.0) |
+| Status | stable |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.16.0-stable conflict detection and multi-turn /post-orders wizard support. Current implementation is Phase 4.17.0-alpha quick reply hints in Open WebUI pipe plus `docs/FUTURE_PLANS.md`, pending manual validation:
+Working proof of work through Phase 4.17.0-stable quick reply hints in Open WebUI pipe plus `docs/FUTURE_PLANS.md`:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -51,7 +51,7 @@ Working proof of work through Phase 4.16.0-stable conflict detection and multi-t
 - Phase 4.14.0 [4.14.0-stable] - Incremental indexing with --files flag: stable
 - Phase 4.15.0 [4.15.0-stable] - Streaming response with /ask/stream SSE endpoint + Open WebUI pipe: stable
 - Phase 4.16.0 [4.16.0-stable] - Conflict detection + multi-turn wizard UX for /post-orders: stable
-- Phase 4.17.0 [4.17.0-alpha] - Quick reply hints in Open WebUI pipe + FUTURE_PLANS.md: alpha
+- Phase 4.17.0 [4.17.0-stable] - Quick reply hints in Open WebUI pipe + FUTURE_PLANS.md: stable
 
 Current architecture:
 
@@ -123,7 +123,7 @@ Phase 4.15.0-stable adds live streaming for Open WebUI. `/ask/stream` returns Se
 
 Phase 4.16.0-stable adds a guided `/post-orders` wizard and conflict preview. Typing `/post-orders` alone starts a two-step community/text flow, while the existing one-line `/post-orders [alias] [text]` shortcut remains available. Post-order previews now scan active vault post-order metadata for near-topic conflicts and ask KEEP NEW or KEEP OLD before allowing the normal YES/NO ingestion confirmation.
 
-Phase 4.17.0-alpha adds quick reply hints in `openwebui/pipe.py` for prompt-for-input responses. The pipe appends bold reply options for community alias prompts, YES/NO confirmations, and KEEP NEW/KEEP OLD conflict prompts. It also introduces `docs/FUTURE_PLANS.md` as the living backlog for future phases and unimplemented ideas.
+Phase 4.17.0-stable adds quick reply hints in `openwebui/pipe.py` for prompt-for-input responses. The pipe appends bold reply options for community alias prompts, YES/NO confirmations, and KEEP NEW/KEEP OLD conflict prompts. It also introduces `docs/FUTURE_PLANS.md` as the living backlog for future phases and unimplemented ideas.
 
 Dashboard endpoints:
 
