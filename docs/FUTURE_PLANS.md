@@ -5,7 +5,7 @@ Completed items are struck through. Every phase should update this file —
 cross off completed items and add new ideas as they arise.
 
 Last updated: 2026-05-19
-Current stable version: 4.17.0-stable
+Current stable version: 4.17.1-stable
 
 ---
 
