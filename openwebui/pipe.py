@@ -28,7 +28,7 @@ def _detect_quick_replies(answer: str) -> list[str]:
 
     # Wizard step 1 - community alias prompt
     if "Reply with your community alias" in text:
-        return ["SR", "CBK", "MON", "GWT", "PBM", "NO"]
+        return ["SR", "CBK", "MON", "GWT", "PBM", "CANCEL"]
 
     # Wizard step 2 - paste text prompt (free text input, no hint needed)
     if "Paste the post order text" in text:
