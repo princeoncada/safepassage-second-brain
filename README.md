@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.21.0-stable |
+| Current | 4.22.0-alpha |
 | Last Stable | 4.21.0-stable (Phase 4.21.0) |
-| Status | stable |
+| Status | alpha |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through 4.21.0-stable handoff readiness:
+Working proof of work through 4.22.0-alpha architecture safety:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -60,6 +60,7 @@ Working proof of work through 4.21.0-stable handoff readiness:
 - Phase 4.19.0 [4.19.0-stable] - Operational trust query/answer audit log: stable
 - Phase 4.20.0 [4.20.0-stable] - Model preloading + audit log source deduplication: stable
 - Phase 4.21.0 [4.21.0-stable] - Handoff readiness documentation and session log automation: stable - VALIDATED
+- Phase 4.22.0 [4.22.0-alpha] - Architecture Safety: Separation of Concerns: alpha
 
 Current architecture:
 
@@ -140,6 +141,10 @@ Phase 4.18.0-stable enriches primary kiosk call flow SOPs with full script dialo
 Phase 4.21.0-stable adds handoff readiness documentation and tooling:
 `docs/ARCHITECTURE.md`, `docs/VAULT_SCHEMA.md`,
 `docs/ONBOARDING.md`, and `automation/generate_session_log.py`.
+
+Phase 4.22.0-alpha extracts the RAG retrieval, context, and answer
+helpers from `rag/scripts/answer_vault.py`, splits API ingest routing
+from query orchestration, and adds soft vault frontmatter validation.
 
 Dashboard endpoints:
 
