@@ -111,18 +111,18 @@ Every version change must be applied consistently across all four locations. Par
 
 | Field | Value |
 | --- | --- |
-| Version | 4.18.2-alpha |
+| Version | 4.18.2-stable |
 | Phase | Patch |
-| State | alpha |
+| State | stable |
 | Date | 2026-05-19 |
-| Commit | uncommitted |
-| Summary | prevent DeepSeek inline Sources block in answers |
+| Commit | master |
+| Summary | prevent DeepSeek inline Sources block in answers - VALIDATED |
 
 ## Complete Version History
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.18.2-alpha | Patch | alpha | 2026-05-19 | prevent DeepSeek inline Sources block in answers |
+| 4.18.2-stable | Patch | stable | 2026-05-19 | prevent DeepSeek inline Sources block in answers - VALIDATED |
 | 4.18.1-stable | Patch | stable | 2026-05-19 | fix GLEN QA tip wording — SP Guard active access framing - VALIDATED |
 | 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
 | 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
@@ -187,9 +187,12 @@ When continuing this project, an AI agent MUST:
 
 ## Next Phase
 
-Current working version: 4.18.2-alpha
+Current working version: 4.18.2-stable
 Current working phase: Patch 4.18.2 — prevent DeepSeek inline Sources block in answers
-Validation status: alpha; not yet validated.
-Next phase: validate Patch 4.18.2.
+Validation status: stable; validated and committed to master.
+Next phase: see docs/FUTURE_PLANS.md — next planned is Phase 4.19.0
+session log automation, or an optional Patch 4.18.3 to restore clean
+CLI citation display (update citation parser to match both [N] and
+[Source N] formats).
 
 Latest checkpoint: `docs/SESSION_LOG/2026-05-18-session-01.md` records the 4.12.1 through 4.13.3-stable session handoff and next action. No version change was made for that checkpoint documentation-only update.
