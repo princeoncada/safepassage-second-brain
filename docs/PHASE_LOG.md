@@ -2,7 +2,8 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
-| 4.22.0-alpha | Phase 4.22.0 | alpha | 2026-05-20 | architecture safety - separation of concerns |
+| 4.23.0-alpha | Phase 4.23.0 | alpha | 2026-05-20 | retrieval correctness tests + xyzzy raw distance floor fix |
+| 4.22.0-stable | Phase 4.22.0 | stable | 2026-05-20 | architecture safety - separation of concerns - VALIDATED |
 | 4.21.0-stable | Phase 4.21.0 | stable | 2026-05-20 | handoff readiness - architecture diagram, vault schema, onboarding guide, session log automation - VALIDATED |
 | 4.20.0-stable | Phase 4.20.0 | stable | 2026-05-19 | model preloading + audit log source deduplication - VALIDATED |
 | 4.19.0-stable | Phase 4.19.0 | stable | 2026-05-19 | operational trust — query/answer audit log - VALIDATED |
@@ -51,11 +52,59 @@
 
 # Phase Log
 
-## Phase 4.22.0 - Architecture Safety: Separation of Concerns
+## Phase 4.23.0 - Developer Scalability: Retrieval Correctness Tests
 
 Status: alpha
 
-Version: 4.22.0-alpha
+Version: 4.23.0-alpha
+
+Date: 2026-05-20
+
+Purpose:
+
+Add targeted retrieval confidence protection for nonsense queries and
+introduce a pytest suite plus GitHub Actions CI coverage for retrieval
+correctness, community resolution, and confidence thresholds.
+
+Bug fix:
+- `rag/retrieval.py`: `retrieval_assessment()` now checks the best raw
+  ChromaDB vector distance before rerank-score inspection. If the best
+  raw distance exceeds `minimum_raw_distance_floor`, the assessment
+  refuses with confidence `none`.
+- `rag/config/retrieval_config.json`: adds
+  `minimum_raw_distance_floor: 0.65`.
+
+New files:
+- tests/__init__.py
+- tests/conftest.py
+- tests/test_retrieval_correctness.py
+- tests/test_community_resolution.py
+- tests/test_confidence_thresholds.py
+- .github/workflows/ci.yml
+
+Validation checklist:
+- [ ] Syntax OK: rag/retrieval.py, tests/conftest.py,
+      tests/test_retrieval_correctness.py,
+      tests/test_community_resolution.py,
+      tests/test_confidence_thresholds.py
+- [ ] retrieval_assessment() remains backward-compatible when config is
+      omitted
+- [ ] retrieval_config.json includes minimum_raw_distance_floor = 0.65
+      and weak_context_distance_threshold remains 0.95
+- [ ] Community resolution unit tests pass without ChromaDB
+- [ ] Confidence threshold no-chunks unit test passes without ChromaDB
+- [ ] Live ChromaDB retrieval correctness tests pass when index exists
+- [ ] xyzzy nonsense query refuses instead of returning strong
+      confidence
+- [ ] Real operational SR kiosk query does not over-refuse
+- [ ] GitHub Actions CI syntax check and unit-only test subset pass
+- [ ] No vault files or protected runtime files changed
+
+## Phase 4.22.0 - Architecture Safety: Separation of Concerns
+
+Status: PASSED - stable
+
+Version: 4.22.0-stable
 
 Date: 2026-05-20
 
@@ -102,6 +151,22 @@ Validation checklist:
 - [ ] validate_frontmatter() warnings are stderr-only and never abort
       ingestion
 - [ ] No protected files changed
+
+### Validation Record - 4.22.0-stable
+
+Date: 2026-05-20
+
+All checks passed. Committed to master.
+
+- [x] 6 new focused modules created, all syntax-clean
+- [x] No circular imports across new module graph
+- [x] answer_vault.py CLI preserved - full retrieval output correct
+- [x] POST /ask: SR post orders correct - no behavior regression
+- [x] POST /ask (/post-orders): wizard prompt correct through thin
+      service.py router
+- [x] vault_schema.validate_frontmatter: returns [] for valid input
+- [x] api/service.py: 26 lines
+- [x] No protected files modified
 
 ## Phase 4.21.0 - Handoff Readiness
 
