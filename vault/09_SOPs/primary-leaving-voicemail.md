@@ -19,17 +19,19 @@ version: "1.0"
 
 # Primary Leaving Voicemail
 
-## Summary
+## Voicemail Script
 
-Leave a voicemail if the resident does not answer.
+> "Hi, I'm ___, with SafePassage from the gate on a recorded line. If you are expecting [guest/vendor], please call us back for their access."
 
-Follow the current voicemail script and keep the message concise and professional.
+## After Leaving Voicemail
+
+→ Process Deny Entry, reason: Res No Answer
+→ Go back to the Guest/Vendor and advise them of the situation
 
 ## Source References
 
 - Source Document: NEW SAFEPASSAGE KIOSK TRAINING SCRIPT.pdf
-- Source Section: Voicemail
-- Source Page: unknown
+- Source Section: Leaving Voicemail
 - Authority Note: Primary workflow is default guidance. Community post orders and announcements override this when applicable.
 
 ## Authority Note

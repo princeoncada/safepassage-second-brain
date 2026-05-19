@@ -19,23 +19,24 @@ version: "1.0"
 
 # Primary Calling Resident For Access
 
-## Summary
+## Resident Call Script
 
-Use the recorded line script when calling the resident.
+> "Hi, I'm ___, with SafePassage from the gate on a recorded line. Are you expecting [NAME of VENDOR/VISITOR]?"
 
-Ask whether the resident is expecting the visitor or vendor.
+## If Resident Approves Access
 
-Ask how many access days should be added when access is approved.
+> "How many days of access?"
+→ Add name, add access, send visitor confirmation
+→ Return to visitor and continue call flow
 
-Add the visitor or vendor name and approved access details.
+## If Resident Declines Access
 
-Deny entry if the resident declines access.
+→ Perform deny entry (see primary-deny-entry)
 
 ## Source References
 
 - Source Document: NEW SAFEPASSAGE KIOSK TRAINING SCRIPT.pdf
-- Source Section: Calling Resident
-- Source Page: unknown
+- Source Section: Calling Resident For Access
 - Authority Note: Primary workflow is default guidance. Community post orders and announcements override this when applicable.
 
 ## Authority Note

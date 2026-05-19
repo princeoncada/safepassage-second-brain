@@ -19,19 +19,29 @@ version: "1.0"
 
 # Primary Deny Entry
 
-## Summary
+## If Resident No Answer — Deny Entry Script
 
-Use the deny-entry script when the resident does not answer or when the resident is not expecting the visitor or vendor.
+> "I tried to call the resident for your access unfortunately, they are not answering, can you try calling the resident for your access instead? And in the meantime, please make a U-Turn so I can assist the car behind you."
 
-Explain the denial clearly and professionally.
+## If Resident Not Expecting — Deny Entry Script
 
-Do not open the gate when access is not approved.
+> "I called the resident and they said they are not expecting you at the moment. Can you call the resident to clarify your access instead? And in the meantime, please make a U-Turn so I can assist the car behind you."
+
+## Deny Entry Form Fields
+
+Complete the deny entry form with the following fields:
+1. Community name and Address
+2. Confirmed Resident name
+3. Confirmed Visitor/Company Name
+4. Did you ask for a mobile passcode
+5. Did you refresh the list
+6. Checked the COMMUNITY APPROVED LIST
+7. Communication Method (e.g., Res no answer, advised guest to call res and perform U-turn)
 
 ## Source References
 
 - Source Document: NEW SAFEPASSAGE KIOSK TRAINING SCRIPT.pdf
-- Source Section: Deny Entry
-- Source Page: unknown
+- Source Section: Informing Guest/Vendor of Deny Entry; Deny Entry Form
 - Authority Note: Primary workflow is default guidance. Community post orders and announcements override this when applicable.
 
 ## Authority Note

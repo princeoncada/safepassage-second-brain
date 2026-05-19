@@ -19,19 +19,15 @@ version: "1.0"
 
 # Primary No Physical ID
 
-## Summary
+## No Physical ID Script
 
-Default workflow says to deny entry when the guest or vendor has no physical ID.
-
-Use the no physical ID reason when recording the denial.
-
-Always check post orders and announcements for community-specific ID rules or approved exceptions.
+> "Unfortunately, we cannot let you in if you do not have physical ID, please make a U-turn so we can assist the car behind you."
+→ Process Deny Entry, reason: NO Physical ID
 
 ## Source References
 
 - Source Document: NEW SAFEPASSAGE KIOSK TRAINING SCRIPT.pdf
-- Source Section: No Physical ID
-- Source Page: unknown
+- Source Section: Guest Do Not Have Physical ID
 - Authority Note: Primary workflow is default guidance. Community post orders and announcements override this when applicable.
 
 ## Authority Note
