@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
 | 4.17.0-stable | Phase 4.17.0 | stable | 2026-05-19 | quick reply hints in Open WebUI pipe + FUTURE_PLANS.md - VALIDATED |
 | 4.16.0-stable | Phase 4.16.0 | stable | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
 | 4.15.0-stable | Phase 4.15.0 | stable | 2026-05-18 | streaming response - /ask/stream SSE endpoint + Open WebUI pipe - VALIDATED |
@@ -85,6 +86,24 @@ due to stale in-memory wizard state from prior test session.
 
 Non-blocking: quick reply hints in Open WebUI chat not visually
 validated (requires live pipe update); logic confirmed by code review.
+
+## Patch 4.17.1 — Duplicate sources + community context bleed
+
+Status: PASSED — stable
+
+Version: 4.17.1-stable
+
+Date: 2026-05-19
+
+Fixes:
+
+- `openwebui/pipe.py`: suppress duplicate Sources footer when inline citations present in answer text.
+- `api/service.py`: skip history community resolution for general queries.
+
+Validation:
+
+- [x] General query with community history: retrieves correctly
+- [x] Syntax OK both files
 
 ## Phase 4.16.0 Conflict Detection + Multi-Turn Wizard UX for /post-orders
 
