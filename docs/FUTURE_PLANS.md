@@ -5,12 +5,13 @@ Completed items are struck through. Every phase should update this file —
 cross off completed items and add new ideas as they arise.
 
 Last updated: 2026-05-19
-Current stable version: 4.20.0-alpha
+Current stable version: 4.20.0-stable
 
 ---
 
 ## Completed
 
+- ~~Phase 4.20.0 — model preloading + audit log source deduplication~~
 - ~~Phase 4.19.0 — operational trust query/answer audit log~~
 - ~~Patch 4.18.3 — restore clean CLI citation display ([Source N] regex fix)~~
 - ~~Phase 4.18.0 — Community-aware kiosk call flow synthesis (SOP enrichment + call flow routing + merged output)~~
@@ -24,7 +25,7 @@ Current stable version: 4.20.0-alpha
 
 ## In Progress
 
-- Phase 4.20.0 — model preloading + audit log source deduplication
+- None
 
 ---
 
