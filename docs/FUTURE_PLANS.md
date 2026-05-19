@@ -5,8 +5,8 @@ Completed items are struck through. Every phase should update this file —
 cross off completed items and add new ideas as they arise.
 
 Last updated: 2026-05-20
-Current stable version: 4.20.0-stable
-Current working version: 4.21.0-stable
+Current stable version: 4.21.0-stable
+Current working version: 4.22.0-alpha
 
 ---
 
@@ -27,13 +27,7 @@ Current working version: 4.21.0-stable
 
 ## In Progress
 
-- None
-
----
-
-## Planned
-
-### Phase 4.22.0 — Architecture Safety: Separation of Concerns
+### Phase 4.22.0 - Architecture Safety: Separation of Concerns
 
 Priority: Architecture safety (P4)
 
@@ -75,6 +69,8 @@ regression testing after each file move. Do not do as a single
 big-bang rewrite.
 
 ---
+
+## Planned
 
 ### Phase 4.23.0 — Developer Scalability: Retrieval Correctness Tests
 
