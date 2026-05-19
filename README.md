@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.16.0-alpha |
-| Last Stable | 4.15.0-stable (Phase 4.15.0) |
-| Status | alpha |
+| Current | 4.16.0-stable |
+| Last Stable | 4.16.0-stable (Phase 4.16.0) |
+| Status | stable |
 
 ## Source Of Truth
 
@@ -16,8 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through Phase 4.15.0-stable streaming response support with `/ask/stream` and Open WebUI pipe.
-Phase 4.16.0-alpha conflict detection and multi-turn /post-orders wizard support is implemented and pending manual validation:
+Working proof of work through Phase 4.16.0-stable conflict detection and multi-turn /post-orders wizard support:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -51,7 +50,7 @@ Phase 4.16.0-alpha conflict detection and multi-turn /post-orders wizard support
 - Phase 4.13.4 [4.13.4-stable] - Fix double sources display in CLI output: stable
 - Phase 4.14.0 [4.14.0-stable] - Incremental indexing with --files flag: stable
 - Phase 4.15.0 [4.15.0-stable] - Streaming response with /ask/stream SSE endpoint + Open WebUI pipe: stable
-- Phase 4.16.0 [4.16.0-alpha] - Conflict detection + multi-turn wizard UX for /post-orders: alpha
+- Phase 4.16.0 [4.16.0-stable] - Conflict detection + multi-turn wizard UX for /post-orders: stable
 
 Current architecture:
 
@@ -121,7 +120,7 @@ Phase 4.14.0-stable adds incremental vault indexing. `rag/scripts/index_vault.py
 
 Phase 4.15.0-stable adds live streaming for Open WebUI. `/ask/stream` returns Server-Sent Events, forwarding DeepSeek tokens as they arrive and ending with structured citations, confidence, and warnings. `openwebui/pipe.py` is a ready-to-install Open WebUI pipe that calls the streaming endpoint and falls back to `/ask` if streaming fails. The original `/ask` endpoint remains unchanged.
 
-Phase 4.16.0-alpha adds a guided `/post-orders` wizard and conflict preview. Typing `/post-orders` alone starts a two-step community/text flow, while the existing one-line `/post-orders [alias] [text]` shortcut remains available. Post-order previews now scan active vault post-order metadata for near-topic conflicts and ask KEEP NEW or KEEP OLD before allowing the normal YES/NO ingestion confirmation.
+Phase 4.16.0-stable adds a guided `/post-orders` wizard and conflict preview. Typing `/post-orders` alone starts a two-step community/text flow, while the existing one-line `/post-orders [alias] [text]` shortcut remains available. Post-order previews now scan active vault post-order metadata for near-topic conflicts and ask KEEP NEW or KEEP OLD before allowing the normal YES/NO ingestion confirmation.
 
 Dashboard endpoints:
 
