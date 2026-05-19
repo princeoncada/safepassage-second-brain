@@ -1,6 +1,6 @@
 # AI Handoff
 
-## Current Version: 4.17.0-stable
+## Current Version: 4.17.1-stable
 
 ## Current Phase
 
@@ -11,6 +11,13 @@ PHASE 4.17.0 [4.17.0-stable] - Quick reply hints in Open WebUI pipe + FUTURE_PLA
 Status: VALIDATED and STABLE — committed to master 2026-05-19.
 
 Phase 4.17.0 adds quick reply hints in `openwebui/pipe.py`. `_detect_quick_replies()` scans the answer text for known sentinel phrases and appends a formatted hint line with bold quick-reply options for prompt-for-input responses. The hint is pipe-only; there are no backend changes. This phase also introduces `docs/FUTURE_PLANS.md` as the living project backlog, with completed items struck through and future ideas kept in one durable document.
+
+## Patch 4.17.1
+
+Z patch on 4.17.0-stable. Two fixes:
+
+1. `openwebui/pipe.py`: suppress Sources footer when answer contains inline `[N]` citations to prevent duplicate display.
+2. `api/service.py`: added `_is_general_query()` - skips history community resolution when query contains general signals, preventing prior community context from bleeding into unrelated queries.
 
 ## Phase 4.16.0 [4.16.0-stable]
 
@@ -166,6 +173,7 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase 4.15.0-stable streaming response support through `/ask/stream`, `call_deepseek_stream()`, `stream_answer_question()`, and `openwebui/pipe.py`.
 - Phase 4.16.0-stable /post-orders wizard and conflict preview support in `api/ingest.py` and `api/service.py`.
 - Phase 4.17.0-stable quick reply hints in `openwebui/pipe.py` and living backlog at `docs/FUTURE_PLANS.md`.
+- Patch 4.17.1-stable duplicate Sources footer suppression in `openwebui/pipe.py` and general-query community bleed guard in `api/service.py`.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
