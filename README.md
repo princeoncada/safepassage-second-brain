@@ -6,9 +6,9 @@ A local-first AI-powered operational knowledge system for workflows, SOPs, post 
 
 | Field | Value |
 | --- | --- |
-| Current | 4.21.0-alpha |
-| Last Stable | 4.20.0-stable (Phase 4.20.0) |
-| Status | alpha |
+| Current | 4.21.0-stable |
+| Last Stable | 4.21.0-stable (Phase 4.21.0) |
+| Status | stable |
 
 ## Source Of Truth
 
@@ -16,7 +16,7 @@ Markdown files in `vault/`.
 
 ## Current Status
 
-Working proof of work through 4.21.0-alpha handoff readiness:
+Working proof of work through 4.21.0-stable handoff readiness:
 
 - Phase 2 [2.0.0-stable] - Minimal POW ingestion: passed
 - Phase 3A [3.0.0-stable] - retrieval: passed
@@ -59,7 +59,7 @@ Working proof of work through 4.21.0-alpha handoff readiness:
 - Patch 4.18.3 [4.18.3-stable] - Restore clean CLI citation display: stable
 - Phase 4.19.0 [4.19.0-stable] - Operational trust query/answer audit log: stable
 - Phase 4.20.0 [4.20.0-stable] - Model preloading + audit log source deduplication: stable
-- Phase 4.21.0 [4.21.0-alpha] - Handoff readiness documentation and session log automation: alpha
+- Phase 4.21.0 [4.21.0-stable] - Handoff readiness documentation and session log automation: stable - VALIDATED
 
 Current architecture:
 
@@ -137,7 +137,7 @@ Patch 4.17.1-stable suppresses duplicate Open WebUI Sources footers when answers
 
 Phase 4.18.0-stable enriches primary kiosk call flow SOPs with full script dialogue, adds a GLEN registered-tag QA tip, marks call flow queries in deterministic intent parsing, retrieves global SOPs alongside community-specific post orders for call flow questions, and adds prompt rules for synthesizing one integrated community-aware kiosk call flow.
 
-Phase 4.21.0-alpha adds handoff readiness documentation and tooling:
+Phase 4.21.0-stable adds handoff readiness documentation and tooling:
 `docs/ARCHITECTURE.md`, `docs/VAULT_SCHEMA.md`,
 `docs/ONBOARDING.md`, and `automation/generate_session_log.py`.
 
