@@ -41,6 +41,7 @@ def load_retrieval_config() -> dict[str, Any]:
                 "QA Notes": 0.06,
             },
             "weak_context_distance_threshold": 0.95,
+            "minimum_raw_distance_floor": 0.65,
             "primary_workflow_default_threshold": 1.1,
         }
     with CONFIG_PATH.open("r", encoding="utf-8") as file:
@@ -222,9 +223,23 @@ def retrieval_assessment(
     threshold: float,
     primary_workflow_default_threshold: float,
     is_default_query: bool,
+    config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    if config is None:
+        config = {}
     if not chunks:
         return {"confidence": "none", "refuse": True, "reason": "no chunks returned"}
+    floor = float(config.get("minimum_raw_distance_floor", 0.65))
+    best_raw = min(float(chunk.get("distance", 999.0)) for chunk in chunks)
+    if best_raw > floor:
+        return {
+            "confidence": "none",
+            "refuse": True,
+            "reason": (
+                f"best raw vector distance {best_raw:.4f} exceeds floor {floor} "
+                f"- no semantically relevant sources found"
+            ),
+        }
     active_temporal = [chunk for chunk in chunks if chunk.get("temporal_state") == "active"]
     noncurrent_temporal = [chunk for chunk in chunks if chunk.get("temporal_state") in {"expired", "pending", "not_yet_active"}]
     if noncurrent_temporal and not active_temporal:
@@ -642,5 +657,6 @@ def retrieve_chunks(query: str, top_k: int, include_low_value_sections: bool) ->
         weak_threshold,
         primary_workflow_default_threshold,
         bool(hints.get("is_default_workflow_query")),
+        config,
     )
     return chunks, hints, assessment
