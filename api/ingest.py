@@ -11,6 +11,8 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
+from rag.vault_schema import validate_frontmatter
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 INGESTION_DIR = REPO_ROOT / "automation" / "ingestion"
@@ -281,6 +283,20 @@ def write_temp_post_order_batch(community: str, code: str, rules: list[dict[str,
         "",
     ]
     for rule in rules:
+        frontmatter_dict = {
+            "type": "post_order",
+            "authority_level": "post_order",
+            "community": community,
+            "community_code": code,
+            "scope_key": rule["type"].lower(),
+            "status": "active",
+            "batch_date": batch_date,
+            "effective_date": batch_date,
+            "rule_hash": rule.get("rule_hash", ""),
+        }
+        warnings = validate_frontmatter(frontmatter_dict)
+        if warnings:
+            print(f"[SCHEMA WARNING] {warnings}", file=sys.stderr)
         lines.extend(
             [
                 rule["date"],
@@ -309,6 +325,19 @@ def write_temp_announcement_batch(community: str, code: str, announcements: list
         "IMPORTANT REMINDERS:",
     ]
     for item in announcements:
+        frontmatter_dict = {
+            "type": "announcement",
+            "authority_level": "announcement",
+            "community": community,
+            "community_code": code,
+            "status": "active",
+            "category": item.get("category", ""),
+            "batch_date": today,
+            "effective_date": today,
+        }
+        warnings = validate_frontmatter(frontmatter_dict)
+        if warnings:
+            print(f"[SCHEMA WARNING] {warnings}", file=sys.stderr)
         lines.append(f"- {code} {item['text']}")
     temp_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     return temp_path
