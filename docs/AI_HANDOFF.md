@@ -1,11 +1,25 @@
 # AI Handoff
 
-## Current Version: 4.19.0-stable
+## Current Version: 4.20.0-alpha
 
 ## Current Phase
 
-Phase 4.19.0 [4.19.0-stable] — operational trust audit log — validated
-and stable.
+Phase 4.20.0 [4.20.0-alpha] — model preloading + audit source
+deduplication — in progress.
+
+## Phase 4.20.0 [4.20.0-alpha]
+
+Status: IN PROGRESS — not yet validated.
+
+Performance fix: SentenceTransformer(MODEL_NAME) moved from inside
+retrieve_chunks() to module level in rag/scripts/answer_vault.py and
+from inside main() to module level in rag/scripts/query_vault.py.
+Model now loads once at API server startup, cached for all subsequent
+requests. Eliminates per-query 103-weight load.
+
+Bug fix (from 4.19.0 validation): sources_cited in api/audit.py
+wrapped with list(dict.fromkeys()) to deduplicate at file level.
+Multiple chunks cited from the same file now appear as one path.
 
 ## Phase 4.19.0 [4.19.0-stable]
 
@@ -309,8 +323,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next immediate: Phase 4.20.0 — model preloading + audit log source
-deduplication.
+Current: Phase 4.20.0-alpha in progress. Run validation after Codex completes.
 
 Full roadmap (in priority order):
 - 4.20.0: Speed — model preloading + audit source dedup
