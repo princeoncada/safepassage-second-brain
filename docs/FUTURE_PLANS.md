@@ -30,69 +30,141 @@ Current stable version: 4.19.0-stable
 
 ## Planned
 
-### Near-term (next 1–3 phases)
+### Phase 4.20.0 — Speed: Model Preloading + Audit Log Deduplication
 
-- Phase 4.20.0 — model preloading (move SentenceTransformer init to
-  module level in answer_vault.py and query_vault.py; eliminates
-  per-query weight load at the API layer)
+Priority: Speed (P2)
 
-### UX / Open WebUI
+`SentenceTransformer(MODEL_NAME)` is initialized inside
+`answer_question()` in `answer_vault.py` on every single API request,
+causing the 103-weight load visible on every query. Move to module
+level in both `answer_vault.py` and `query_vault.py` so the model
+loads once at server startup and is cached for all subsequent requests.
 
-- Action Function button UX (future)
-  Replace quick reply hints with genuine tappable buttons using Open WebUI's
-  Action Function system. Requires a separate `openwebui/action.py` file
-  installed alongside the pipe. Uses `__event_call__` for two-way confirmation
-  dialogs. Deferred because it requires a separate install step and is more
-  complex than quick reply hints.
+Also bundled (from 4.19.0 validation observation):
+- Deduplicate `sources_cited` in `api/audit.py` at the file level.
+  Currently cited_chunks with multiple sections from the same file
+  appear as duplicate paths. Add `list(dict.fromkeys(...))` to
+  produce unique file paths only.
 
-- Community alias autocomplete (future)
-  When typing `/post-orders` in Open WebUI, show alias suggestions as the
-  operator types. Requires Open WebUI frontend customization — not achievable
-  via pipe alone.
+Files to change:
+- rag/scripts/answer_vault.py
+- rag/scripts/query_vault.py
+- api/audit.py (deduplication fix)
+- docs (all four versioning locations + FUTURE_PLANS.md)
+- api/version.py
 
-### Ingestion / Vault
+---
 
-- `/post-orders` batch input (future)
-  Allow pasting multiple dated post order blocks in a single ingestion.
-  Currently each date block is parsed but only one community per command.
-  Future: support multi-community batches in a single paste.
+### Phase 4.21.0 — Handoff Readiness
 
-- Announcement expiry tracking (future)
-  Auto-archive announcements past their event date. Currently announcements
-  stay active indefinitely unless manually archived.
+Priority: Handoff readiness (P3)
 
-- Vault integrity check command (future)
-  `/vault-check` slash command that scans for orphaned rules, duplicate hashes,
-  missing frontmatter fields, and reports any inconsistencies without modifying
-  anything.
+Make the repository understandable and operable by someone other
+than the original developer.
 
-### Retrieval / Answering
+Scope:
+- Architecture diagram (Mermaid) in docs/ showing the full data
+  flow: vault → indexer → ChromaDB → answer_vault → service → pipe
+- Formal vault schema documentation: every frontmatter field defined
+  with type, required/optional, valid values, and authority hierarchy
+- Onboarding guide: setup steps, environment variables, how to
+  ingest new post orders, how to validate, how to deploy
+- Session log automation: Python script that reads git log for the
+  current day and PHASE_LOG.md validation records, then generates a
+  SESSION_LOG draft file — reduces manual session checkpoint effort
 
-- Query intent confidence tuning (future)
-  The rerank threshold (0.95) and refusal logic were hand-tuned. A future
-  phase could add a calibration script that tests thresholds against a
-  labelled query set and reports precision/recall.
+Files to change:
+- docs/ARCHITECTURE.md (new)
+- docs/VAULT_SCHEMA.md (new)
+- docs/ONBOARDING.md (new)
+- automation/generate_session_log.py (new)
+- docs (all four versioning locations + FUTURE_PLANS.md)
+- api/version.py
 
-- Multi-community queries (future)
-  Currently each query resolves to one community. Future: detect queries that
-  span multiple communities ("what is the ID policy for SR and CBK?") and
-  retrieve from both.
+---
 
-### Infrastructure
+### Phase 4.22.0 — Architecture Safety: Separation of Concerns
 
-- Production deployment (X = 1 milestone)
-  Deploy to a cloud server so VA team accesses remotely instead of localhost.
-  Replace ChromaDB local storage with a managed vector database.
-  Add per-user authentication. This is the X = 1 version bump milestone.
+Priority: Architecture safety (P4)
 
-- Model load optimization (future)
-  Keep the SentenceTransformer model loaded as a long-lived FastAPI background
-  service rather than loading it as a subprocess on each query. Reduces
-  per-query latency by ~1–2 seconds.
+Address the main architectural smell identified in external senior
+engineering review: services acting multiple roles with no clear
+domain boundaries.
 
-- Automated vault backup (future)
-  Daily git commit of vault/ changes to a separate backup branch or remote.
-  Currently relies on manual commits.
+Scope:
+- Separate ingestion from querying in api/service.py. The file
+  currently owns wizard state, conflict detection, ingestion routing,
+  retrieval routing, answer formatting, and community resolution.
+  Extract ingestion orchestration into api/ingest_service.py and
+  retrieval/answer into api/query_service.py.
+- Extract retrieval pipeline from rag/scripts/answer_vault.py monolith.
+  answer_vault.py currently handles retrieval, reranking, context
+  assembly, prompt building, model calling, citation parsing, and
+  source formatting. Extract into focused modules:
+  rag/retrieval.py (retrieve_chunks, rerank),
+  rag/context.py (build_context_packet),
+  rag/answer.py (call_deepseek, strip_sources, cited_source_ids).
+- Formalize vault frontmatter metadata model with Pydantic. Add
+  validation at ingest time so malformed frontmatter raises a clear
+  error rather than silently producing wrong retrieval results.
+
+Files to change:
+- api/service.py (reduced)
+- api/query_service.py (new)
+- api/ingest_service.py (new)
+- rag/retrieval.py (new, extracted from answer_vault.py)
+- rag/context.py (new, extracted)
+- rag/answer.py (new, extracted)
+- rag/scripts/answer_vault.py (reduced to orchestration only)
+- rag/vault_schema.py (new Pydantic models)
+- docs (all four versioning locations + FUTURE_PLANS.md)
+- api/version.py
+
+Note: This phase requires careful incremental extraction with full
+regression testing after each file move. Do not do as a single
+big-bang rewrite.
+
+---
+
+### Phase 4.23.0 — Developer Scalability: Retrieval Correctness Tests
+
+Priority: Developer scalability (P5)
+
+Add automated tests around retrieval correctness — the highest-risk
+behavior in the system since wrong answers directly influence VA
+access decisions.
+
+Scope:
+- Retrieval correctness test suite: assert that known queries return
+  expected sources, expected confidence levels, and expected
+  community resolution. Tests run against the live ChromaDB index.
+- Refuse/weak confidence tests: assert that queries with no meaningful
+  vault match return weak or none confidence and do not give
+  confident AI answers. Addresses the 4.19.0 validation observation
+  where a nonsense query ("xyzzy unknown community gate protocol")
+  returned strong confidence and a full AI answer.
+- Community resolution tests: assert that community alias resolution
+  works correctly for known aliases (SIERRA → Sierra Ridge,
+  GLEN → The Glen (Tamiment), etc.).
+- CI pipeline: basic GitHub Actions workflow that runs tests on push
+  to master.
+
+Tracked from 4.19.0 validation:
+- xyzzy nonsense query returned [AI] at strong confidence instead of
+  refusing. Fix: add retrieval correctness threshold test that asserts
+  queries with no relevant vault content return confidence=weak or
+  confidence=none. If the model currently scores nonsense queries as
+  strong, adjust the confidence threshold or add a minimum semantic
+  similarity floor before allowing AI answer generation.
+
+Files to change:
+- tests/ (new directory)
+- tests/test_retrieval_correctness.py (new)
+- tests/test_community_resolution.py (new)
+- tests/test_confidence_thresholds.py (new)
+- .github/workflows/ci.yml (new)
+- docs (all four versioning locations + FUTURE_PLANS.md)
+- api/version.py
 
 ---
 
