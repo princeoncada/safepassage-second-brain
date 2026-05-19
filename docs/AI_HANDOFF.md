@@ -1,10 +1,16 @@
 # AI Handoff
 
-## Current Version: 4.17.1-stable
+## Current Version: 4.18.0-stable
 
 ## Current Phase
 
-PHASE 4.17.0 [4.17.0-stable] - Quick reply hints in Open WebUI pipe + FUTURE_PLANS.md introduced - validated and stable.
+PHASE 4.18.0 [4.18.0-stable] — Community-aware kiosk call flow synthesis — validated and stable.
+
+## Phase 4.18.0 [4.18.0-stable]
+
+Status: VALIDATED and STABLE — committed to master 2026-05-19.
+
+Phase 4.18.0 adds community-aware kiosk call flow synthesis. The six primary kiosk SOP vault files are enriched with full verbatim call flow scripts and dialogue from the SafePassage Kiosk Training Script. A new GLEN QA tip is added to vault/04_QA_Rules/ for registered-tag access. The query intent parser gains an `is_call_flow_query` flag propagated from query_topics.json. answer_vault.py explicitly fetches global community SOP documents when a call flow query is detected. answer_from_context.md adds call flow synthesis instructions that produce a merged community-specific call flow integrating post-order overrides naturally at each step, with QA tips appended as advisory notes.
 
 ## Phase 4.17.0 [4.17.0-stable]
 
@@ -174,6 +180,7 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase 4.16.0-stable /post-orders wizard and conflict preview support in `api/ingest.py` and `api/service.py`.
 - Phase 4.17.0-stable quick reply hints in `openwebui/pipe.py` and living backlog at `docs/FUTURE_PLANS.md`.
 - Patch 4.17.1-stable duplicate Sources footer suppression in `openwebui/pipe.py` and general-query community bleed guard in `api/service.py`.
+- Phase 4.18.0-stable community-aware kiosk call flow synthesis: six primary kiosk SOP vault files enriched with full verbatim call flow scripts and dialogue; new GLEN QA tip in `vault/04_QA_Rules/`; `is_call_flow_query` flag in `rag/query_intent.py`; explicit global SOP fetch block in `rag/scripts/answer_vault.py`; call flow synthesis instructions in `rag/prompts/answer_from_context.md`. Queries such as "kiosk call flow for SR" now return a merged community-specific call flow with post-order overrides integrated at each step and QA tips appended as advisory notes.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -238,7 +245,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-See docs/FUTURE_PLANS.md for the current backlog. Next planned: Phase 4.18.0 — session log automation, or Action Function button UX.
+Next: Patch 4.18.1 — two fixes: (1) GLEN QA tip wording — replace "license plate or RFID tag is already registered in the system" with "visitor already confirmed in SP Guard with active access"; (2) CLI duplicate Sources block — handle bold **Sources:** blocks embedded mid-answer by DeepSeek, in addition to the existing plain Sources: strip logic.
 
 ## Phase 4I-lite Implementation Added
 
