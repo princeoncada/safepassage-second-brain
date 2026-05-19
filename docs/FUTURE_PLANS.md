@@ -5,7 +5,7 @@ Completed items are struck through. Every phase should update this file —
 cross off completed items and add new ideas as they arise.
 
 Last updated: 2026-05-19
-Current stable version: 4.19.0-stable
+Current stable version: 4.20.0-alpha
 
 ---
 
@@ -24,36 +24,11 @@ Current stable version: 4.19.0-stable
 
 ## In Progress
 
-- None
+- Phase 4.20.0 — model preloading + audit log source deduplication
 
 ---
 
 ## Planned
-
-### Phase 4.20.0 — Speed: Model Preloading + Audit Log Deduplication
-
-Priority: Speed (P2)
-
-`SentenceTransformer(MODEL_NAME)` is initialized inside
-`answer_question()` in `answer_vault.py` on every single API request,
-causing the 103-weight load visible on every query. Move to module
-level in both `answer_vault.py` and `query_vault.py` so the model
-loads once at server startup and is cached for all subsequent requests.
-
-Also bundled (from 4.19.0 validation observation):
-- Deduplicate `sources_cited` in `api/audit.py` at the file level.
-  Currently cited_chunks with multiple sections from the same file
-  appear as duplicate paths. Add `list(dict.fromkeys(...))` to
-  produce unique file paths only.
-
-Files to change:
-- rag/scripts/answer_vault.py
-- rag/scripts/query_vault.py
-- api/audit.py (deduplication fix)
-- docs (all four versioning locations + FUTURE_PLANS.md)
-- api/version.py
-
----
 
 ### Phase 4.21.0 — Handoff Readiness
 
