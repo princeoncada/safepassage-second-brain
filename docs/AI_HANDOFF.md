@@ -1,14 +1,41 @@
 # AI Handoff
 
-## Current Version: 4.22.0-alpha
+## Current Version: 4.23.0-alpha
 
 ## Current Phase
 
-Phase 4.22.0 [4.22.0-alpha] - architecture safety: separation of concerns - alpha.
+Phase 4.23.0 [4.23.0-alpha] - developer scalability: retrieval correctness tests - alpha.
 
-## Phase 4.22.0 [4.22.0-alpha]
+## Phase 4.23.0 [4.23.0-alpha]
 
 Status: ALPHA - implemented 2026-05-20, not yet manually validated.
+
+Bug fix:
+- `rag/retrieval.py` now applies `minimum_raw_distance_floor` inside
+  `retrieval_assessment()` before rerank-score confidence checks.
+  This prevents cumulative authority/status/lifecycle rerank boosts from
+  inflating nonsense queries such as "xyzzy unknown community gate
+  protocol" to `strong` confidence when the best raw vector distance is
+  not semantically relevant.
+- `rag/config/retrieval_config.json` defines
+  `minimum_raw_distance_floor: 0.65`.
+
+New files:
+- tests/__init__.py
+- tests/conftest.py
+- tests/test_retrieval_correctness.py
+- tests/test_community_resolution.py
+- tests/test_confidence_thresholds.py
+- .github/workflows/ci.yml
+
+CI:
+- GitHub Actions runs Python syntax checks on the extracted runtime
+  modules and runs unit-only tests that do not require a ChromaDB index
+  or DeepSeek API key.
+
+## Phase 4.22.0 [4.22.0-stable]
+
+Status: VALIDATED and STABLE - committed to master 2026-05-20.
 
 NEW files:
 - rag/retrieval.py: extracted retrieval constants, metadata helpers,
@@ -34,6 +61,25 @@ SOFT VALIDATION:
 - api/ingest.py calls validate_frontmatter() while building new
   slash-command temp batch inputs. Warnings print to stderr only and
   do not abort ingestion.
+
+### Validation Record - 4.22.0-stable
+
+Date: 2026-05-20
+
+All checks passed. Committed to master.
+
+- [x] All 6 new files created and syntax-clean:
+      rag/retrieval.py, rag/context.py, rag/answer.py,
+      rag/vault_schema.py, api/ingest_service.py, api/query_service.py
+- [x] No circular imports - all modules import cleanly
+- [x] answer_vault.py CLI: --no-ai --show-context correct output
+- [x] API /ask RAG query: correct SR post orders returned,
+      behavior unchanged after refactor
+- [x] Slash command routing: /post-orders wizard prompt returned
+      correctly through 26-line thin service.py
+- [x] vault_schema soft validation: valid frontmatter returns warns=[]
+- [x] api/service.py: 26 lines (thin router confirmed)
+- [x] No protected files touched
 
 ## Phase 4.21.0 [4.21.0-stable]
 
@@ -303,6 +349,12 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase UX-1 Open WebUI VA operator shift reference at `openwebui/USAGE_GUIDE.md`.
 - Full virtual community alias table in `rag/config/community_aliases.json`.
 - Phase 4I-lite slash command ingestion handler at `api/ingest.py`.
+- Phase 4.22.0 architecture-safety modules:
+  `rag/retrieval.py`, `rag/context.py`, `rag/answer.py`,
+  `rag/vault_schema.py`, `api/ingest_service.py`, and
+  `api/query_service.py`.
+- Phase 4.23.0 retrieval correctness test suite under `tests/` and
+  GitHub Actions CI workflow at `.github/workflows/ci.yml`.
 - Phase 4I-lite Open WebUI ingest command guide at `openwebui/INGEST_COMMANDS.md`.
 - Phase 4I-lite slash command ingestion in `api/ingest.py` with /post-orders and /announcements commands routed through `api/service.py`.
 - Phase 4I-lite operator guide at `openwebui/INGEST_COMMANDS.md`.
@@ -331,11 +383,15 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase 4.21.0-stable handoff readiness documentation and tooling:
   docs/ARCHITECTURE.md, docs/VAULT_SCHEMA.md, docs/ONBOARDING.md,
   and automation/generate_session_log.py.
-- Phase 4.22.0-alpha architecture safety extraction:
+- Phase 4.22.0-stable architecture safety extraction:
   rag/retrieval.py, rag/context.py, rag/answer.py,
   api/ingest_service.py, api/query_service.py, rag/vault_schema.py;
   api/service.py and rag/scripts/answer_vault.py reduced while
   preserving public imports.
+- Phase 4.23.0-alpha retrieval correctness tests and CI:
+  tests/test_retrieval_correctness.py,
+  tests/test_community_resolution.py,
+  tests/test_confidence_thresholds.py, and .github/workflows/ci.yml.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -400,7 +456,7 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.23.0 - Developer Scalability: Retrieval Correctness Tests.
+Next: Validate Phase 4.23.0 - Retrieval Correctness Tests, then promote to stable if all checks pass.
 
 ## Phase 4I-lite Implementation Added
 
