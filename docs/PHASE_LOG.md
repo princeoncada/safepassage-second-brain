@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.18.0-stable | Phase 4.18.0 | stable | 2026-05-19 | community-aware kiosk call flow synthesis - VALIDATED |
 | 4.17.1-stable | Patch | stable | 2026-05-19 | fix duplicate sources in pipe + community context bleed - VALIDATED |
 | 4.17.0-stable | Phase 4.17.0 | stable | 2026-05-19 | quick reply hints in Open WebUI pipe + FUTURE_PLANS.md - VALIDATED |
 | 4.16.0-stable | Phase 4.16.0 | stable | 2026-05-18 | conflict detection + multi-turn wizard UX for /post-orders - VALIDATED |
@@ -42,6 +43,64 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.18.0 — Community-Aware Kiosk Call Flow Synthesis
+
+Status: PASSED — stable
+
+Version: 4.18.0-stable
+
+Date: 2026-05-19
+
+Purpose:
+
+Enrich the kiosk SOP vault files with full scripts from the training document. Add GLEN registered-tag QA tip. Add is_call_flow_query routing. Add explicit global SOP retrieval for call flow queries. Add call flow synthesis prompt instructions that merge community post orders into the default flow at the step level.
+
+Implementation scope:
+
+- vault/09_SOPs/primary-kiosk-call-flow.md: full call flow script with all 7 steps and dialogue
+- vault/09_SOPs/primary-calling-resident-for-access.md: full resident call script with access and decline paths
+- vault/09_SOPs/primary-leaving-voicemail.md: full voicemail script and after-voicemail steps
+- vault/09_SOPs/primary-deny-entry.md: full denial scripts for res-no-answer and res-not-expecting; deny entry form fields
+- vault/09_SOPs/primary-no-physical-id.md: full no-physical-ID denial script
+- vault/09_SOPs/primary-incomplete-interaction.md: full incomplete interaction notification script
+- vault/04_QA_Rules/the-glen-tamiment-qa-tip-k-registered-tag-access-fullname-only.md: new QA tip file
+- rag/config/query_topics.json: new "kiosk call flow" and "call flow" topics with call_flow: true
+- rag/query_intent.py: is_call_flow_query field in QueryIntent and detect_topic() propagation
+- rag/scripts/answer_vault.py: explicit global SOP fetch block for is_call_flow_query
+- rag/prompts/answer_from_context.md: call flow synthesis section appended
+
+Validation checklist:
+
+- [ ] Syntax OK: rag/query_intent.py
+- [ ] Syntax OK: rag/scripts/answer_vault.py
+- [ ] Syntax OK: rag/prompts/answer_from_context.md
+- [ ] ChromaDB re-index succeeds with higher chunk count (enriched SOP content)
+- [ ] Default call flow query returns full script with dialogue
+- [ ] Sierra Ridge call flow query returns merged flow with 1-hour access modification naturally integrated
+- [ ] GLEN call flow query returns merged flow with registered-tag QA tip in 💡 QA Tips section
+- [ ] Normal SR kiosk post order query (non-call-flow) still works correctly
+- [ ] Normal GLEN post order query (non-call-flow) still works correctly
+- [ ] No regression in denial, voicemail, or physical ID queries
+
+### Validation Record — 4.18.0-stable
+
+Date: 2026-05-19
+
+All checks passed. Committed to master.
+
+- [x] Re-index succeeded: 227 chunks from 114 files (up from 210/113)
+- [x] Default call flow: full 7-step script with dialogue, exceptions block, correct "no community modifications" note
+- [x] Sierra Ridge call flow: 1-hour max integrated naturally at Step 5, physical ID at Step 3, tag rules at Step 6, barrier arm at Step 7, QA Tips section populated
+- [x] GLEN call flow: all GLEN rules integrated at correct steps, registered-tag exception in Step 3 and 💡 QA Tips
+- [x] SR post order listing: clean K/KC grouping, all 8 rules, no call flow contamination
+- [x] GLEN post order listing: Active/Pending grouping intact, QA tip surfacing correctly as advisory
+- [x] Denial script query: correct safe behavior — refused without community, listed per-community rules
+- [x] No physical ID query: correct safe behavior — community-specific rules surfaced
+
+Non-blocking (tracked to Patch 4.18.1):
+- CLI duplicate Sources block: DeepSeek embeds **Sources:** mid-answer for some responses; CLI also prints Sources: separately. Cosmetic only.
+- GLEN QA tip wording: still says "license plate or RFID tag is already registered" — needs update to "visitor already confirmed in SP Guard with active access".
 
 ## Phase 4.17.0 Quick Reply Hints in Open WebUI Pipe + FUTURE_PLANS.md
 
@@ -585,7 +644,7 @@ Non-blocking:
 
 ## Current Phase
 
-PHASE 4.17.0 [4.17.0-stable] QUICK REPLY HINTS IN OPEN WEBUI PIPE + FUTURE_PLANS.md
+PHASE 4.18.0 [4.18.0-stable] COMMUNITY-AWARE KIOSK CALL FLOW SYNTHESIS
 
 ## Overall System Status
 
