@@ -2,6 +2,7 @@
 
 | Version | Phase | State | Date | Summary |
 | --- | --- | --- | --- | --- |
+| 4.21.0-alpha | Phase 4.21.0 | alpha | 2026-05-20 | handoff readiness - architecture diagram, vault schema, onboarding guide, session log automation |
 | 4.20.0-stable | Phase 4.20.0 | stable | 2026-05-19 | model preloading + audit log source deduplication - VALIDATED |
 | 4.19.0-stable | Phase 4.19.0 | stable | 2026-05-19 | operational trust — query/answer audit log - VALIDATED |
 | 4.18.3-stable | Patch | stable | 2026-05-19 | restore clean CLI citation display — match [Source N] format - VALIDATED |
@@ -48,6 +49,62 @@
 | 2.0.0-stable | Phase 2 | stable | 2026-05-17 | minimal POW ingestion |
 
 # Phase Log
+
+## Phase 4.21.0 - Handoff Readiness
+
+Status: alpha
+
+Version: 4.21.0-alpha
+
+Date: 2026-05-20
+
+New files:
+- docs/ARCHITECTURE.md
+- docs/VAULT_SCHEMA.md
+- docs/ONBOARDING.md
+- automation/generate_session_log.py
+
+Purpose:
+
+Make the repository easier to hand off to another engineer or operator
+without changing runtime architecture, retrieval behavior, ingestion
+behavior, vault data, OCR behavior, Open WebUI behavior, or ChromaDB.
+
+Implementation scope:
+- Added a system architecture document covering ingestion, query,
+  dashboard, OCR, authority hierarchy, lifecycle priority, and key
+  config files.
+- Added a vault schema document defining frontmatter fields, document
+  types, authority levels, status values, and retrieval/ingestion
+  effects.
+- Added an onboarding guide for local setup, indexing, API startup,
+  CLI queries, slash-command ingestion, audit review, Open WebUI pipe
+  setup, and rollback.
+- Added a standard-library-only session log draft generator that reads
+  docs/PHASE_LOG.md, extracts phase entries between start and end
+  versions, refuses to overwrite existing output, and never touches
+  vault, ingestion scripts, or ChromaDB.
+
+Validation checklist:
+- [ ] Review docs/ARCHITECTURE.md for accurate ingestion, query,
+      dashboard, OCR, authority, lifecycle, and config coverage
+- [ ] Review docs/VAULT_SCHEMA.md against current vault frontmatter
+      fields and valid document/status/authority values
+- [ ] Review docs/ONBOARDING.md for setup and operator workflow
+      accuracy
+- [ ] Inspect automation/generate_session_log.py for standard-library
+      imports only: argparse, datetime, pathlib, re, sys
+- [ ] Confirm generate_session_log.py supports --date, --session,
+      --version-start, --version-end, and --output
+- [ ] Confirm generate_session_log.py warns and does not overwrite
+      an existing session log
+- [ ] Confirm version string is 4.21.0-alpha in docs/VERSIONING.md,
+      docs/AI_HANDOFF.md, docs/PHASE_LOG.md, README.md, and
+      api/version.py
+- [ ] Confirm docs/FUTURE_PLANS.md moves Phase 4.21.0 to In Progress
+- [ ] Confirm no files under rag/, automation/ingestion/,
+      automation/ocr/, openwebui/, vault/, or workflows/ were changed
+- [ ] Confirm docs/WORKFLOW.md was not changed
 
 ## Phase 4.20.0 — Model Preloading + Audit Log Source Deduplication
 
