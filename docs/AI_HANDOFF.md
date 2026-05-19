@@ -1,10 +1,20 @@
 # AI Handoff
 
-## Current Version: 4.18.0-stable
+## Current Version: 4.18.1-alpha
 
 ## Current Phase
 
-PHASE 4.18.0 [4.18.0-stable] — Community-aware kiosk call flow synthesis — validated and stable.
+Patch 4.18.1 [4.18.1-alpha] — GLEN QA tip wording fix — in progress.
+
+## Patch 4.18.1
+
+Z patch on 4.18.0-stable. One fix:
+
+`vault/04_QA_Rules/the-glen-tamiment-qa-tip-k-registered-tag-access-fullname-only.md`:
+replaced "vehicle's license plate or RFID tag is already registered in
+the system" framing with "visitor already confirmed in SP Guard with
+active access" framing throughout the ## QA Tip and ## When This Applies
+sections.
 
 ## Phase 4.18.0 [4.18.0-stable]
 
