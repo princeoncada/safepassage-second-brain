@@ -309,10 +309,22 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Next: Phase 4.20.0 — eliminate per-query SentenceTransformer weight
-load. SentenceTransformer(MODEL_NAME) is initialized inside
-answer_question() on every request. Move to module level in both
-answer_vault.py and query_vault.py so it loads once at server startup.
+Next immediate: Phase 4.20.0 — model preloading + audit log source
+deduplication.
+
+Full roadmap (in priority order):
+- 4.20.0: Speed — model preloading + audit source dedup
+- 4.21.0: Handoff readiness — architecture diagram, vault schema docs,
+  onboarding guide, session log automation
+- 4.22.0: Architecture safety — separation of concerns (service.py,
+  answer_vault.py), Pydantic metadata models
+- 4.23.0: Developer scalability — retrieval correctness tests, CI pipeline
+
+Two tracked observations from 4.19.0 validation:
+- Duplicate source paths in audit log → fixed in 4.20.0
+  (deduplicate sources_cited at file level in api/audit.py)
+- xyzzy nonsense query returned strong confidence + AI answer →
+  addressed in 4.23.0 (retrieval correctness threshold tests)
 
 ## Phase 4I-lite Implementation Added
 
