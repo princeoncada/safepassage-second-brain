@@ -1,14 +1,15 @@
 # AI Handoff
 
-## Current Version: 4.19.0-alpha
+## Current Version: 4.19.0-stable
 
 ## Current Phase
 
-Phase 4.19.0 [4.19.0-alpha] — operational trust audit log — in progress.
+Phase 4.19.0 [4.19.0-stable] — operational trust audit log — validated
+and stable.
 
-## Phase 4.19.0 [4.19.0-alpha]
+## Phase 4.19.0 [4.19.0-stable]
 
-Status: IN PROGRESS — not yet validated.
+Status: VALIDATED and STABLE — committed to master 2026-05-19.
 
 New files:
 - api/audit.py: write_audit_entry() appends JSON Lines records to
@@ -236,6 +237,14 @@ Patch 2 applied: alias_tokens() regex cap raised from {2,6} to {2,20} in query_i
 - Phase 4.17.0-stable quick reply hints in `openwebui/pipe.py` and living backlog at `docs/FUTURE_PLANS.md`.
 - Patch 4.17.1-stable duplicate Sources footer suppression in `openwebui/pipe.py` and general-query community bleed guard in `api/service.py`.
 - Phase 4.18.0-stable community-aware kiosk call flow synthesis: six primary kiosk SOP vault files enriched with full verbatim call flow scripts and dialogue; new GLEN QA tip in `vault/04_QA_Rules/`; `is_call_flow_query` flag in `rag/query_intent.py`; explicit global SOP fetch block in `rag/scripts/answer_vault.py`; call flow synthesis instructions in `rag/prompts/answer_from_context.md`. Queries such as "kiosk call flow for SR" now return a merged community-specific call flow with post-order overrides integrated at each step and QA tips appended as advisory notes.
+- Phase 4.19.0-stable operational trust audit log: api/audit.py
+  write_audit_entry() appends JSON Lines to logs/query_audit.jsonl on
+  every retrieval query (both /ask and /ask/stream, AI-success and
+  refuse paths). api/version.py holds VAULT_VERSION updated on each
+  version promotion. automation/audit_review.py provides --tail,
+  --community, --date, --confidence, --warnings, --entry, --full
+  filters for compliance review. Audit log silently fails on errors
+  and never interrupts VA queries.
 - Versioning reference at `docs/VERSIONING.md` - read this first for all versioning operations.
 - Operational workflow reference at `docs/WORKFLOW.md` - read this at the start of every session.
 - `docs/WORKFLOW.md` documents that the 3-section format is only for implementation work, not post-validation documentation, session checkpoints, or documentation-only tasks.
@@ -300,7 +309,10 @@ Future AI work should:
 
 ## Recommended Next Step
 
-Current: Phase 4.19.0-alpha in progress. Run validation after Codex completes.
+Next: Phase 4.20.0 — eliminate per-query SentenceTransformer weight
+load. SentenceTransformer(MODEL_NAME) is initialized inside
+answer_question() on every request. Move to module level in both
+answer_vault.py and query_vault.py so it loads once at server startup.
 
 ## Phase 4I-lite Implementation Added
 
